@@ -1,0 +1,74 @@
+# 📰 AI 뉴스 자동 요약 & Notion 저장 파이프라인
+
+매일 아침 최신 AI 뉴스를 자동으로 수집·요약하고, 썸네일과 함께 Notion에 저장하는 자동화 워크플로우입니다.
+
+---
+
+## 🔧 사용 도구
+
+- **Make (Integromat)**: 워크플로우 자동화
+- **Google News RSS**: 뉴스 수집
+- **OpenAI**: 본문 요약 + 썸네일 생성 (DALL-E)
+- **Cloudinary**: 이미지 호스팅
+- **Notion**: 최종 저장소
+- **Google Sheets**: 성공/실패 로깅
+
+---
+
+## ⏰ 트리거
+
+| 항목 | 내용 |
+|------|------|
+| 실행 시각 | 매일 오전 9:00 |
+| 수집 소스 | Google News RSS (AI 키워드) |
+| 수집 건수 | 최신 1건 |
+
+---
+
+## 🔄 워크플로우 (8단계)
+
+1. **RSS 수집** - Google News에서 최신 AI 뉴스 1건
+2. **중복 체크** - GUID 기준으로 기존 저장 여부 확인
+3. **Router 분기** - 신규/중복 분리 처리
+4. **OpenAI 요약** - 본문 요약 생성
+5. **이미지 생성** - DALL-E로 썸네일 생성
+6. **Cloudinary 업로드** - 이미지 호스팅 URL 발급
+7. **Notion 저장** - 제목/요약/URL/발행일/썸네일 저장
+8. **로깅** - Google Sheets에 성공/실패 기록
+
+---
+
+## 🎨 AI 썸네일 생성
+
+| 항목 | 내용 |
+|------|------|
+| 이미지 생성 | OpenAI DALL-E |
+| 이미지 호스팅 | Cloudinary |
+| Notion 저장 | "파일과 미디어" 속성에 URL 첨부 |
+
+> Notion "파일과 미디어"는 외부 URL 방식이라 Cloudinary 경유 필요
+> (기존 Discord 호스팅 → 400 에러 발생으로 Cloudinary 교체)
+
+---
+
+## 🛡️ 안정성 설계
+
+- **중복 방지**: URL 기준 체크
+- **재시도**: 각 단계별 1회 자동 재시도
+- **에러 알림**: Make 자동 이메일 발송 (에러 발생 시에만)
+- **로깅**: 성공 시트 / 실패 시트 분리 운영
+
+---
+
+## ✅ 검증 결과
+
+- Notion DB에 3건 정상 저장 확인
+- 제목 / 요약 / URL / 발행일 / 썸네일 모두 정상
+- 에러 알림 정상 작동 확인
+
+
+기사 수집 노션 : https://app.notion.com/p/388052445cd2805989c0d32e2c1a320a?p=389052445cd28131af33efc0d6742147&pm=s
+
+기사 성공 로그 (중복방지 용도 - 기사생성일/GUID 저장) :https://docs.google.com/spreadsheets/d/1tnV9sKsmuPFYaLmkzmjGcmdAbWsbT125kDNBHRrYV2Q/edit?gid=0#gid=0
+
+기사 실패 로그 (에러 로그) - https://docs.google.com/spreadsheets/d/1XSiqrc62LGbr7amKT9yKZk1MMBy55pDwsny346MVDOE/edit?gid=0#gid=0
