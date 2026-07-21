@@ -129,7 +129,6 @@ print("추천 맛집이 {}개 검색되었습니다.".format(len(restaurants)))
 
 def save_markdown(result, restaurants):
     os.makedirs("results",exist_ok=True)
-python travel_planner.py --date 2026-08-02
     filename = os.path.join(
         "results",
         f"{args.date}_{result['recommended_city']}_travel_plan.md"
