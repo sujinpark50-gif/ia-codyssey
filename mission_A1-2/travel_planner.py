@@ -3,13 +3,22 @@ import os
 import requests
 import json
 
-api_key = os.getenv("OPENAI_API_KEY")
+from dotenv import load_dotenv
+load_dotenv() 
+
+API_URL = "https://api.openai.com/v1/chat/completions"
+API_KEY = os.getenv("OPENAI_API_KEY")
+KAKAO_REST_API_KEY = os.getenv("KAKAO_REST_API_KEY")
+KAKAO_API_URL = os.getenv("KAKAO_LOCAL_API_URL")
 
 headers = {
-    "Authorization": f"Bearer {api_key}",
+    "Authorization": f"Bearer {API_KEY}",
     "Content-Type": "application/json"
 }
 
+kakao_headers = {
+    "Authorization": f"KakaoAK {KAKAO_REST_API_KEY}"
+}
 
 
 from datetime import datetime
@@ -54,7 +63,7 @@ prompt = f"""
 """
 
 request_data = {
-    "model": "gpt-5",
+    "model": "gpt-5.4-mini",
     "messages": [
         {
             "role": "user",
@@ -63,15 +72,98 @@ request_data = {
     ]
 }
 
-response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=request_data)
+response = requests.post(API_URL, 
+           headers=headers, 
+           json=request_data)
+
+response.raise_for_status()
+
 response_data = response.json()
 
 answer = response_data["choices"][0]["message"]["content"]
 result = json.loads(answer)
 
-response.raise_for_status()
 
-print(result["recommended_city"])
-print(result["weather"])
-print(result["events"])
-print(result["reason"])
+
+
+print("추천도시 : " + result["recommended_city"])
+
+
+
+city = result["recommended_city"]
+
+kakao_params = {
+    "query": city + " 맛집",
+    "category_group_code": "FD6",
+    "size": 5,
+    "sort": "accuracy"
+}
+
+place_response = requests.get(
+    KAKAO_API_URL,
+    headers=kakao_headers,
+    params=kakao_params
+)
+
+
+
+place_response.raise_for_status()
+
+place_data = place_response.json()
+restaurants = []
+
+for place in place_data["documents"]:
+    restaurant = {
+        "name": place["place_name"],
+        "address": place["road_address_name"] or place["address_name"],
+        "category": place.get("category_name", ""),
+        "phone": place.get("phone", ""),
+        "url": place["place_url"],
+        "lng": float(place["x"]),
+        "lat": float(place["y"])
+    }
+
+    restaurants.append(restaurant)
+
+print("추천 맛집이 {}개 검색되었습니다.".format(len(restaurants)))
+
+def save_markdown(result, restaurants):
+    os.makedirs("results",exist_ok=True)
+python travel_planner.py --date 2026-08-02
+    filename = os.path.join(
+        "results",
+        f"{args.date}_{result['recommended_city']}_travel_plan.md"
+    )
+
+    with open(filename, "w", encoding="utf-8") as file:
+        file.write("# 여행 추천 결과\n\n")
+
+        file.write("## 추천 여행지\n")
+        file.write(f"{result['recommended_city']}\n\n")
+
+        file.write("## 날씨\n")
+        file.write(f"{result['weather']}\n\n")
+
+        file.write("## 추천 이유\n")
+        file.write(f"{result['reason']}\n\n")
+
+        file.write("## 행사\n")
+        for event in result["events"]:
+            file.write(f"- {event}\n")
+        file.write("\n")
+
+        file.write("## 추천 맛집\n\n")
+
+        for index, restaurant in enumerate(restaurants, start=1):
+            file.write(f"### {index}. {restaurant['name']}\n")
+            file.write(f"- 주소: {restaurant['address']}\n")
+            file.write(f"- 분류: {restaurant['category']}\n")
+            file.write(f"- 전화: {restaurant['phone']}\n")
+            file.write(f"- URL: {restaurant['url']}\n")
+            file.write(f"- 위도: {restaurant['lat']}\n")
+            file.write(f"- 경도: {restaurant['lng']}\n\n")
+
+    print(f"'{filename}' 파일이 저장되었습니다.") 
+
+save_markdown(result, restaurants)
+
