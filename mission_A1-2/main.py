@@ -84,7 +84,7 @@ response_data = response.json()
 answer = response_data["choices"][0]["message"]["content"]
 try:
     # 첫 번째 JSON 변환 시도
-    result = json.loads(content)
+    result = json.loads(answer)
 
 except json.JSONDecodeError:
     print("JSON 변환에 실패했습니다. 한 번 더 요청합니다.")
@@ -222,6 +222,14 @@ def save_markdown(result, restaurants, errors):
         else:
             file.write("## 추천 맛집\n")
             file.write("데이터 없음\n\n")
+
+        file.write("## Errors\n")
+
+        if errors:
+            for error in errors:
+               file.write(f"- {error}\n")
+        else:
+            file.write("- 없음\n")
     print(f"'{filename}' 파일이 저장되었습니다.") 
 
 save_markdown(result, restaurants, errors)
