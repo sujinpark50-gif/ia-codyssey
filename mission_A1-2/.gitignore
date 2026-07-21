@@ -1,0 +1,5 @@
+# API 키
+.env
+
+# 캐시
+__pycache__/
