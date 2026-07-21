@@ -20,6 +20,7 @@ kakao_headers = {
     "Authorization": f"KakaoAK {KAKAO_REST_API_KEY}"
 }
 
+errors = [] 
 
 from datetime import datetime
 
@@ -81,7 +82,58 @@ response.raise_for_status()
 response_data = response.json()
 
 answer = response_data["choices"][0]["message"]["content"]
-result = json.loads(answer)
+try:
+    # 첫 번째 JSON 변환 시도
+    result = json.loads(content)
+
+except json.JSONDecodeError:
+    print("JSON 변환에 실패했습니다. 한 번 더 요청합니다.")
+
+    retry_request_data = request_data.copy()
+    retry_request_data["messages"] = request_data["messages"].copy()
+
+    retry_request_data["messages"].append({
+        "role": "user",
+        "content": """
+            이전 답변을 올바른 JSON 형식으로 다시 출력하세요.
+
+            반드시 다음 키만 포함하세요.
+            - recommended_city
+            - weather
+            - reason
+            - events
+
+            설명, 마크다운 코드 블록, 추가 문장은 작성하지 말고
+            파싱 가능한 JSON 객체만 출력하세요.
+            """
+    })
+
+    try:
+        retry_response = requests.post(
+            OPENAI_API_URL,
+            headers=headers,
+            json=retry_request_data
+        )
+
+        retry_response.raise_for_status()
+
+        retry_content = (
+            retry_response.json()["choices"][0]["message"]["content"]
+        )
+
+        result = json.loads(retry_content)
+
+        errors.append("LLM 응답의 JSON 파싱 실패 후 재요청하여 복구함")
+
+    except (requests.RequestException, KeyError, json.JSONDecodeError) as e:
+        errors.append(f"LLM JSON 재시도 실패: {e}")
+
+        result = {
+            "recommended_city": "데이터 없음",
+            "weather": "데이터 없음",
+            "reason": "데이터 없음",
+            "events": []
+        }
 
 
 
@@ -106,28 +158,33 @@ place_response = requests.get(
 )
 
 
+try:
+    place_response.raise_for_status()
 
-place_response.raise_for_status()
+    place_data = place_response.json()
+    restaurants = []
 
-place_data = place_response.json()
-restaurants = []
+    for place in place_data["documents"]:
+        restaurant = {
+            "name": place["place_name"],
+            "address": place["road_address_name"] or place["address_name"],
+            "category": place.get("category_name", ""),
+            "phone": place.get("phone", ""),
+            "url": place["place_url"],
+            "lng": float(place["x"]),
+            "lat": float(place["y"])
+        }
 
-for place in place_data["documents"]:
-    restaurant = {
-        "name": place["place_name"],
-        "address": place["road_address_name"] or place["address_name"],
-        "category": place.get("category_name", ""),
-        "phone": place.get("phone", ""),
-        "url": place["place_url"],
-        "lng": float(place["x"]),
-        "lat": float(place["y"])
-    }
+        restaurants.append(restaurant)
 
-    restaurants.append(restaurant)
+    print("추천 맛집이 {}개 검색되었습니다.".format(len(restaurants)))
+except Exception as e:
+    restaurants = []
+    errors.append(f"맛집 API 오류: {e}")
+    print("맛집 정보를 가져오지 못했습니다.")
 
-print("추천 맛집이 {}개 검색되었습니다.".format(len(restaurants)))
 
-def save_markdown(result, restaurants):
+def save_markdown(result, restaurants, errors):
     os.makedirs("results",exist_ok=True)
     filename = os.path.join(
         "results",
@@ -151,18 +208,23 @@ def save_markdown(result, restaurants):
             file.write(f"- {event}\n")
         file.write("\n")
 
-        file.write("## 추천 맛집\n\n")
+        if restaurants:
+            file.write("## 추천 맛집\n\n")
 
-        for index, restaurant in enumerate(restaurants, start=1):
-            file.write(f"### {index}. {restaurant['name']}\n")
-            file.write(f"- 주소: {restaurant['address']}\n")
-            file.write(f"- 분류: {restaurant['category']}\n")
-            file.write(f"- 전화: {restaurant['phone']}\n")
-            file.write(f"- URL: {restaurant['url']}\n")
-            file.write(f"- 위도: {restaurant['lat']}\n")
-            file.write(f"- 경도: {restaurant['lng']}\n\n")
-
+            for index, restaurant in enumerate(restaurants, start=1):
+                file.write(f"### {index}. {restaurant['name']}\n")
+                file.write(f"- 주소: {restaurant['address']}\n")
+                file.write(f"- 분류: {restaurant['category']}\n")
+                file.write(f"- 전화: {restaurant['phone']}\n")
+                file.write(f"- URL: {restaurant['url']}\n")
+                file.write(f"- 위도: {restaurant['lat']}\n")
+                file.write(f"- 경도: {restaurant['lng']}\n\n")
+        else:
+            file.write("## 추천 맛집\n")
+            file.write("데이터 없음\n\n")
     print(f"'{filename}' 파일이 저장되었습니다.") 
 
-save_markdown(result, restaurants)
+save_markdown(result, restaurants, errors)
+
+
 
