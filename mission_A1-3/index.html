@@ -904,6 +904,59 @@
     btn.disabled = true;
     // TODO: 베타 신청 폼 백엔드 연결 필요
   }
+  
+  const refineButton = document.getElementById("refine-button");
+  const originalText = document.getElementById("original-text");
+  const resultArea = document.getElementById("result-area");
+  const resultText = document.getElementById("result-text");
+  const errorMessage = document.getElementById("error-message");
+
+  refineButton.addEventListener("click", async function () {
+    const text = originalText.value.trim();
+
+    resultArea.hidden = true;
+    errorMessage.hidden = true;
+
+    if (!text) {
+      errorMessage.textContent = "다듬을 게시글을 입력해 주세요.";
+      errorMessage.hidden = false;
+      return;
+    }
+
+    refineButton.disabled = true;
+    refineButton.textContent = "레피로 다듬는 중...";
+
+    try {
+      const response = await fetch("/api/refine", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          text: text
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "변환에 실패했습니다.");
+      }
+
+      resultText.textContent = data.result;
+      resultArea.hidden = false;
+
+    } catch (error) {
+      errorMessage.textContent = error.message;
+      errorMessage.hidden = false;
+
+    } finally {
+      refineButton.disabled = false;
+      refineButton.textContent = "레피로 다듬기";
+    }
+  });
+
+
 </script>
 
 </body>
