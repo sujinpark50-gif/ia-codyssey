@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>레피(Lepi) — SNS 게시 전 정리 솔루션</title>
+  <meta name="description" content="소상공인이 직접 쓴 글이나 메모를 SNS에 올릴 수 있는 표현으로 정리해주는 게시 전 정리 도구입니다." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;300;400&display=swap" rel="stylesheet" />
+  <style>
+    /* ── CSS Variables (shadcn/ui pattern) ── */
+    :root {
+      --bg: #eae8e3;
+      --fg: #22211d;
+      --muted: #86847d;
+      --border: #d9d7d0;
+      --accent: #a49e93;
+      --serif: 'Noto Serif KR', 'Apple SD Gothic Neo', serif;
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                   'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Layout ── */
+    .container { max-width: 1120px; margin: 0 auto; padding: 0 32px; }
+    section { padding: 120px 0; border-bottom: 1px solid var(--border); }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(250,250,250,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 20px 0;
+    }
+    nav .container { display: flex; justify-content: space-between; align-items: center; }
+    .logo {
+      font-size: 14px; font-weight: 500;
+      letter-spacing: 0.12em; text-transform: uppercase;
+    }
+    .logo-dot { color: var(--accent); }
+    .nav-right { display: flex; align-items: center; gap: 32px; }
+    .nav-link {
+      font-size: 11px; font-weight: 500; color: var(--muted);
+      text-decoration: none; letter-spacing: 0.15em; text-transform: uppercase;
+      transition: color 0.3s ease;
+    }
+    .nav-link:hover { color: var(--fg); }
+    .nav-cta {
+      font-size: 10px; font-weight: 500; color: var(--fg);
+      text-decoration: none; letter-spacing: 0.12em; text-transform: uppercase;
+      padding: 7px 16px; border: 1px solid var(--fg);
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+    .nav-cta:hover { background: var(--fg); color: var(--bg); }
+
+    /* ── Section Label (FeaturedSpotlight 패턴) ── */
+    .sl {
+      display: flex; align-items: center; gap: 16px;
+      margin-bottom: 48px; cursor: default;
+    }
+    .sl-line {
+      height: 1px; background: var(--fg); width: 32px;
+      transition: width 0.7s var(--ease);
+    }
+    .sl:hover .sl-line { width: 48px; }
+    .sl-text {
+      font-size: 10px; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.25em; color: var(--fg);
+      transition: letter-spacing 0.7s var(--ease);
+    }
+    .sl:hover .sl-text { letter-spacing: 0.32em; }
+    .sl-num {
+      margin-left: auto;
+      font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+      font-size: 11px; color: var(--muted);
+    }
+
+    /* ── Section Heading ── */
+    .sh {
+      font-family: var(--serif);
+      font-size: clamp(29px, 4.6vw, 56px);
+      font-weight: 300; line-height: 1.28;
+      letter-spacing: -0.015em; color: var(--fg);
+      margin-bottom: 64px; max-width: 680px;
+    }
+
+    /* ── Arrow Button (FeaturedSpotlight CTA pattern) ── */
+    .arr-btn {
+      display: inline-flex; align-items: center; gap: 14px;
+      text-decoration: none; cursor: pointer;
+      background: none; border: none; font-family: inherit; padding: 0;
+    }
+    .arr-circle {
+      width: 44px; height: 44px; border-radius: 50%;
+      border: 1px solid var(--fg);
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.5s var(--ease), box-shadow 0.5s var(--ease);
+      flex-shrink: 0;
+    }
+    .arr-circle svg {
+      stroke: var(--fg);
+      transition: stroke 0.5s var(--ease), transform 0.5s var(--ease);
+    }
+    .arr-btn:hover .arr-circle { background: var(--fg); box-shadow: 0 8px 32px rgba(10,10,10,0.15); }
+    .arr-btn:hover .arr-circle svg { stroke: var(--bg); transform: rotate(45deg); }
+    .arr-label {
+      font-size: 10px; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.2em; color: var(--fg);
+      transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
+      opacity: 0.5; transform: translateX(-8px);
+    }
+    .arr-btn:hover .arr-label { opacity: 1; transform: translateX(0); }
+
+    .arr-btn.ghost .arr-circle { border-color: var(--border); }
+    .arr-btn.ghost .arr-circle svg { stroke: var(--fg); }
+    .arr-btn.ghost:hover .arr-circle { background: var(--fg); border-color: var(--fg); }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 90vh;
+      display: flex; align-items: center;
+      padding: 80px 0;
+    }
+    .hero-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 80px; align-items: end; width: 100%;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-size: 10px; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.2em; color: var(--muted);
+      margin-bottom: 40px;
+    }
+    .badge-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent);
+      animation: blink 2.6s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+    .hero-h1 {
+      font-family: var(--serif);
+      font-size: clamp(42px, 6.6vw, 84px);
+      font-weight: 300; line-height: 1.16;
+      letter-spacing: -0.02em; margin-bottom: 24px;
+    }
+    .hero-h1 em { font-style: normal; display: block; }
+    .hero-h1 .indent { padding-left: 0.2em; }
+    .hero-promise {
+      font-family: var(--serif);
+      font-size: clamp(19px, 2.5vw, 29px);
+      font-weight: 400; line-height: 1.45;
+      letter-spacing: -0.01em; color: var(--fg);
+      max-width: 460px; margin-bottom: 30px;
+    }
+    .hero-promise b { font-weight: 500; }
+    .hero-sub {
+      font-size: 15px; color: var(--muted);
+      line-height: 1.8; max-width: 380px; margin-bottom: 48px;
+    }
+    .hero-btns { display: flex; gap: 20px; flex-wrap: wrap; }
+    /* hero right */
+    .hero-right { display: flex; flex-direction: column; gap: 0; }
+    .hero-stat {
+      padding: 24px 0;
+      border-top: 1px solid var(--border);
+    }
+    .hero-stat:last-of-type { border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+    .stat-label {
+      font-size: 10px; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.2em; color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .stat-val { font-size: 14px; color: var(--fg); }
+    .hero-note { font-size: 11px; color: var(--muted); letter-spacing: 0.05em; }
+
+    /* ── PROBLEM ── */
+    .prob-list { display: flex; flex-direction: column; }
+    .prob-row {
+      display: grid; grid-template-columns: 48px 1fr 32px;
+      gap: 32px; align-items: start;
+      padding: 28px 0;
+      border-top: 1px solid var(--border);
+      cursor: default;
+    }
+    .prob-row:last-child { border-bottom: 1px solid var(--border); }
+    .prob-n {
+      font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+      font-size: 11px; color: var(--muted);
+      padding-top: 3px;
+      transition: color 0.5s var(--ease);
+    }
+    .prob-row:hover .prob-n { color: var(--fg); }
+    .prob-title {
+      font-size: 17px; font-weight: 400; margin-bottom: 6px;
+      transition: transform 0.5s var(--ease);
+    }
+    .prob-row:hover .prob-title { transform: translateX(8px); }
+    .prob-desc {
+      font-size: 14px; color: var(--muted); line-height: 1.7;
+      transition: transform 0.5s var(--ease), color 0.5s var(--ease);
+    }
+    .prob-row:hover .prob-desc { transform: translateX(8px); color: #525252; }
+    .prob-em {
+      padding-top: 2px;
+      color: var(--fg);
+      opacity: 0.38;
+      transition: transform 0.5s var(--ease), opacity 0.5s var(--ease);
+    }
+    .mono-icon {
+      display: block;
+      width: 22px;
+      height: 22px;
+      color: currentColor;
+      stroke: currentColor;
+      stroke-width: 1.45;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+    .prob-row:hover .prob-em { transform: translateY(-4px); opacity: 1; }
+    .prob-callout {
+      margin-top: 56px; padding: 28px 32px;
+      border: 1px solid var(--fg);
+      font-size: 15px; line-height: 1.75; max-width: 620px;
+    }
+
+    /* ── SOLUTION ── */
+    .sol-steps { max-width: 720px; }
+    .sol-step {
+      display: grid; grid-template-columns: 48px 1fr;
+      gap: 32px; padding: 28px 0;
+      border-top: 1px solid var(--border);
+    }
+    .sol-step:last-of-type { border-bottom: 1px solid var(--border); }
+    .sol-n {
+      font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+      font-size: 11px; color: var(--muted); padding-top: 3px;
+    }
+    .sol-title { font-size: 17px; font-weight: 400; margin-bottom: 6px; }
+    .sol-desc { font-size: 14px; color: var(--muted); line-height: 1.7; }
+    .sol-note {
+      margin-top: 48px; padding: 20px 28px;
+      border-left: 2px solid var(--fg);
+      font-size: 14px; color: var(--muted); line-height: 1.8;
+      max-width: 580px;
+    }
+    .sol-note strong { color: var(--fg); font-weight: 500; }
+
+    /* ── FEATURES ── */
+    .feat-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1px; background: var(--border);
+      border: 1px solid var(--border);
+    }
+    .feat-card {
+      background: var(--bg); padding: 36px 28px;
+      position: relative; overflow: hidden;
+      transition: background 0.4s ease;
+    }
+    .feat-card:hover { background: #f2f2f2; }
+    /* corner lines — FeaturedSpotlight style */
+    .feat-card::before { /* top-left H */
+      content: '';
+      position: absolute; left: 16px; top: 16px;
+      width: 0; height: 1px; background: var(--fg);
+      transition: width 0.4s var(--ease) 0.05s;
+    }
+    .feat-card::after { /* top-left V */
+      content: '';
+      position: absolute; left: 16px; top: 16px;
+      width: 1px; height: 0; background: var(--fg);
+      transition: height 0.4s var(--ease) 0.1s;
+    }
+    .feat-card:hover::before { width: 20px; }
+    .feat-card:hover::after { height: 20px; }
+    .feat-icon { width: 24px; height: 24px; margin-bottom: 20px; color: var(--fg); opacity: 0.72; }
+    .feat-title { font-size: 15px; font-weight: 500; margin-bottom: 10px; }
+    .feat-desc { font-size: 13px; color: var(--muted); line-height: 1.7; }
+    .feat-tag {
+      display: inline-block; margin-top: 18px;
+      font-size: 9px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.12em;
+      padding: 4px 10px; border: 1px solid;
+    }
+    .tag-live { border-color: var(--fg); color: var(--fg); }
+    .tag-soon { border-color: var(--border); color: var(--muted); }
+
+    /* ── FAQ ── */
+    .faq-list { max-width: 720px; }
+    .faq-item { border-top: 1px solid var(--border); }
+    .faq-item:last-child { border-bottom: 1px solid var(--border); }
+    .faq-btn {
+      width: 100%; text-align: left; background: none; border: none;
+      cursor: pointer; font-family: inherit; padding: 26px 0;
+      display: grid; grid-template-columns: 48px 1fr 20px;
+      gap: 24px; align-items: center;
+    }
+    .faq-btn:hover .faq-q-text { transform: translateX(4px); }
+    .faq-n {
+      font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+      font-size: 11px; color: var(--muted);
+    }
+    .faq-q-text {
+      font-size: 16px; font-weight: 400; color: var(--fg);
+      transition: transform 0.4s var(--ease);
+    }
+    .faq-chev {
+      width: 16px; height: 16px; color: var(--muted);
+      transition: transform 0.4s var(--ease);
+      flex-shrink: 0;
+    }
+    .faq-item.open .faq-chev { transform: rotate(180deg); }
+    .faq-body { max-height: 0; overflow: hidden; transition: max-height 0.4s var(--ease); }
+    .faq-item.open .faq-body { max-height: 360px; }
+    .faq-body-inner {
+      padding: 0 0 26px 72px;
+      font-size: 14px; color: var(--muted); line-height: 1.8;
+    }
+
+    /* ── CTA ── */
+    #cta {
+      background: var(--fg); color: var(--bg);
+      border-bottom: none;
+    }
+    #cta .sl-line { background: rgba(250,250,250,0.3); }
+    #cta .sl-text { color: rgba(250,250,250,0.4); }
+    #cta .sl-num  { color: rgba(250,250,250,0.2); }
+    .cta-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 80px; align-items: start;
+    }
+    .cta-h {
+      font-family: var(--serif);
+      font-size: clamp(26px, 3.8vw, 46px);
+      font-weight: 300; line-height: 1.24;
+      letter-spacing: -0.015em; color: var(--bg);
+      margin-bottom: 20px;
+    }
+    .cta-sub { font-size: 14px; color: rgba(250,250,250,0.45); line-height: 1.8; }
+
+    /* form — underline only */
+    .fg { margin-bottom: 20px; }
+    .fl {
+      display: block; font-size: 10px; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.15em;
+      color: rgba(250,250,250,0.35); margin-bottom: 8px;
+    }
+    .fl .req { color: rgba(250,250,250,0.2); }
+    .fi, .fs, .ft {
+      width: 100%; background: transparent; border: none;
+      border-bottom: 1px solid rgba(250,250,250,0.15);
+      color: var(--bg); font-family: inherit; font-size: 15px;
+      padding: 10px 0; outline: none;
+      transition: border-color 0.3s ease;
+    }
+    .fi:focus, .fs:focus, .ft:focus { border-bottom-color: rgba(250,250,250,0.6); }
+    .fi::placeholder, .ft::placeholder { color: rgba(250,250,250,0.18); }
+    .fs option { background: var(--fg); color: var(--bg); }
+    .ft { resize: none; min-height: 56px; }
+    .fc-wrap {
+      display: flex; gap: 12px; align-items: flex-start;
+      padding: 16px 0;
+      border-top: 1px solid rgba(250,250,250,0.08);
+      margin-top: 4px; margin-bottom: 28px;
+    }
+    .fc { width: auto; flex-shrink: 0; margin-top: 2px; }
+    .fc-label { font-size: 12px; color: rgba(250,250,250,0.3); line-height: 1.65; }
+
+    /* submit button — arr-btn inverted */
+    .submit-btn {
+      display: inline-flex; align-items: center; gap: 14px;
+      background: none; border: none; font-family: inherit;
+      cursor: pointer; padding: 0;
+    }
+    .submit-btn:disabled { opacity: 0.4; cursor: default; pointer-events: none; }
+    .submit-circle {
+      width: 44px; height: 44px; border-radius: 50%;
+      border: 1px solid rgba(250,250,250,0.3);
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.5s var(--ease), border-color 0.5s var(--ease), box-shadow 0.5s var(--ease);
+    }
+    .submit-circle svg { stroke: var(--bg); transition: transform 0.5s var(--ease); }
+    .submit-btn:not(:disabled):hover .submit-circle {
+      background: var(--bg); border-color: var(--bg);
+      box-shadow: 0 8px 32px rgba(250,250,250,0.1);
+    }
+    .submit-btn:not(:disabled):hover .submit-circle svg { stroke: var(--fg); transform: rotate(45deg); }
+    .submit-label {
+      font-size: 10px; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.2em; color: var(--bg);
+      opacity: 0.5; transform: translateX(-8px);
+      transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
+    }
+    .submit-btn:not(:disabled):hover .submit-label { opacity: 1; transform: translateX(0); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--fg);
+      border-top: 1px solid rgba(250,250,250,0.06);
+      padding: 36px 0;
+    }
+    .foot-inner {
+      display: flex; gap: 48px;
+      justify-content: space-between; align-items: flex-start;
+    }
+    .foot-logo {
+      font-size: 13px; font-weight: 500;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: rgba(250,250,250,0.4); white-space: nowrap;
+    }
+    .foot-logo span { color: var(--accent); }
+    .foot-disc { font-size: 12px; color: rgba(250,250,250,0.25); line-height: 1.75; }
+    .foot-disc p + p { margin-top: 6px; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .hero-grid { grid-template-columns: 1fr; gap: 48px; }
+      .hero-right { display: none; }
+      .feat-grid { grid-template-columns: 1fr 1fr; }
+      .cta-grid { grid-template-columns: 1fr; gap: 48px; }
+      .foot-inner { flex-direction: column; gap: 20px; }
+      .prob-row { grid-template-columns: 40px 1fr; }
+      .prob-em { display: none; }
+    }
+    @media (max-width: 600px) {
+      .container { padding: 0 20px; }
+      section { padding: 80px 0; }
+      #hero { min-height: auto; padding: 60px 0; }
+      .feat-grid { grid-template-columns: 1fr; }
+      .faq-btn { grid-template-columns: 36px 1fr 18px; gap: 14px; }
+      .faq-body-inner { padding-left: 50px; }
+      nav .nav-link { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="container">
+    <div class="logo">Lepi<span class="logo-dot">.</span></div>
+    <div class="nav-right">
+      <a href="#faq" class="nav-link">FAQ</a>
+      <a href="#cta" class="nav-cta">무료 베타 신청</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="container">
+    <div class="hero-grid">
+      <div>
+        <div class="hero-badge">
+          <span class="badge-dot"></span>
+          무료 베타 운영 중
+        </div>
+        <h1 class="hero-h1">
+          <em>쓰긴 썼는데,</em>
+          <em class="indent">차마 못 올린 글.</em>
+        </h1>
+        <p class="hero-promise">그 마지막 한 줄, <b>레피가 올릴 수 있게 다듬어드려요.</b></p>
+        <p class="hero-sub">
+          가격도 날짜도 그대로 두고, 표현과 흐름만 살며시.
+          망설이던 그 글을, 오늘은 올릴 수 있도록.
+        </p>
+        <div class="hero-btns">
+          <a href="#cta" class="arr-btn">
+            <div class="arr-circle">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+            </div>
+            <span class="arr-label">무료 베타 신청하기</span>
+          </a>
+          <a href="#cta" class="arr-btn ghost">
+            <div class="arr-circle">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+            </div>
+            <span class="arr-label">내 게시글로 테스트</span>
+          </a>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="hero-stat">
+          <div class="stat-label">무엇을 하나요</div>
+          <div class="stat-val">올리기 직전의 글을 다듬어요</div>
+        </div>
+        <div class="hero-stat">
+          <div class="stat-label">누구를 위해</div>
+          <div class="stat-val">혼자 SNS까지 챙기는 사장님</div>
+        </div>
+        <div class="hero-stat">
+          <div class="stat-label">지금은</div>
+          <div class="stat-val">무료 베타, 조용히 초대하는 중</div>
+        </div>
+        <p class="hero-note">AI를 몰라도 괜찮아요 &nbsp;·&nbsp; 쓰던 그대로 넣기만 하면 돼요</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section id="problem">
+  <div class="container">
+    <div class="sl">
+      <div class="sl-line"></div>
+      <span class="sl-text">문제</span>
+      <span class="sl-num">01</span>
+    </div>
+    <h2 class="sh">다 써놓고도,<br>'올리기' 앞에서 멈춰요.</h2>
+    <div class="prob-list">
+      <div class="prob-row">
+        <div class="prob-n">01</div>
+        <div>
+          <div class="prob-title">손이 열 개라도 모자라요</div>
+          <div class="prob-desc">판매하고 응대하고 예약 받다 보면, 글 한 줄 다듬을 틈이 없어요.</div>
+        </div>
+        <div class="prob-em"><svg class="mono-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"></circle><path d="M12 7v5l3 2"></path></svg></div>
+      </div>
+      <div class="prob-row">
+        <div class="prob-n">02</div>
+        <div>
+          <div class="prob-title">AI는 또 따로 배워야 하더라고요</div>
+          <div class="prob-desc">열어봐도 매번 프롬프트를 새로 쓰고, 원하는 말투를 일일이 설명해야 해요.</div>
+        </div>
+        <div class="prob-em"><svg class="mono-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M8 14c-1.4-1.1-2.2-2.8-2.2-4.6A6.2 6.2 0 0 1 12 3.2a6.2 6.2 0 0 1 6.2 6.2c0 1.8-.8 3.5-2.2 4.6-.7.6-1 1.2-1 2H9c0-.8-.3-1.4-1-2Z"></path></svg></div>
+      </div>
+      <div class="prob-row">
+        <div class="prob-n">03</div>
+        <div>
+          <div class="prob-title">결국 다시 읽어보게 돼요</div>
+          <div class="prob-desc">맞게 썼는지, 너무 광고 같진 않은지, 다시 읽고 고민하는 몫이 남아요.</div>
+        </div>
+        <div class="prob-em"><svg class="mono-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="5.5"></circle><path d="M15 15l4 4"></path><path d="M10.5 8v5"></path><path d="M8 10.5h5"></path></svg></div>
+      </div>
+      <div class="prob-row">
+        <div class="prob-n">04</div>
+        <div>
+          <div class="prob-title">옮겨 붙이다 흐름이 끊겨요</div>
+          <div class="prob-desc">여기서 쓰고 저기서 다듬고 또 옮겨 붙이다, 어느새 손을 놓게 돼요.</div>
+        </div>
+        <div class="prob-em"><svg class="mono-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="4" width="10" height="16" rx="1.6"></rect><path d="M9.5 8h5"></path><path d="M9.5 12h5"></path><path d="M9.5 16h3"></path></svg></div>
+      </div>
+      <div class="prob-row">
+        <div class="prob-n">05</div>
+        <div>
+          <div class="prob-title">그러다 임시저장함에 잠들어요</div>
+          <div class="prob-desc">올리려던 글이 메모장에, 임시저장함에 그대로 남아버려요.</div>
+        </div>
+        <div class="prob-em"><svg class="mono-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h9l3 3v13H6z"></path><path d="M15 4v4h4"></path><path d="M9 14h6"></path></svg></div>
+      </div>
+    </div>
+    <div class="prob-callout">
+      레피가 보는 건 아이디어가 부족한 게 아니에요.<br>
+      올릴 수 있는 문장이 되기까지, 그 <strong>마지막 한 걸음의 무게</strong>예요.
+    </div>
+  </div>
+</section>
+
+<!-- SOLUTION -->
+<section id="solution">
+  <div class="container">
+    <div class="sl">
+      <div class="sl-line"></div>
+      <span class="sl-text">해결</span>
+      <span class="sl-num">02</span>
+    </div>
+    <h2 class="sh">당신이 쓴 그대로,<br>올릴 수 있게만 다듬어요.</h2>
+    <div class="sol-steps">
+      <div class="sol-step">
+        <div class="sol-n">01</div>
+        <div>
+          <div class="sol-title">쓰던 글이나 메모를 그대로 가져와요</div>
+          <p class="sol-desc">대충 적어둔 홍보 메모, 메시지로 보낸 글, 음성으로 남긴 아이디어 — 잘 쓰지 않아도 됩니다.</p>
+        </div>
+      </div>
+      <div class="sol-step">
+        <div class="sol-n">02</div>
+        <div>
+          <div class="sol-title">레피에게 건네요</div>
+          <p class="sol-desc">프롬프트를 입력하거나 AI 사용법을 따로 익힐 필요가 없습니다. 있는 내용을 그대로 넣으면 됩니다.</p>
+        </div>
+      </div>
+      <div class="sol-step">
+        <div class="sol-n">03</div>
+        <div>
+          <div class="sol-title">가격도 날짜도, 사실은 그대로 지켜요</div>
+          <p class="sol-desc">사용자가 입력한 사실 정보를 기준으로 유지합니다. 레피가 바꾸는 것은 표현과 흐름뿐입니다.</p>
+        </div>
+      </div>
+      <div class="sol-step">
+        <div class="sol-n">04</div>
+        <div>
+          <div class="sol-title">표현과 흐름만, 올리기 좋게 다듬어요</div>
+          <p class="sol-desc">너무 딱딱하거나 너무 광고 같지 않게, 업장 분위기에 맞게 다듬어드립니다.</p>
+        </div>
+      </div>
+      <div class="sol-step">
+        <div class="sol-n">05</div>
+        <div>
+          <div class="sol-title">마지막은 언제나 당신이 정해요</div>
+          <p class="sol-desc">최종 게시 전 내용은 사용자가 직접 확인합니다. 레피는 결정을 대신하지 않습니다.</p>
+        </div>
+      </div>
+    </div>
+    <div class="sol-note">
+      <strong>레피는 새 글을 무에서 생성하는 도구가 아닙니다.</strong><br>
+      사용자가 이미 가진 소재를 게시 가능한 표현으로 정리하는 것이 레피의 역할입니다.
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="container">
+    <div class="sl">
+      <div class="sl-line"></div>
+      <span class="sl-text">특징</span>
+      <span class="sl-num">03</span>
+    </div>
+    <h2 class="sh">기능을 자랑하기보다,<br>당신의 하루에 맞췄어요.</h2>
+    <div class="feat-grid">
+      <div class="feat-card">
+        <div class="feat-icon"><svg class="mono-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l4.2-1 10-10a2.1 2.1 0 0 0-3-3l-10 10L4 20z"></path><path d="M13.5 7.5l3 3"></path></svg></div>
+        <div class="feat-title">게시 전 문장 정리</div>
+        <p class="feat-desc">거칠게 쓴 초안이나 메모를 SNS에 올릴 수 있는 문장으로 다듬습니다.</p>
+        <span class="feat-tag tag-live">베타 제공</span>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon"><svg class="mono-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="1.8"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path><path d="M12 14v2"></path></svg></div>
+        <div class="feat-title">핵심 정보 유지</div>
+        <p class="feat-desc">가격, 날짜, 메뉴명, 구성, 예약 조건처럼 틀리면 안 되는 정보는 사용자가 입력한 내용을 기준으로 유지합니다.</p>
+        <span class="feat-tag tag-live">베타 제공</span>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon"><svg class="mono-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 3L5 14h6l-1 7 9-12h-6l0-6z"></path></svg></div>
+        <div class="feat-title">프롬프트 없는 실행</div>
+        <p class="feat-desc">"과하지 않게", "우리 가게 톤으로" — 매번 같은 요청을 길게 입력하지 않아도 됩니다.</p>
+        <span class="feat-tag tag-live">베타 제공</span>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon"><svg class="mono-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 0 1 13.6-5.7"></path><path d="M17.6 6.3H14"></path><path d="M17.6 6.3V2.7"></path><path d="M20 12a8 8 0 0 1-13.6 5.7"></path><path d="M6.4 17.7H10"></path><path d="M6.4 17.7v3.6"></path></svg></div>
+        <div class="feat-title">작업 흐름 안에서 사용</div>
+        <p class="feat-desc">별도 창 이동 없이, 글을 넣고 정리된 결과를 확인하는 흐름이 한 곳에서 이어집니다.</p>
+        <span class="feat-tag tag-live">베타 제공</span>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon"><svg class="mono-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18.5c3-5.8 6.2-8.8 9.4-9"></path><path d="M7 20c4.8-.2 8.6-2.3 11.5-6.5"></path><path d="M15 4c2.8.6 4.7 2.7 5 5.5"></path><path d="M13 9.5c.5-2.4 1.2-4.2 2-5.5"></path></svg></div>
+        <div class="feat-title">브랜드 톤 프로필</div>
+        <p class="feat-desc">사용자의 선택, 수정, 삭제 이력을 바탕으로 업장별 말투와 선호 표현을 쌓아가는 기능을 준비합니다.</p>
+        <span class="feat-tag tag-soon">고도화 예정</span>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon"><svg class="mono-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="4" width="6" height="11" rx="3"></rect><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0"></path><path d="M12 18v3"></path><path d="M9 21h6"></path></svg></div>
+        <div class="feat-title">음성 저장 기반 게시 전환</div>
+        <p class="feat-desc">영업 중 떠오른 홍보 아이디어를 음성으로 남기면, 나중에 게시 가능한 글로 정리하는 흐름을 준비합니다.</p>
+        <span class="feat-tag tag-soon">예정 기능</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="container">
+    <div class="sl">
+      <div class="sl-line"></div>
+      <span class="sl-text">FAQ</span>
+      <span class="sl-num">04</span>
+    </div>
+    <h2 class="sh" style="margin-bottom: 0;">혹시, 이런 게 궁금하셨나요?</h2>
+    <div class="faq-list" style="margin-top: 40px;">
+
+      <div class="faq-item">
+        <button class="faq-btn" aria-expanded="false">
+          <span class="faq-n">01</span>
+          <span class="faq-q-text">레피는 ChatGPT나 Gemini와 무엇이 다른가요?</span>
+          <svg class="faq-chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 8l5 5 5-5"/></svg>
+        </button>
+        <div class="faq-body">
+          <div class="faq-body-inner">ChatGPT나 Gemini도 문장을 바꿀 수 있습니다. 다만 범용 AI는 사용자가 프롬프트를 직접 작성하고, 원하는 톤을 설명하고, 결과를 다시 판단해야 합니다. 레피는 소상공인의 SNS 게시 전 정리 흐름에 맞춰, 사용자가 AI 사용법을 따로 익히지 않아도 작성한 글을 게시 가능한 표현으로 정리하는 데 집중합니다.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-btn" aria-expanded="false">
+          <span class="faq-n">02</span>
+          <span class="faq-q-text">레피가 글을 대신 새로 써주나요?</span>
+          <svg class="faq-chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 8l5 5 5-5"/></svg>
+        </button>
+        <div class="faq-body">
+          <div class="faq-body-inner">레피의 기본 방향은 새 글을 무에서 생성하는 것이 아닙니다. 사용자가 이미 작성한 글이나 메모한 홍보 소재를 바탕으로, 표현과 흐름을 정리하는 것이 레피의 역할입니다.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-btn" aria-expanded="false">
+          <span class="faq-n">03</span>
+          <span class="faq-q-text">어떤 업종에 적합한가요?</span>
+          <svg class="faq-chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 8l5 5 5-5"/></svg>
+        </button>
+        <div class="faq-body">
+          <div class="faq-body-inner">공방, 핸드메이드 판매자, 디저트·카페, 온라인 셀러, 네일샵, 미용실, 꽃집처럼 SNS 게시가 고객 접점에 영향을 주는 소규모 업장에 우선 적합합니다. SNS를 직접 운영하고 있지만 게시 전 표현 정리가 부담스러운 분이라면 업종과 관계없이 써보실 수 있습니다.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-btn" aria-expanded="false">
+          <span class="faq-n">04</span>
+          <span class="faq-q-text">무료인가요? 나중에 유료로 바뀌나요?</span>
+          <svg class="faq-chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 8l5 5 5-5"/></svg>
+        </button>
+        <div class="faq-body">
+          <div class="faq-body-inner">현재는 초기 무료 베타를 기준으로 운영합니다. 기본 게시글 정리 기능을 먼저 사용해보고, 향후 페르소나 커스텀, 업종별 게시 양식, 고급 템플릿 등 프리미엄 기능이 추가될 예정입니다. 요금 전환이 있다면 사전에 공지드립니다.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-btn" aria-expanded="false">
+          <span class="faq-n">05</span>
+          <span class="faq-q-text">레피를 쓰면 매출이 늘어나나요?</span>
+          <svg class="faq-chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 8l5 5 5-5"/></svg>
+        </button>
+        <div class="faq-body">
+          <div class="faq-body-inner">레피는 매출 증가를 보장하지 않습니다. 레피의 목표는 게시 전 문장 정리 부담을 줄이고, 소상공인이 SNS 게시를 더 쉽게 실행할 수 있도록 돕는 것입니다. 실제 매출, 방문, 문의 변화는 업종, 상품, 사진, 지역, 고객 반응 등에 따라 달라질 수 있습니다.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-btn" aria-expanded="false">
+          <span class="faq-n">06</span>
+          <span class="faq-q-text">AI가 잘못된 정보를 만들지는 않나요?</span>
+          <svg class="faq-chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 8l5 5 5-5"/></svg>
+        </button>
+        <div class="faq-body">
+          <div class="faq-body-inner">레피는 사용자가 입력한 가격, 날짜, 메뉴명, 이벤트 조건 같은 핵심 정보를 유지하는 방향으로 설계합니다. 다만 최종 게시 전 사실 정보는 반드시 사용자가 직접 확인해야 합니다.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-btn" aria-expanded="false">
+          <span class="faq-n">07</span>
+          <span class="faq-q-text">내가 쓴 글이나 데이터는 어떻게 처리되나요?</span>
+          <svg class="faq-chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 8l5 5 5-5"/></svg>
+        </button>
+        <div class="faq-body">
+          <div class="faq-body-inner">베타 테스트에서는 원문, 정리 결과, 사용자 수정본, 피드백을 사전 동의 범위 내에서 서비스 개선과 사용성 검증에 활용할 수 있습니다. 수집 항목과 처리 방법은 베타 참여 동의 시 구체적으로 안내드립니다.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <div class="container">
+    <div class="sl">
+      <div class="sl-line"></div>
+      <span class="sl-text">무료 베타</span>
+      <span class="sl-num">05</span>
+    </div>
+    <div class="cta-grid">
+      <div>
+        <h2 class="cta-h">올리려다 접어둔 글,<br>레피에게 먼저 보여주세요.</h2>
+        <p class="cta-sub">망설이던 초안 한두 개면 충분해요. 레피가 어떻게 다듬는지, 부담 없이 먼저 만나보세요.</p>
+      </div>
+      <form id="betaForm" onsubmit="handleSubmit(event)" novalidate>
+        <div class="fg">
+          <label class="fl">이름 또는 닉네임 <span class="req">*</span></label>
+          <input class="fi" type="text" name="name" placeholder="예: 지은 사장님" required />
+        </div>
+        <div class="fg">
+          <label class="fl">업종 <span class="req">*</span></label>
+          <select class="fs" name="category" required>
+            <option value="">업종을 선택해주세요</option>
+            <option value="cafe">카페·디저트</option>
+            <option value="craft">공방·핸드메이드</option>
+            <option value="nail">네일샵·미용실</option>
+            <option value="flower">꽃집</option>
+            <option value="online">온라인 셀러</option>
+            <option value="etc">기타 소규모 업장</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label class="fl">운영 중인 SNS 채널</label>
+          <input class="fi" type="text" name="sns" placeholder="예: 인스타그램, 네이버 블로그" />
+        </div>
+        <div class="fg">
+          <label class="fl">연락 가능한 이메일 <span class="req">*</span></label>
+          <input class="fi" type="email" name="email" placeholder="example@email.com" required />
+        </div>
+        <div class="fg">
+          <label class="fl">최근 올리려다 멈춘 게시글</label>
+          <textarea class="ft" name="post" placeholder="있다면 간단히 적어주세요. (선택)"></textarea>
+        </div>
+        <div class="fc-wrap">
+          <input class="fc" type="checkbox" id="agree" name="agree" required />
+          <label class="fc-label" for="agree">
+            베타 테스트 참여에 동의합니다. 입력한 내용은 서비스 개선과 사용성 검증에 활용될 수 있습니다.
+            <!-- TODO: 개인정보 처리방침 및 베타 참여 동의 링크 연결 필요 -->
+          </label>
+        </div>
+        <button type="submit" class="submit-btn" id="submitBtn">
+          <div class="submit-circle">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+          </div>
+          <span class="submit-label">무료 베타 신청하기</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="foot-inner">
+      <div class="foot-logo">Lepi<span>.</span></div>
+      <div class="foot-disc">
+        <p>레피는 사용자가 입력한 내용을 바탕으로 SNS 게시글 표현을 정리하는 AI 보조 도구이며, 가격·일정·이벤트 조건 등 사실 정보와 최종 게시 여부는 사용자가 직접 확인해야 합니다.</p>
+        <p>베타 기간 중 수집되는 원문, 정리 결과, 수정본, 피드백은 사전 동의 범위 내에서 서비스 개선과 사용성 검증에 활용될 수 있습니다.</p>
+        <!-- TODO: 개인정보 처리방침 및 베타 참여 동의 링크 연결 필요 -->
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('.faq-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var item = btn.closest('.faq-item');
+      var isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(function(el) {
+        el.classList.remove('open');
+        el.querySelector('.faq-btn').setAttribute('aria-expanded', 'false');
+      });
+      if (!isOpen) {
+        item.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    var form = e.target;
+    var name = form.querySelector('[name="name"]').value.trim();
+    var email = form.querySelector('[name="email"]').value.trim();
+    var category = form.querySelector('[name="category"]').value;
+    var agree = form.querySelector('[name="agree"]').checked;
+    if (!name || !email || !category || !agree) {
+      alert('필수 항목을 모두 입력해주세요.');
+      return;
+    }
+    var btn = document.getElementById('submitBtn');
+    btn.querySelector('.submit-label').textContent = '신청 완료. 감사합니다!';
+    btn.disabled = true;
+    // TODO: 베타 신청 폼 백엔드 연결 필요
+  }
+</script>
+
+</body>
+</html>
