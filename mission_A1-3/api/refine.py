@@ -1,11 +1,22 @@
 from http.server import BaseHTTPRequestHandler
 import json
+import os
+
+from openai import OpenAI
+
+
+client = OpenAI(
+    api_key=os.environ.get("OPENAI_API_KEY")
+)
 
 
 class handler(BaseHTTPRequestHandler):
     def do_POST(self):
         try:
-            content_length = int(self.headers.get("Content-Length", 0))
+            content_length = int(
+                self.headers.get("Content-Length", 0)
+            )
+
             request_body = self.rfile.read(content_length)
             request_data = json.loads(request_body)
 
@@ -14,26 +25,71 @@ class handler(BaseHTTPRequestHandler):
             if not original_text:
                 self.send_json(
                     400,
-                    {"error": "변환할 글을 입력해 주세요."}
+                    {
+                        "error": "다듬을 게시글을 입력해 주세요."
+                    }
                 )
                 return
 
-            result = {
-                "result": f"[테스트 변환 결과]\n{original_text}"
-            }
+            if not os.environ.get("OPENAI_API_KEY"):
+                self.send_json(
+                    500,
+                    {
+                        "error": "OpenAI API 키가 설정되지 않았습니다."
+                    }
+                )
+                return
 
-            self.send_json(200, result)
+            response = client.responses.create(
+                model="gpt-5.4",
+                instructions=(
+                    "너는 사용자가 작성한 게시글을 "
+                    "한가지 주제를 중심으로 자연스럽게 다듬는 글쓰기 도우미 레피다. "
+                    "사용자가 입력한 사실, 가격, 날짜, 고유명사, "
+                    "의미는 임의로 변경하지 않는다. "
+                    "새로운 정보를 추가하거나 과장하지 않는다. "
+                    "표현과 문장 흐름만 자연스럽게 다듬는다. "
+                    "설명이나 분석 없이 다듬은 게시글만 출력한다."
+                    "부정적인 표현은 긍정적인 표현으로 바꾸고, "
+                    "모든 내용은 사용자가 입력한 원문을 기반으로 한다."
+                ),
+                input=original_text
+            )
+
+            refined_text = response.output_text.strip()
+
+            if not refined_text:
+                self.send_json(
+                    500,
+                    {
+                        "error": "레피 변환 결과가 비어 있습니다."
+                    }
+                )
+                return
+
+            self.send_json(
+                200,
+                {
+                    "result": refined_text
+                }
+            )
 
         except json.JSONDecodeError:
             self.send_json(
                 400,
-                {"error": "요청 데이터 형식이 올바르지 않습니다."}
+                {
+                    "error": "요청 데이터 형식이 올바르지 않습니다."
+                }
             )
 
-        except Exception:
+        except Exception as error:
+            print("OpenAI API 오류:", error)
+
             self.send_json(
                 500,
-                {"error": "서버에서 오류가 발생했습니다."}
+                {
+                    "error": "게시글을 변환하는 중 오류가 발생했습니다."
+                }
             )
 
     def send_json(self, status_code, data):
@@ -43,7 +99,16 @@ class handler(BaseHTTPRequestHandler):
         ).encode("utf-8")
 
         self.send_response(status_code)
-        self.send_header("Content-Type", "application/json; charset=utf-8")
-        self.send_header("Content-Length", str(len(response_body)))
+
+        self.send_header(
+            "Content-Type",
+            "application/json; charset=utf-8"
+        )
+
+        self.send_header(
+            "Content-Length",
+            str(len(response_body))
+        )
+
         self.end_headers()
         self.wfile.write(response_body)
