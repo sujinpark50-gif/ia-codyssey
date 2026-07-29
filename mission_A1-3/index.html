@@ -329,6 +329,44 @@
       font-size: 14px; color: var(--muted); line-height: 1.8;
     }
 
+    /* ── TEST (LEPI TEST) ── */
+    .test-desc {
+      font-size: 15px; color: var(--muted); line-height: 1.8;
+      max-width: 620px; margin-bottom: 56px;
+    }
+    .test-form { max-width: 720px; }
+    .test-label {
+      display: block; font-size: 10px; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.2em; color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .test-textarea {
+      width: 100%; background: transparent;
+      border: 1px solid var(--border); color: var(--fg);
+      font-family: inherit; font-size: 15px; line-height: 1.7;
+      padding: 20px; resize: vertical; outline: none;
+      transition: border-color 0.3s ease;
+      margin-bottom: 28px;
+    }
+    .test-textarea::placeholder { color: var(--muted); opacity: 0.7; }
+    .test-textarea:focus { border-color: var(--fg); }
+    button.arr-btn:disabled { opacity: 0.4; cursor: default; pointer-events: none; }
+    .test-result {
+      margin-top: 48px; padding: 28px 32px;
+      border: 1px solid var(--fg); max-width: 720px;
+    }
+    .test-result-label {
+      font-size: 10px; font-weight: 500; text-transform: uppercase;
+      letter-spacing: 0.2em; color: var(--muted); margin-bottom: 16px;
+    }
+    .test-result-text {
+      font-size: 15px; line-height: 1.8; color: var(--fg);
+      white-space: pre-wrap;
+    }
+    .test-error {
+      margin-top: 20px; font-size: 14px; color: #9c4a3c; max-width: 720px;
+    }
+
     /* ── CTA ── */
     #cta {
       background: var(--fg); color: var(--bg);
@@ -767,34 +805,38 @@
 <!-- LEPI TEST -->
 <section id="test">
   <div class="container">
-    <div class="test-wrap">
-      <div class="test-heading">
-        <span class="section-label">LEPI TEST</span>
-        <h2>내 게시글로 직접 테스트해보세요.</h2>
-        <p>작성한 글의 내용은 유지하고, 표현과 흐름만 자연스럽게 다듬어드립니다.</p>
-      </div>
-
-      <div class="test-form">
-        <label for="original-text">원문</label>
-
-        <textarea
-          id="original-text"
-          placeholder="다듬고 싶은 게시글을 입력해 주세요."
-          rows="8"
-        ></textarea>
-
-        <button id="refine-button" type="button">
-          레피로 다듬기
-        </button>
-      </div>
-
-      <div id="result-area" class="result-area" hidden>
-        <h3>변환 결과</h3>
-        <div id="result-text"></div>
-      </div>
-
-      <p id="error-message" class="error-message" hidden></p>
+    <div class="sl">
+      <div class="sl-line"></div>
+      <span class="sl-text">직접 체험</span>
+      <span class="sl-num">05</span>
     </div>
+    <h2 class="sh">내 게시글로<br>직접 테스트해보세요.</h2>
+    <p class="test-desc">작성한 글의 내용은 유지하고, 표현과 흐름만 자연스럽게 다듬어드립니다.</p>
+
+    <div class="test-form">
+      <label class="test-label" for="original-text">원문</label>
+
+      <textarea
+        id="original-text"
+        class="test-textarea"
+        placeholder="다듬고 싶은 게시글을 입력해 주세요."
+        rows="8"
+      ></textarea>
+
+      <button id="refine-button" type="button" class="arr-btn">
+        <div class="arr-circle">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+        </div>
+        <span class="arr-label" id="refine-label">레피로 다듬기</span>
+      </button>
+    </div>
+
+    <div id="result-area" class="test-result" hidden>
+      <div class="test-result-label">변환 결과</div>
+      <div id="result-text" class="test-result-text"></div>
+    </div>
+
+    <p id="error-message" class="test-error" hidden></p>
   </div>
 </section>
 
@@ -804,7 +846,7 @@
     <div class="sl">
       <div class="sl-line"></div>
       <span class="sl-text">무료 베타</span>
-      <span class="sl-num">05</span>
+      <span class="sl-num">06</span>
     </div>
     <div class="cta-grid">
       <div>
@@ -932,8 +974,9 @@
         return;
       }
 
+      const refineLabel = document.getElementById("refine-label");
       refineButton.disabled = true;
-      refineButton.textContent = "레피로 다듬는 중...";
+      refineLabel.textContent = "레피로 다듬는 중...";
 
       const controller = new AbortController();
 
@@ -975,7 +1018,7 @@
       } finally {
         clearTimeout(timeout);
         refineButton.disabled = false;
-        refineButton.textContent = "레피로 다듬기";
+        refineLabel.textContent = "레피로 다듬기";
       }
     });
   }
