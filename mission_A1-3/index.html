@@ -935,6 +935,12 @@
       refineButton.disabled = true;
       refineButton.textContent = "레피로 다듬는 중...";
 
+      const controller = new AbortController();
+
+      const timeout = setTimeout(() => {
+       controller.abort();
+      }, 10000); // 10초
+
       try {
         const response = await fetch("/api/refine", {
           method: "POST",
@@ -943,10 +949,12 @@
           },
           body: JSON.stringify({
             text: text
-          })
+          }),
+          signal: controller.signal
         });
 
         const data = await response.json();
+
 
         if (!response.ok) {
           throw new Error(
@@ -959,13 +967,13 @@
 
       } catch (error) {
         console.error("게시글 변환 오류:", error);
-
         errorMessage.textContent =
           error.message || "서버와 연결할 수 없습니다.";
 
         errorMessage.hidden = false;
 
       } finally {
+        clearTimeout(timeout);
         refineButton.disabled = false;
         refineButton.textContent = "레피로 다듬기";
       }
