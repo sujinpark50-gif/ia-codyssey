@@ -911,52 +911,66 @@
   const resultText = document.getElementById("result-text");
   const errorMessage = document.getElementById("error-message");
 
-  refineButton.addEventListener("click", async function () {
-    const text = originalText.value.trim();
+  if (
+    refineButton &&
+    originalText &&
+    resultArea &&
+    resultText &&
+    errorMessage
+  ) {
+    refineButton.addEventListener("click", async function () {
+      const text = originalText.value.trim();
 
-    resultArea.hidden = true;
-    errorMessage.hidden = true;
+      resultArea.hidden = true;
+      errorMessage.hidden = true;
+      errorMessage.textContent = "";
 
-    if (!text) {
-      errorMessage.textContent = "다듬을 게시글을 입력해 주세요.";
-      errorMessage.hidden = false;
-      return;
-    }
-
-    refineButton.disabled = true;
-    refineButton.textContent = "레피로 다듬는 중...";
-
-    try {
-      const response = await fetch("/api/refine", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          text: text
-        })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "변환에 실패했습니다.");
+      if (!text) {
+        errorMessage.textContent = "다듬을 게시글을 입력해 주세요.";
+        errorMessage.hidden = false;
+        originalText.focus();
+        return;
       }
 
-      resultText.textContent = data.result;
-      resultArea.hidden = false;
+      refineButton.disabled = true;
+      refineButton.textContent = "레피로 다듬는 중...";
 
-    } catch (error) {
-      errorMessage.textContent = error.message;
-      errorMessage.hidden = false;
+      try {
+        const response = await fetch("/api/refine", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            text: text
+          })
+        });
 
-    } finally {
-      refineButton.disabled = false;
-      refineButton.textContent = "레피로 다듬기";
-    }
-  });
+        const data = await response.json();
 
+        if (!response.ok) {
+          throw new Error(
+            data.error || "게시글 변환에 실패했습니다."
+          );
+        }
 
+        resultText.textContent = data.result;
+        resultArea.hidden = false;
+
+      } catch (error) {
+        console.error("게시글 변환 오류:", error);
+
+        errorMessage.textContent =
+          error.message || "서버와 연결할 수 없습니다.";
+
+        errorMessage.hidden = false;
+
+      } finally {
+        refineButton.disabled = false;
+        refineButton.textContent = "레피로 다듬기";
+      }
+    });
+  }
 </script>
 
 </body>
