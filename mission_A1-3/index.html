@@ -930,22 +930,66 @@
     });
   });
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
+
     var form = e.target;
+
     var name = form.querySelector('[name="name"]').value.trim();
-    var email = form.querySelector('[name="email"]').value.trim();
     var category = form.querySelector('[name="category"]').value;
+    var sns = form.querySelector('[name="sns"]').value.trim();
+    var email = form.querySelector('[name="email"]').value.trim();
+    var recentPost = form.querySelector('[name="post"]').value.trim();
     var agree = form.querySelector('[name="agree"]').checked;
+
     if (!name || !email || !category || !agree) {
       alert('필수 항목을 모두 입력해주세요.');
       return;
     }
+
     var btn = document.getElementById('submitBtn');
-    btn.querySelector('.submit-label').textContent = '신청 완료. 감사합니다!';
+    var label = btn.querySelector('.submit-label');
+
     btn.disabled = true;
-    // TODO: 베타 신청 폼 백엔드 연결 필요
-  }
+    label.textContent = '신청 중...';
+
+    try {
+      var response = await fetch(
+        "https://lepi2026.app.n8n.cloud/webhook/d8fb407a-3c06-4358-a882-5a150d5672eb",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            name: name,
+            category: category,
+            sns: sns,
+            email: email,
+            recent_post: recentPost,
+            agree: agree
+          })
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("베타 신청 전송 실패");
+      }
+
+      label.textContent = '신청 완료. 감사합니다!';
+      form.reset();
+
+    } catch (error) {
+      console.error("베타 신청 오류:", error);
+
+      alert(
+        '신청을 처리하는 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'
+      );
+
+      label.textContent = '무료 베타 신청하기';
+      btn.disabled = false;
+    }
+}
   
   const refineButton = document.getElementById("refine-button");
   const originalText = document.getElementById("original-text");
