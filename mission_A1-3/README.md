@@ -123,12 +123,12 @@ mission_A1-3/
 └── service_plan.md
 ```
 
--index.html: 랜딩페이지 UI 및 프론트엔드 동작
--api/refine.py: AI 글 다듬기 API
--requirements.txt: Python 패키지 목록
--vercel.json: Vercel 배포 설정
--README.md: 프로젝트 설명
--service_plan.md: 서비스 기획서
+ - index.html: 랜딩페이지 UI 및 프론트엔드 동작
+ - api/refine.py: AI 글 다듬기 API
+ - requirements.txt: Python 패키지 목록
+ - vercel.json: Vercel 배포 설정
+ - README.md: 프로젝트 설명
+ - service_plan.md: 서비스 기획서
 
 
 ## 5. AI 기능 처리 흐름
@@ -235,7 +235,7 @@ Discord 알림
 웹사이트에서 테스트 신청 후 Google Sheets에 신청 정보가 저장되고
 Discord로 신규 신청 알림이 전달되는 것을 확인했습니다.
 
-12. 프로젝트에서 학습한 내용
+## 12. 프로젝트에서 학습한 내용
 
 이 프로젝트를 통해 다음 과정을 직접 구현하고 확인했습니다.
 
