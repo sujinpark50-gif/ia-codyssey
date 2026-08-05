@@ -122,15 +122,15 @@ mission_A1-3/
 ├── README.md
 └── service_plan.md
 ```
-#index.html: 랜딩페이지 UI 및 프론트엔드 동작
-#api/refine.py: AI 글 다듬기 API
-#requirements.txt: Python 패키지 목록
-#vercel.json: Vercel 배포 설정
-#README.md: 프로젝트 설명
-#service_plan.md: 서비스 기획서
+index.html: 랜딩페이지 UI 및 프론트엔드 동작
+api/refine.py: AI 글 다듬기 API
+requirements.txt: Python 패키지 목록
+vercel.json: Vercel 배포 설정
+README.md: 프로젝트 설명
+service_plan.md: 서비스 기획서
 
 
-5. AI 기능 처리 흐름
+## 5. AI 기능 처리 흐름
 사용자 원문 입력
         ↓
 JavaScript fetch 요청
@@ -146,7 +146,7 @@ AI 변환 결과 반환
 프론트엔드에서 API 키를 직접 사용하지 않고
 Vercel Serverless Function을 통해 OpenAI API를 호출하도록 구성했습니다.
 
-6. AI 기능 입력 / 출력 / 실패 처리
+## 6. AI 기능 입력 / 출력 / 실패 처리
 입력
 
 사용자가 직접 작성한 메모 또는 글의 초안
@@ -160,7 +160,9 @@ Vercel Serverless Function을 통해 OpenAI API를 호출하도록 구성했습�
 API 요청 중에는 버튼을 비활성화하여 중복 요청을 방지합니다.
 API 호출에 실패하면 사용자에게 오류 메시지를 표시합니다.
 처리 완료 후 버튼 상태를 복구합니다.
-7. 로컬 실행 방법
+
+
+## 7. 로컬 실행 방법
 
 저장소를 clone 합니다.
 
@@ -178,7 +180,7 @@ AI API를 사용하려면 환경 변수에 OpenAI API 키를 설정해야 합니
 
 로컬 환경에서는 사용 환경에 맞는 방법으로 환경 변수를 설정한 뒤 실행합니다.
 
-8. 환경 변수
+## 8. 환경 변수
 
 필수 환경 변수:
 
@@ -191,7 +193,7 @@ OPENAI_API_KEY를 등록합니다.
 
 API 키가 GitHub 저장소, README, 스크린샷 등에 노출되지 않도록 주의해야 합니다.
 
-9. 배포
+## 9. 배포
 
 서비스는 GitHub 저장소와 Vercel을 연결하여 배포했습니다.
 
@@ -202,7 +204,7 @@ Vercel에서 변경 사항을 반영하여 다시 배포합니다.
 
 <https://ia-codyssey-two.vercel.app/>
 
-10. 반응형 확인
+## 10. 반응형 확인
 
 데스크톱 브라우저와 실제 모바일 기기에서 화면을 직접 확인했습니다.
 
@@ -217,7 +219,7 @@ AI 변환 기능
 
 실제 모바일 기기에서 레이아웃이 깨지지 않고 정상적으로 표시되는 것을 확인했습니다.
 
-11. 운영 자동화
+## 11. 운영 자동화
 
 무료 베타 신청 기능은 n8n을 이용하여 외부 서비스와 연동했습니다.
 
