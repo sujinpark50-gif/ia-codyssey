@@ -5,11 +5,6 @@ import os
 from openai import OpenAI
 
 
-client = OpenAI(
-    api_key=os.environ.get("OPENAI_API_KEY")
-)
-
-
 class handler(BaseHTTPRequestHandler):
     def do_POST(self):
         try:
@@ -31,7 +26,9 @@ class handler(BaseHTTPRequestHandler):
                 )
                 return
 
-            if not os.environ.get("OPENAI_API_KEY"):
+            api_key = os.environ.get("OPENAI_API_KEY")
+
+            if not api_key:
                 self.send_json(
                     500,
                     {
@@ -39,6 +36,8 @@ class handler(BaseHTTPRequestHandler):
                     }
                 )
                 return
+
+            client = OpenAI(api_key=api_key)
 
             response = client.responses.create(
                 model="gpt-5.4",

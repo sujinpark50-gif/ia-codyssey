@@ -16,6 +16,7 @@
       --muted: #86847d;
       --border: #d9d7d0;
       --accent: #a49e93;
+      --gold: #c9a463;
       --serif: 'Noto Serif KR', 'Apple SD Gothic Neo', serif;
       --ease: cubic-bezier(0.16, 1, 0.3, 1);
     }
@@ -407,6 +408,9 @@
     .fi::placeholder, .ft::placeholder { color: rgba(250,250,250,0.18); }
     .fs option { background: var(--fg); color: var(--bg); }
     .ft { resize: none; min-height: 56px; }
+    .fi:disabled, .fs:disabled, .ft:disabled {
+      opacity: 0.55; cursor: default; border-bottom-color: rgba(250,250,250,0.08);
+    }
     .fc-wrap {
       display: flex; gap: 12px; align-items: flex-start;
       padding: 16px 0;
@@ -415,21 +419,24 @@
     }
     .fc { width: auto; flex-shrink: 0; margin-top: 2px; }
     .fc-label { font-size: 12px; color: rgba(250,250,250,0.3); line-height: 1.65; }
+    .fc:disabled ~ .fc-label { opacity: 0.55; }
 
     /* submit button — arr-btn inverted */
     .submit-btn {
       display: inline-flex; align-items: center; gap: 14px;
       background: none; border: none; font-family: inherit;
       cursor: pointer; padding: 0;
+      transition: opacity 0.6s var(--ease);
     }
-    .submit-btn:disabled { opacity: 0.4; cursor: default; pointer-events: none; }
+    .submit-btn:disabled { cursor: default; pointer-events: none; }
+    .submit-btn:disabled:not(.success) { opacity: 0.4; }
     .submit-circle {
       width: 44px; height: 44px; border-radius: 50%;
       border: 1px solid rgba(250,250,250,0.3);
       display: flex; align-items: center; justify-content: center;
       transition: background 0.5s var(--ease), border-color 0.5s var(--ease), box-shadow 0.5s var(--ease);
     }
-    .submit-circle svg { stroke: var(--bg); transition: transform 0.5s var(--ease); }
+    .submit-circle svg { stroke: var(--bg); transition: transform 0.5s var(--ease), stroke 0.5s var(--ease); }
     .submit-btn:not(:disabled):hover .submit-circle {
       background: var(--bg); border-color: var(--bg);
       box-shadow: 0 8px 32px rgba(250,250,250,0.1);
@@ -439,9 +446,25 @@
       font-size: 10px; font-weight: 500;
       text-transform: uppercase; letter-spacing: 0.2em; color: var(--bg);
       opacity: 0.5; transform: translateX(-8px);
-      transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
+      transition: opacity 0.5s var(--ease), transform 0.5s var(--ease), color 0.5s var(--ease);
     }
     .submit-btn:not(:disabled):hover .submit-label { opacity: 1; transform: translateX(0); }
+
+    /* success micro-interaction */
+    @keyframes submitPop {
+      0% { transform: scale(1); }
+      45% { transform: scale(1.18); }
+      100% { transform: scale(1); }
+    }
+    .submit-btn.success .submit-circle {
+      background: var(--gold); border-color: var(--gold);
+      box-shadow: 0 8px 32px rgba(201,164,99,0.35);
+      animation: submitPop 0.6s var(--ease);
+    }
+    .submit-btn.success .submit-circle svg { stroke: var(--fg); }
+    .submit-btn.success .submit-label {
+      color: var(--gold); opacity: 1; transform: translateX(0);
+    }
 
     /* ── FOOTER ── */
     footer {
@@ -977,7 +1000,12 @@
       }
 
       label.textContent = '신청 완료. 감사합니다!';
-      form.reset();
+      btn.querySelector('.submit-circle').innerHTML =
+        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+      btn.classList.add('success');
+      form.querySelectorAll('input, select, textarea').forEach(function (el) {
+        el.disabled = true;
+      });
 
     } catch (error) {
       console.error("베타 신청 오류:", error);
@@ -989,7 +1017,7 @@
       label.textContent = '무료 베타 신청하기';
       btn.disabled = false;
     }
-}
+  }
   
   const refineButton = document.getElementById("refine-button");
   const originalText = document.getElementById("original-text");
