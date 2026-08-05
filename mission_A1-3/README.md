@@ -133,30 +133,40 @@ mission_A1-3/
 
 ## 5. AI 기능 처리 흐름
 사용자 원문 입력
+
         ↓
+
 JavaScript fetch 요청
+
         ↓
+
 Vercel Serverless Function
+
         ↓
+
 OpenAI API
+
         ↓
+
 AI 변환 결과 반환
+
         ↓
+
 웹페이지에 결과 표시
 
 프론트엔드에서 API 키를 직접 사용하지 않고
 Vercel Serverless Function을 통해 OpenAI API를 호출하도록 구성했습니다.
 
 ## 6. AI 기능 입력 / 출력 / 실패 처리
-입력
+ - 입력
 
 사용자가 직접 작성한 메모 또는 글의 초안
 
-출력
+ - 출력
 
 원문의 의미와 사실관계를 유지하면서 자연스럽게 다듬어진 글
 
-실패 처리
+ - 실패 처리
 입력값이 비어 있으면 사용자에게 입력 안내 메시지를 표시합니다.
 API 요청 중에는 버튼을 비활성화하여 중복 요청을 방지합니다.
 API 호출에 실패하면 사용자에게 오류 메시지를 표시합니다.
@@ -196,10 +206,9 @@ API 키가 GitHub 저장소, README, 스크린샷 등에 노출되지 않도록 
 
 ## 9. 배포
 
-서비스는 GitHub 저장소와 Vercel을 연결하여 배포했습니다.
+ - 서비스는 GitHub 저장소와 Vercel을 연결하여 배포했습니다.
 
-GitHub의 main 브랜치에 변경 사항을 push하면
-Vercel에서 변경 사항을 반영하여 다시 배포합니다.
+ - GitHub의 main 브랜치에 변경 사항을 push하면 Vercel에서 변경 사항을 반영하여 다시 배포합니다.
 
 배포 URL
 
@@ -211,12 +220,13 @@ Vercel에서 변경 사항을 반영하여 다시 배포합니다.
 
 모바일 환경에서 다음 항목을 확인했습니다.
 
-주요 섹션 레이아웃
-메뉴 및 텍스트 표시
-AI 글 입력 영역
-AI 변환 기능
-무료 베타 신청 폼
-신청 버튼 및 완료 상태
+ - 주요 섹션 레이아웃
+ - 메뉴 및 텍스트 표시
+ - AI 글 입력 영역
+ - AI 변환 기능
+ - 무료 베타 신청 폼
+ - 신청 버튼 및 완료 상태
+
 
 실제 모바일 기기에서 레이아웃이 깨지지 않고 정상적으로 표시되는 것을 확인했습니다.
 
@@ -225,33 +235,42 @@ AI 변환 기능
 무료 베타 신청 기능은 n8n을 이용하여 외부 서비스와 연동했습니다.
 
 LEPI 무료 베타 신청
+
         ↓
+        
 n8n Webhook
+
         ↓
+        
 Google Sheets 저장
+       
         ↓
+        
 Discord 알림
+
 
 웹사이트에서 테스트 신청 후 Google Sheets에 신청 정보가 저장되고
 Discord로 신규 신청 알림이 전달되는 것을 확인했습니다.
 
 ## 12. 프로젝트에서 학습한 내용
 
+
 이 프로젝트를 통해 다음 과정을 직접 구현하고 확인했습니다.
 
-HTML, CSS, JavaScript를 이용한 웹페이지 구성
-반응형 웹페이지 확인
-JavaScript fetch()를 이용한 프론트엔드와 백엔드 통신
-Python 기반 Vercel Serverless Function 구현
-OpenAI API 연동
-환경 변수를 이용한 API 키 관리
-GitHub와 Vercel을 이용한 배포
-배포 과정에서 발생한 오류 확인 및 수정
-n8n Webhook을 이용한 외부 서비스 연동
-Google Sheets 데이터 자동 저장
-Discord 운영 알림 자동화
-사용자 상태 피드백을 위한 마이크로 인터랙션 적용
-13. 관련 문서
+ - HTML, CSS, JavaScript를 이용한 웹페이지 구성
+ - 반응형 웹페이지 확인
+ - JavaScript fetch()를 이용한 프론트엔드와 백엔드 통신
+ - Python 기반 Vercel Serverless Function 구현
+ - OpenAI API 연동
+ - 환경 변수를 이용한 API 키 관리
+ - GitHub와 Vercel을 이용한 배포
+ - 배포 과정에서 발생한 오류 확인 및 수정
+ - n8n Webhook을 이용한 외부 서비스 연동
+ - Google Sheets 데이터 자동 저장
+ - Discord 운영 알림 자동화
+ - 사용자 상태 피드백을 위한 마이크로 인터랙션 적용
+
+## 13. 관련 문서
 
 서비스의 목적, 타겟 사용자, 페이지 구성 및 AI 기능 설계에 대한 자세한 내용은
 service_plan.md에서 확인할 수 있습니다.
