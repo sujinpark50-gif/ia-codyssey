@@ -132,30 +132,23 @@ mission_A1-3/
 
 
 ## 5. AI 기능 처리 흐름
+
+```text
 사용자 원문 입력
-
         ↓
-
 JavaScript fetch 요청
-
         ↓
-
 Vercel Serverless Function
-
         ↓
-
 OpenAI API
-
         ↓
-
 AI 변환 결과 반환
-
         ↓
-
 웹페이지에 결과 표시
+```
 
-프론트엔드에서 API 키를 직접 사용하지 않고
-Vercel Serverless Function을 통해 OpenAI API를 호출하도록 구성했습니다.
+ - 프론트엔드에서 API 키를 직접 사용하지 않고
+   Vercel Serverless Function을 통해 OpenAI API를 호출하도록 구성했습니다.
 
 ## 6. AI 기능 입력 / 출력 / 실패 처리
  - 입력
@@ -234,19 +227,15 @@ API 키가 GitHub 저장소, README, 스크린샷 등에 노출되지 않도록 
 
 무료 베타 신청 기능은 n8n을 이용하여 외부 서비스와 연동했습니다.
 
+```text
 LEPI 무료 베타 신청
-
         ↓
-        
 n8n Webhook
-
         ↓
-        
 Google Sheets 저장
-       
         ↓
-        
 Discord 알림
+```
 
 
 웹사이트에서 테스트 신청 후 Google Sheets에 신청 정보가 저장되고
