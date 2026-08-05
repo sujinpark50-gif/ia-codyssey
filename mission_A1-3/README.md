@@ -121,13 +121,15 @@ mission_A1-3/
 ├── vercel.json
 ├── README.md
 └── service_plan.md
+```
+#index.html: 랜딩페이지 UI 및 프론트엔드 동작
+#api/refine.py: AI 글 다듬기 API
+#requirements.txt: Python 패키지 목록
+#vercel.json: Vercel 배포 설정
+#README.md: 프로젝트 설명
+#service_plan.md: 서비스 기획서
 
-index.html: 랜딩페이지 UI 및 프론트엔드 동작
-api/refine.py: AI 글 다듬기 API
-requirements.txt: Python 패키지 목록
-vercel.json: Vercel 배포 설정
-README.md: 프로젝트 설명
-service_plan.md: 서비스 기획서
+
 5. AI 기능 처리 흐름
 사용자 원문 입력
         ↓
