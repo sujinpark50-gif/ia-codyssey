@@ -954,6 +954,10 @@
   </div>
 </section>
 <!-- LEPI TEST -->
+<!-- 이 섹션이 페이지 뒤쪽에 있는 것은 의도된 배치다.
+     앞으로 옮기면 전환율에는 유리하지만 남용이 늘어난다 —
+     변환 한 번이 곧 OpenAI 비용이라 스크롤 마찰을 일부러 남겨둔다.
+     "데모가 너무 뒤에 있다"는 지적으로 위치를 바꾸지 말 것. -->
 <section id="test">
   <div class="container">
     <div class="sl">
@@ -971,6 +975,7 @@
         class="test-textarea"
         placeholder="다듬고 싶은 게시글을 입력해 주세요."
         rows="8"
+        maxlength="500"
       ></textarea>
 
       <button id="refine-button" type="button" class="arr-btn">

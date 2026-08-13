@@ -5,12 +5,35 @@ import os
 from openai import OpenAI
 
 
+# 남용 상한. 이 엔드포인트는 페이지를 거치지 않고 직접 호출할 수 있으므로
+# 프런트의 입력 제한만으로는 비용이 보호되지 않는다. 변환 한 번이 곧 OpenAI
+# 비용이라, 긴 글 한 번이 짧은 글 수십 번보다 비싸다.
+# 레피는 짧은 홍보 메모를 다듬는 도구다. 인스타 캡션 상한이 2,200자인데
+# 실제 홍보 글은 100~300자 선이라 500자면 정상 사용에 지장이 없다.
+MAX_TEXT_LENGTH = 500
+
+# 한글은 UTF-8에서 글자당 3바이트다. 500자 = 1.5KB에 JSON 여유를 더한 값.
+# 본문을 읽기 전에 막아야 큰 요청이 메모리에 올라오는 것을 방지할 수 있다.
+MAX_BODY_BYTES = 8 * 1024
+
+TOO_LONG_MESSAGE = "글이 너무 깁니다. 500자 이내로 줄여 주세요."
+
+
 class handler(BaseHTTPRequestHandler):
     def do_POST(self):
         try:
             content_length = int(
                 self.headers.get("Content-Length", 0)
             )
+
+            if content_length > MAX_BODY_BYTES:
+                self.send_json(
+                    413,
+                    {
+                        "error": TOO_LONG_MESSAGE
+                    }
+                )
+                return
 
             request_body = self.rfile.read(content_length)
             request_data = json.loads(request_body)
@@ -22,6 +45,15 @@ class handler(BaseHTTPRequestHandler):
                     400,
                     {
                         "error": "다듬을 게시글을 입력해 주세요."
+                    }
+                )
+                return
+
+            if len(original_text) > MAX_TEXT_LENGTH:
+                self.send_json(
+                    413,
+                    {
+                        "error": TOO_LONG_MESSAGE
                     }
                 )
                 return
