@@ -137,19 +137,18 @@
       display: flex; align-items: center; gap: 16px;
       margin-bottom: 48px; cursor: default;
     }
+    /* 호버 반응을 뺐다. .sl은 cursor: default인 정적 표지판인데
+       마우스가 스치면 선이 50% 길어지고 자간이 두 배가 됐다.
+       누를 수 없는 것이 움직이면 누를 수 있다는 신호가 된다. */
     .sl-line {
       height: 1px; background: var(--fg); width: 32px;
-      transition: width 0.7s var(--ease);
     }
-    .sl:hover .sl-line { width: 48px; }
     /* 한글은 획이 많아 10px에서 자획이 붙는다. 넓은 자간도 대문자 라틴용 기법이라
        한글에서는 단어가 흩어져 더 안 읽힌다 — 크기를 올리고 자간은 줄인다. */
     .sl-text {
       font-size: 12.5px; font-weight: 500;
       text-transform: uppercase; letter-spacing: 0.16em; color: var(--fg);
-      transition: letter-spacing 0.7s var(--ease);
     }
-    .sl:hover .sl-text { letter-spacing: 0.32em; }
     /* 섹션 번호(01~06)는 제거했다. 문제·해결·특징·FAQ·체험·베타는 순서가 없는
        병렬 목록이라, 번호를 붙이면 없는 순서를 있는 것처럼 말하게 된다.
        해결 섹션 안의 단계 번호(.sol-n)는 실제 순서이므로 남긴다. */
@@ -277,22 +276,23 @@
       padding-top: 3px;
       transition: color 0.5s var(--ease);
     }
+    /* 위치 이동은 뺐다. 색 변화만 남긴다 —
+       색이 진해지는 것은 "지금 이 줄을 읽고 있다"는 표시이고,
+       옆으로 미는 것은 "누르면 뭔가 있다"는 신호다. 앞만 남긴다. */
     .prob-row:hover .prob-n { color: var(--fg); }
     .prob-title {
       font-size: 17px; font-weight: 400; margin-bottom: 6px;
-      transition: transform 0.5s var(--ease);
     }
-    .prob-row:hover .prob-title { transform: translateX(8px); }
     .prob-desc {
       font-size: 14px; color: var(--muted); line-height: 1.7;
-      transition: transform 0.5s var(--ease), color 0.5s var(--ease);
+      transition: color 0.5s var(--ease);
     }
-    .prob-row:hover .prob-desc { transform: translateX(8px); color: var(--fg); }
+    .prob-row:hover .prob-desc { color: var(--fg); }
     .prob-em {
       padding-top: 2px;
       color: var(--fg);
       opacity: 0.38;
-      transition: transform 0.5s var(--ease), opacity 0.5s var(--ease);
+      transition: opacity 0.5s var(--ease);
     }
     .mono-icon {
       display: block;
@@ -305,7 +305,7 @@
       stroke-linejoin: round;
       fill: none;
     }
-    .prob-row:hover .prob-em { transform: translateY(-4px); opacity: 1; }
+    .prob-row:hover .prob-em { opacity: 1; }
     /* 문제 섹션의 결론. 테두리 대신 서체로 무게를 준다.
        둘째 줄이 약 28.9em이라 26px × 28.9 ≈ 751px → 폭 780px 안에 한 줄로 들어간다. */
     .prob-callout {
