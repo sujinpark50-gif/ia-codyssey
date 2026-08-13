@@ -4,19 +4,44 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>레피(Lepi) — SNS 게시 전 정리 솔루션</title>
-  <meta name="description" content="소상공인이 직접 쓴 글이나 메모를 SNS에 올릴 수 있는 표현으로 정리해주는 게시 전 정리 도구입니다." />
+  <meta name="description" content="전하고 싶은 의미는 그대로, 표현은 더 선명하게. 소상공인이 직접 쓴 글이나 메모를 SNS에 올릴 수 있는 표현으로 정리해주는 게시 전 정리 도구입니다." />
+
+  <!-- 카톡·슬랙 링크 미리보기용. og:url과 og:image는 배포 주소가 정해지면 채운다. -->
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="ko_KR" />
+  <meta property="og:site_name" content="레피(Lepi)" />
+  <meta property="og:title" content="레피(Lepi) — 전하고 싶은 의미는 그대로, 표현은 더 선명하게." />
+  <meta property="og:description" content="소상공인이 직접 쓴 글이나 메모를 SNS에 올릴 수 있는 표현으로 정리해드려요." />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="레피(Lepi) — 전하고 싶은 의미는 그대로, 표현은 더 선명하게." />
+  <meta name="twitter:description" content="소상공인이 직접 쓴 글이나 메모를 SNS에 올릴 수 있는 표현으로 정리해드려요." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;300;400&display=swap" rel="stylesheet" />
   <style>
-    /* ── CSS Variables (shadcn/ui pattern) ── */
+    /* ── CSS Variables ──
+       Olive Garden Feast — 크림 · 딥 포레스트 · 올리브 · 샌드 · 번트 오커
+       강조는 바탕에 따라 나눠 쓴다. 밝은 면은 --accent(오커, 크림 위 3.8:1),
+       어두운 면은 --accent-dark(샌드, 포레스트 위 6.0:1).
+       샌드는 크림 위에서 2.1:1이라 밝은 면의 선·텍스트로는 쓰지 않는다. */
     :root {
-      --bg: #eae8e3;
-      --fg: #22211d;
-      --muted: #86847d;
-      --border: #d9d7d0;
-      --accent: #a49e93;
-      --gold: #c9a463;
+      /* Earthy Caramel Glow(FEFAE0)와 Whimsical Cherry Farm(FFFFEA)의 중간값.
+         토큰을 반투명으로 두면 어두운 면의 글자색(color: var(--bg))까지 비쳐서
+         깨지므로 불투명한 결과값으로 고정한다. */
+      --bg: #FFFDE5;
+      --surface: #F7F0D2;
+      --fg: #283618;
+      --muted: #606C38;
+      /* 선은 세 층이다.
+         --border:  nav 하단 구분선 + 버튼/태그/입력창 테두리.  2.92:1  진하게
+         --rule:    본문 안쪽 목록선. 블러시.                   1.56:1
+         --divider: 섹션 사이 구분선.                          1.32:1  가장 옅게
+         섹션 구분은 선이 아니라 120px 여백이 맡는다. */
+      --border: #93987C;
+      --rule: #EBC3BE;
+      --divider: #E0DEC4;
+      --accent: #BC6C25;
+      --accent-dark: #DDA15E;
       --serif: 'Noto Serif KR', 'Apple SD Gothic Neo', serif;
       --ease: cubic-bezier(0.16, 1, 0.3, 1);
     }
@@ -31,16 +56,32 @@
       font-size: 16px;
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
+      /* 브라우저 기본값은 한글을 아무 글자에서나 끊어 단어가 중간에 갈라진다.
+         keep-all로 띄어쓰기 단위로만 끊고, 긴 영문/이메일은 break-word로 예외 처리한다. */
+      word-break: keep-all;
+      overflow-wrap: break-word;
+    }
+
+    /* 줄 길이를 고르게 나눈다. 단 <br>로 줄을 직접 잡아둔 요소
+       (.sh · .hero-promise · .prob-callout · .cta-h · .cta-sub)는 제외한다.
+       balance는 브라우저가 줄을 재분배하는 기능이라 수동 줄바꿈과 충돌한다. */
+    .prob-title, .sol-title, .feat-title, .faq-q-text, .stat-val, .test-desc {
+      text-wrap: balance;
+    }
+    /* 여러 줄 본문은 마지막 줄에 한 단어만 남는 것을 막는다. */
+    .hero-note, .prob-desc, .sol-desc, .feat-desc,
+    .faq-body-inner, .fc-label, .test-result-text, .foot-disc p {
+      text-wrap: pretty;
     }
 
     /* ── Layout ── */
     .container { max-width: 1120px; margin: 0 auto; padding: 0 32px; }
-    section { padding: 120px 0; border-bottom: 1px solid var(--border); }
+    section { padding: 120px 0; border-bottom: 1px solid var(--divider); }
 
     /* ── NAV ── */
     nav {
       position: sticky; top: 0; z-index: 100;
-      background: rgba(250,250,250,0.92);
+      background: rgba(254,250,224,0.92);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
       padding: 20px 0;
@@ -59,8 +100,8 @@
     }
     .nav-link:hover { color: var(--fg); }
     .nav-cta {
-      font-size: 10px; font-weight: 500; color: var(--fg);
-      text-decoration: none; letter-spacing: 0.12em; text-transform: uppercase;
+      font-size: 11.5px; font-weight: 500; color: var(--fg);
+      text-decoration: none; letter-spacing: 0.1em; text-transform: uppercase;
       padding: 7px 16px; border: 1px solid var(--fg);
       transition: background 0.3s ease, color 0.3s ease;
     }
@@ -76,9 +117,11 @@
       transition: width 0.7s var(--ease);
     }
     .sl:hover .sl-line { width: 48px; }
+    /* 한글은 획이 많아 10px에서 자획이 붙는다. 넓은 자간도 대문자 라틴용 기법이라
+       한글에서는 단어가 흩어져 더 안 읽힌다 — 크기를 올리고 자간은 줄인다. */
     .sl-text {
-      font-size: 10px; font-weight: 500;
-      text-transform: uppercase; letter-spacing: 0.25em; color: var(--fg);
+      font-size: 12.5px; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.16em; color: var(--fg);
       transition: letter-spacing 0.7s var(--ease);
     }
     .sl:hover .sl-text { letter-spacing: 0.32em; }
@@ -94,7 +137,8 @@
       font-size: clamp(29px, 4.6vw, 56px);
       font-weight: 300; line-height: 1.28;
       letter-spacing: -0.015em; color: var(--fg);
-      margin-bottom: 64px; max-width: 680px;
+      /* 슬로건 첫 줄 "전하고 싶은 의미는 그대로,"가 56px에서 약 730px 필요하다. */
+      margin-bottom: 64px; max-width: 760px;
     }
 
     /* ── Arrow Button (FeaturedSpotlight CTA pattern) ── */
@@ -114,11 +158,11 @@
       stroke: var(--fg);
       transition: stroke 0.5s var(--ease), transform 0.5s var(--ease);
     }
-    .arr-btn:hover .arr-circle { background: var(--fg); box-shadow: 0 8px 32px rgba(10,10,10,0.15); }
+    .arr-btn:hover .arr-circle { background: var(--fg); box-shadow: 0 8px 32px rgba(40,54,24,0.18); }
     .arr-btn:hover .arr-circle svg { stroke: var(--bg); transform: rotate(45deg); }
     .arr-label {
-      font-size: 10px; font-weight: 500;
-      text-transform: uppercase; letter-spacing: 0.2em; color: var(--fg);
+      font-size: 11.5px; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.14em; color: var(--fg);
       transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
       opacity: 0.5; transform: translateX(-8px);
     }
@@ -140,8 +184,8 @@
     }
     .hero-badge {
       display: inline-flex; align-items: center; gap: 10px;
-      font-size: 10px; font-weight: 500;
-      text-transform: uppercase; letter-spacing: 0.2em; color: var(--muted);
+      font-size: 11.5px; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted);
       margin-bottom: 40px;
     }
     .badge-dot {
@@ -150,20 +194,26 @@
       animation: blink 2.6s ease-in-out infinite;
     }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+    /* 두 줄이 각각 한 줄로 유지되도록 크기를 제한한다.
+       왼쪽 칸은 최대 488px(컨테이너 1120 − 패딩 64 − 갭 80, ÷2)이고
+       "차마 못 올린 글."은 들여쓰기 포함 약 7.0em이 필요하다 → 상한 64px.
+       vw 계수도 900~1120px 구간에서 같은 제약을 받으므로 함께 낮춘다. */
     .hero-h1 {
       font-family: var(--serif);
-      font-size: clamp(42px, 6.6vw, 84px);
+      font-size: clamp(42px, 5.6vw, 64px);
       font-weight: 300; line-height: 1.16;
       letter-spacing: -0.02em; margin-bottom: 24px;
     }
     .hero-h1 em { font-style: normal; display: block; }
     .hero-h1 .indent { padding-left: 0.2em; }
+    /* 둘째 줄 "레피가 올릴 수 있게 다듬어드려요."가 약 15.3em이라
+       27px × 15.3 ≈ 413px. 폭 480px 안에 한 줄로 들어간다. */
     .hero-promise {
       font-family: var(--serif);
-      font-size: clamp(19px, 2.5vw, 29px);
+      font-size: clamp(18px, 2.3vw, 27px);
       font-weight: 400; line-height: 1.45;
       letter-spacing: -0.01em; color: var(--fg);
-      max-width: 460px; margin-bottom: 30px;
+      max-width: 480px; margin-bottom: 30px;
     }
     .hero-promise b { font-weight: 500; }
     .hero-sub {
@@ -175,16 +225,17 @@
     .hero-right { display: flex; flex-direction: column; gap: 0; }
     .hero-stat {
       padding: 24px 0;
-      border-top: 1px solid var(--border);
+      border-top: 1px solid var(--rule);
     }
-    .hero-stat:last-of-type { border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+    .hero-stat:last-of-type { border-bottom: 1px solid var(--rule); margin-bottom: 20px; }
     .stat-label {
-      font-size: 10px; font-weight: 500;
-      text-transform: uppercase; letter-spacing: 0.2em; color: var(--muted);
+      font-size: 11.5px; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted);
       margin-bottom: 6px;
     }
     .stat-val { font-size: 14px; color: var(--fg); }
-    .hero-note { font-size: 11px; color: var(--muted); letter-spacing: 0.05em; }
+    /* 라벨(.hero-badge 11.5px)보다는 커야 한다 — 이건 라벨이 아니라 문장이다. */
+    .hero-note { font-size: 12.5px; color: var(--muted); letter-spacing: 0.02em; }
 
     /* ── PROBLEM ── */
     .prob-list { display: flex; flex-direction: column; }
@@ -192,10 +243,10 @@
       display: grid; grid-template-columns: 48px 1fr 32px;
       gap: 32px; align-items: start;
       padding: 28px 0;
-      border-top: 1px solid var(--border);
+      border-top: 1px solid var(--rule);
       cursor: default;
     }
-    .prob-row:last-child { border-bottom: 1px solid var(--border); }
+    .prob-row:last-child { border-bottom: 1px solid var(--rule); }
     .prob-n {
       font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
       font-size: 11px; color: var(--muted);
@@ -212,7 +263,7 @@
       font-size: 14px; color: var(--muted); line-height: 1.7;
       transition: transform 0.5s var(--ease), color 0.5s var(--ease);
     }
-    .prob-row:hover .prob-desc { transform: translateX(8px); color: #525252; }
+    .prob-row:hover .prob-desc { transform: translateX(8px); color: var(--fg); }
     .prob-em {
       padding-top: 2px;
       color: var(--fg);
@@ -231,77 +282,115 @@
       fill: none;
     }
     .prob-row:hover .prob-em { transform: translateY(-4px); opacity: 1; }
+    /* 문제 섹션의 결론. 테두리 대신 서체로 무게를 준다.
+       둘째 줄이 약 28.9em이라 26px × 28.9 ≈ 751px → 폭 780px 안에 한 줄로 들어간다. */
     .prob-callout {
-      margin-top: 56px; padding: 28px 32px;
-      border: 1px solid var(--fg);
-      font-size: 15px; line-height: 1.75; max-width: 620px;
+      margin-top: 72px;
+      font-family: var(--serif);
+      font-size: clamp(19px, 2.2vw, 26px);
+      font-weight: 300; line-height: 1.5;
+      letter-spacing: -0.01em;
+      max-width: 860px;
     }
+    .prob-callout strong { font-weight: 500; }
 
     /* ── SOLUTION ── */
     .sol-steps { max-width: 720px; }
     .sol-step {
       display: grid; grid-template-columns: 48px 1fr;
       gap: 32px; padding: 28px 0;
-      border-top: 1px solid var(--border);
+      border-top: 1px solid var(--rule);
     }
-    .sol-step:last-of-type { border-bottom: 1px solid var(--border); }
+    .sol-step:last-of-type { border-bottom: 1px solid var(--rule); }
     .sol-n {
       font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
       font-size: 11px; color: var(--muted); padding-top: 3px;
     }
     .sol-title { font-size: 17px; font-weight: 400; margin-bottom: 6px; }
     .sol-desc { font-size: 14px; color: var(--muted); line-height: 1.7; }
-    .sol-note {
-      margin-top: 48px; padding: 20px 28px;
-      border-left: 2px solid var(--fg);
-      font-size: 14px; color: var(--muted); line-height: 1.8;
-      max-width: 580px;
-    }
-    .sol-note strong { color: var(--fg); font-weight: 500; }
 
-    /* ── FEATURES ── */
-    .feat-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr);
-      gap: 1px; background: var(--border);
-      border: 1px solid var(--border);
+    /* ── FEATURES ──
+       박스 격자를 버리고 세로 헤어라인으로 나눈다. 문제·해결 섹션의 가로선과
+       같은 문법이라 이질적이지 않고, 칸이 비어도 아무 일도 생기지 않는다.
+       (이전 격자는 배경색을 1px 틈으로 비추는 방식이라 빈 칸이 덩어리로 드러났다.) */
+    .feat-photo {
+      margin: 0 0 56px; overflow: hidden; background: var(--surface);
     }
-    .feat-card {
-      background: var(--bg); padding: 36px 28px;
-      position: relative; overflow: hidden;
-      transition: background 0.4s ease;
+    .feat-photo img { display: block; width: 100%; height: auto; }
+
+    /* 다섯 칸이 균등하다가, 하나에 커서를 올리면 그 칸만 2.4배로 늘고
+       나머지 넷이 균일하게 줄어든다. 2.4 + 4×0.65 = 5로 총합이 유지돼
+       행 전체 폭은 그대로다. JS 없이 flex-grow 전환만 쓴다. */
+    .feat-row { display: flex; }
+    .feat-item {
+      flex: 1 1 0; min-width: 0;
+      padding: 0 18px 0 24px;
+      border-left: 1px solid var(--rule);
+      transition: flex-grow 0.55s var(--ease);
+      /* 다섯째 항목만 제목 아래 태그가 하나 더 있어 내용 높이가 다르다.
+         상자는 전체 높이를 유지해 세로선을 온전히 그리고,
+         내용만 가운데로 모아 넷이 위로 쏠려 보이지 않게 한다. */
+      display: flex; flex-direction: column; justify-content: center;
     }
-    .feat-card:hover { background: #f2f2f2; }
-    /* corner lines — FeaturedSpotlight style */
-    .feat-card::before { /* top-left H */
-      content: '';
-      position: absolute; left: 16px; top: 16px;
-      width: 0; height: 1px; background: var(--fg);
-      transition: width 0.4s var(--ease) 0.05s;
+    /* 선은 카드끼리 마주보는 자리에만 둔다. 첫 항목 왼쪽은 바깥 모서리라
+       선을 빼고, 글자를 섹션 제목과 같은 선에 맞춘다. */
+    .feat-item:first-child { border-left: none; padding-left: 0; }
+    .feat-row:hover .feat-item,
+    .feat-row:focus-within .feat-item { flex-grow: 0.65; }
+    .feat-item:hover,
+    .feat-item:focus-within { flex-grow: 2.4; }
+    .feat-item:focus-visible { outline: 2px solid var(--fg); outline-offset: 4px; }
+
+    /* 설명문은 접어둔다. 접힌 칸은 120px 남짓이라 제목만으로도 빠듯하다.
+       grid-template-rows 0fr→1fr은 높이를 매끄럽게 전환하는 방법이다. */
+    .feat-body {
+      display: grid; grid-template-rows: 0fr;
+      transition: grid-template-rows 0.55s var(--ease);
     }
-    .feat-card::after { /* top-left V */
-      content: '';
-      position: absolute; left: 16px; top: 16px;
-      width: 1px; height: 0; background: var(--fg);
-      transition: height 0.4s var(--ease) 0.1s;
-    }
-    .feat-card:hover::before { width: 20px; }
-    .feat-card:hover::after { height: 20px; }
-    .feat-icon { width: 24px; height: 24px; margin-bottom: 20px; color: var(--fg); opacity: 0.72; }
-    .feat-title { font-size: 15px; font-weight: 500; margin-bottom: 10px; }
-    .feat-desc { font-size: 13px; color: var(--muted); line-height: 1.7; }
+    .feat-body > p { overflow: hidden; }
+    .feat-item:hover .feat-body,
+    .feat-item:focus-within .feat-body { grid-template-rows: 1fr; }
+
+    /* 라벨이 위, 내용이 아래. "이건 지금 됨 → 뭐가 되는지" 순서로 읽힌다. */
     .feat-tag {
-      display: inline-block; margin-top: 18px;
-      font-size: 9px; font-weight: 600;
-      text-transform: uppercase; letter-spacing: 0.12em;
+      display: inline-block;
+      font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.1em;
       padding: 4px 10px; border: 1px solid;
     }
-    .tag-live { border-color: var(--fg); color: var(--fg); }
-    .tag-soon { border-color: var(--border); color: var(--muted); }
+    /* 되는 기능에는 라벨을 안 붙인다 — 되는 게 기본이므로 말할 필요가 없다.
+       아직인 것 하나에만 붙이고, 그것도 제목 아래에 둬서
+       다섯 제목의 시작 높이가 어긋나지 않게 한다.
+       (그리드 밖 각주의 태그는 혼자 있으므로 박스를 유지한다.) */
+    .feat-row .feat-tag {
+      border: none; padding: 0;
+      display: block; margin-bottom: 12px;
+      font-size: 11px; letter-spacing: 0.12em;
+      color: var(--muted);
+    }
+    .feat-title { font-size: 18px; font-weight: 500; margin: 0 0 8px; letter-spacing: -0.01em; }
+    .feat-desc { font-size: 13.5px; color: var(--muted); line-height: 1.75; }
+
+    /* 아직 시점이 없는 기능. 항목 행 밖에 한 줄 각주로 둔다. */
+    .feat-later {
+      margin-top: 44px;
+      display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
+      font-size: 13.5px; color: var(--muted); line-height: 1.7;
+    }
+    .feat-later b { color: var(--fg); font-weight: 500; }
+    .feat-later .feat-tag { flex-shrink: 0; }
+
+    /* 세 등급을 테두리 진하기로 구분한다.
+       글자색은 셋 다 4.5:1을 넘는 값만 쓴다 — --border(2.92:1)는 테두리 전용. */
+
+    .tag-live { border-color: var(--fg); color: var(--fg); }      /* 지금 됨 */
+    .tag-next { border-color: var(--muted); color: var(--muted); } /* 정식 출시 때 */
+    .tag-soon { border-color: var(--border); color: var(--muted); }/* 아직 미정 */
 
     /* ── FAQ ── */
     .faq-list { max-width: 720px; }
-    .faq-item { border-top: 1px solid var(--border); }
-    .faq-item:last-child { border-bottom: 1px solid var(--border); }
+    .faq-item { border-top: 1px solid var(--rule); }
+    .faq-item:last-child { border-bottom: 1px solid var(--rule); }
     .faq-btn {
       width: 100%; text-align: left; background: none; border: none;
       cursor: pointer; font-family: inherit; padding: 26px 0;
@@ -337,8 +426,8 @@
     }
     .test-form { max-width: 720px; }
     .test-label {
-      display: block; font-size: 10px; font-weight: 500;
-      text-transform: uppercase; letter-spacing: 0.2em; color: var(--muted);
+      display: block; font-size: 12px; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted);
       margin-bottom: 12px;
     }
     .test-textarea {
@@ -373,52 +462,57 @@
       background: var(--fg); color: var(--bg);
       border-bottom: none;
     }
-    #cta .sl-line { background: rgba(250,250,250,0.3); }
-    #cta .sl-text { color: rgba(250,250,250,0.4); }
-    #cta .sl-num  { color: rgba(250,250,250,0.2); }
+    /* 딥포레스트 바탕에서 본문 4.5:1을 넘으려면 알파 0.55가 하한이다.
+       읽어야 하는 텍스트는 전부 그 위로, 장식용 선은 낮게 둔다. */
+    #cta .sl-line { background: rgba(254,250,224,0.3); }
+    #cta .sl-text { color: rgba(254,250,224,0.62); }
+    #cta .sl-num  { color: rgba(254,250,224,0.5); }
     .cta-grid {
       display: grid; grid-template-columns: 1fr 1fr;
       gap: 80px; align-items: start;
     }
+    /* 히어로와 같은 제약. 왼쪽 칸 488px에 "레피에게 먼저 보여주세요."가
+       약 11.6em이라 상한 38px, vw 계수 3.4가 한계다. */
     .cta-h {
       font-family: var(--serif);
-      font-size: clamp(26px, 3.8vw, 46px);
+      font-size: clamp(26px, 3.4vw, 38px);
       font-weight: 300; line-height: 1.24;
       letter-spacing: -0.015em; color: var(--bg);
       margin-bottom: 20px;
     }
-    .cta-sub { font-size: 14px; color: rgba(250,250,250,0.45); line-height: 1.8; }
+    .cta-sub { font-size: 14px; color: rgba(254,250,224,0.66); line-height: 1.8; }
 
     /* form — underline only */
     .fg { margin-bottom: 20px; }
     .fl {
-      display: block; font-size: 10px; font-weight: 500;
-      text-transform: uppercase; letter-spacing: 0.15em;
-      color: rgba(250,250,250,0.35); margin-bottom: 8px;
+      display: block; font-size: 11.5px; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.12em;
+      color: rgba(254,250,224,0.62); margin-bottom: 8px;
     }
-    .fl .req { color: rgba(250,250,250,0.2); }
+    .fl .req { color: rgba(254,250,224,0.55); }
     .fi, .fs, .ft {
       width: 100%; background: transparent; border: none;
-      border-bottom: 1px solid rgba(250,250,250,0.15);
+      border-bottom: 1px solid rgba(254,250,224,0.3);
       color: var(--bg); font-family: inherit; font-size: 15px;
       padding: 10px 0; outline: none;
       transition: border-color 0.3s ease;
     }
-    .fi:focus, .fs:focus, .ft:focus { border-bottom-color: rgba(250,250,250,0.6); }
-    .fi::placeholder, .ft::placeholder { color: rgba(250,250,250,0.18); }
+    .fi:focus, .fs:focus, .ft:focus { border-bottom-color: rgba(254,250,224,0.6); }
+    .fi::placeholder, .ft::placeholder { color: rgba(254,250,224,0.45); }
     .fs option { background: var(--fg); color: var(--bg); }
     .ft { resize: none; min-height: 56px; }
     .fi:disabled, .fs:disabled, .ft:disabled {
-      opacity: 0.55; cursor: default; border-bottom-color: rgba(250,250,250,0.08);
+      opacity: 0.55; cursor: default; border-bottom-color: rgba(254,250,224,0.08);
     }
     .fc-wrap {
       display: flex; gap: 12px; align-items: flex-start;
       padding: 16px 0;
-      border-top: 1px solid rgba(250,250,250,0.08);
+      border-top: 1px solid rgba(254,250,224,0.08);
       margin-top: 4px; margin-bottom: 28px;
     }
     .fc { width: auto; flex-shrink: 0; margin-top: 2px; }
-    .fc-label { font-size: 12px; color: rgba(250,250,250,0.3); line-height: 1.65; }
+    /* 개인정보 수집 동의 문구. 법적으로 읽혀야 하는 텍스트라 가장 먼저 올린다. */
+    .fc-label { font-size: 12px; color: rgba(254,250,224,0.62); line-height: 1.65; }
     .fc:disabled ~ .fc-label { opacity: 0.55; }
 
     /* submit button — arr-btn inverted */
@@ -432,19 +526,19 @@
     .submit-btn:disabled:not(.success) { opacity: 0.4; }
     .submit-circle {
       width: 44px; height: 44px; border-radius: 50%;
-      border: 1px solid rgba(250,250,250,0.3);
+      border: 1px solid rgba(254,250,224,0.45);
       display: flex; align-items: center; justify-content: center;
       transition: background 0.5s var(--ease), border-color 0.5s var(--ease), box-shadow 0.5s var(--ease);
     }
     .submit-circle svg { stroke: var(--bg); transition: transform 0.5s var(--ease), stroke 0.5s var(--ease); }
     .submit-btn:not(:disabled):hover .submit-circle {
       background: var(--bg); border-color: var(--bg);
-      box-shadow: 0 8px 32px rgba(250,250,250,0.1);
+      box-shadow: 0 8px 32px rgba(254,250,224,0.1);
     }
     .submit-btn:not(:disabled):hover .submit-circle svg { stroke: var(--fg); transform: rotate(45deg); }
     .submit-label {
-      font-size: 10px; font-weight: 500;
-      text-transform: uppercase; letter-spacing: 0.2em; color: var(--bg);
+      font-size: 11.5px; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.14em; color: var(--bg);
       opacity: 0.5; transform: translateX(-8px);
       transition: opacity 0.5s var(--ease), transform 0.5s var(--ease), color 0.5s var(--ease);
     }
@@ -457,19 +551,19 @@
       100% { transform: scale(1); }
     }
     .submit-btn.success .submit-circle {
-      background: var(--gold); border-color: var(--gold);
-      box-shadow: 0 8px 32px rgba(201,164,99,0.35);
+      background: var(--accent-dark); border-color: var(--accent-dark);
+      box-shadow: 0 8px 32px rgba(221,161,94,0.35);
       animation: submitPop 0.6s var(--ease);
     }
     .submit-btn.success .submit-circle svg { stroke: var(--fg); }
     .submit-btn.success .submit-label {
-      color: var(--gold); opacity: 1; transform: translateX(0);
+      color: var(--accent-dark); opacity: 1; transform: translateX(0);
     }
 
     /* ── FOOTER ── */
     footer {
       background: var(--fg);
-      border-top: 1px solid rgba(250,250,250,0.06);
+      border-top: 1px solid rgba(254,250,224,0.06);
       padding: 36px 0;
     }
     .foot-inner {
@@ -479,17 +573,31 @@
     .foot-logo {
       font-size: 13px; font-weight: 500;
       letter-spacing: 0.12em; text-transform: uppercase;
-      color: rgba(250,250,250,0.4); white-space: nowrap;
+      color: rgba(254,250,224,0.6); white-space: nowrap;
     }
-    .foot-logo span { color: var(--accent); }
-    .foot-disc { font-size: 12px; color: rgba(250,250,250,0.25); line-height: 1.75; }
+    /* 어두운 푸터 위이므로 샌드를 쓴다 (포레스트 위 6.0:1). 오커는 3.4:1로 약하다. */
+    .foot-logo span { color: var(--accent-dark); }
+    /* 브랜드 서명. 본문 고딕이 아니라 명조로 써서 약관 문구와 구분한다. */
+    .foot-brand { display: flex; flex-direction: column; gap: 10px; }
+    .foot-slogan {
+      font-family: var(--serif); font-weight: 300;
+      font-size: 14px; line-height: 1.5; letter-spacing: -0.01em;
+      color: rgba(254,250,224,0.55); white-space: nowrap;
+    }
+    .foot-disc { font-size: 12px; color: rgba(254,250,224,0.58); line-height: 1.75; }
     .foot-disc p + p { margin-top: 6px; }
 
     /* ── RESPONSIVE ── */
     @media (max-width: 900px) {
       .hero-grid { grid-template-columns: 1fr; gap: 48px; }
       .hero-right { display: none; }
-      .feat-grid { grid-template-columns: 1fr 1fr; }
+      /* 터치 기기엔 호버가 없다 — 접힌 설명문에 닿을 방법이 사라지므로
+         가로 확장을 버리고 전부 펼친 격자로 되돌린다. */
+      .feat-row { display: grid; grid-template-columns: 1fr 1fr; column-gap: 36px; row-gap: 40px; }
+      .feat-item { flex: none; padding-right: 0; }
+      .feat-row:hover .feat-item, .feat-row:focus-within .feat-item,
+      .feat-item:hover, .feat-item:focus-within { flex-grow: 0; }
+      .feat-body, .feat-item:hover .feat-body { grid-template-rows: 1fr; }
       .cta-grid { grid-template-columns: 1fr; gap: 48px; }
       .foot-inner { flex-direction: column; gap: 20px; }
       .prob-row { grid-template-columns: 40px 1fr; }
@@ -499,7 +607,9 @@
       .container { padding: 0 20px; }
       section { padding: 80px 0; }
       #hero { min-height: auto; padding: 60px 0; }
-      .feat-grid { grid-template-columns: 1fr; }
+      .feat-row { grid-template-columns: 1fr; row-gap: 34px; }
+      .feat-photo { margin-bottom: 40px; }
+      .prob-callout { margin-top: 48px; }
       .faq-btn { grid-template-columns: 36px 1fr 18px; gap: 14px; }
       .faq-body-inner { padding-left: 50px; }
       nav .nav-link { display: none; }
@@ -532,9 +642,11 @@
           <em>쓰긴 썼는데,</em>
           <em class="indent">차마 못 올린 글.</em>
         </h1>
-        <p class="hero-promise">그 마지막 한 줄, <b>레피가 올릴 수 있게 다듬어드려요.</b></p>
+        <!-- 줄바꿈을 의미 단위로 고정한다. 자동 줄바꿈에 맡기면
+             "올릴 수 / 있게"처럼 구가 갈라진다. -->
+        <p class="hero-promise">그 마지막 한 줄,<br><b>레피가 올릴 수 있게 다듬어드려요.</b></p>
         <p class="hero-sub">
-          가격도 날짜도 그대로 두고, 표현과 흐름만 살며시.
+          가격도 날짜도 그대로 두고, 표현만 더 선명하게.<br>
           망설이던 그 글을, 오늘은 올릴 수 있도록.
         </p>
         <div class="hero-btns">
@@ -594,8 +706,8 @@
       <div class="prob-row">
         <div class="prob-n">02</div>
         <div>
-          <div class="prob-title">AI는 또 따로 배워야 하더라고요</div>
-          <div class="prob-desc">열어봐도 매번 프롬프트를 새로 쓰고, 원하는 말투를 일일이 설명해야 해요.</div>
+          <div class="prob-title">AI는 또 따로 배워야 해요</div>
+          <div class="prob-desc">매번 프롬프트를 새로 쓰고, 원하는 말투를 일일이 설명해야 해요.</div>
         </div>
         <div class="prob-em"><svg class="mono-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M8 14c-1.4-1.1-2.2-2.8-2.2-4.6A6.2 6.2 0 0 1 12 3.2a6.2 6.2 0 0 1 6.2 6.2c0 1.8-.8 3.5-2.2 4.6-.7.6-1 1.2-1 2H9c0-.8-.3-1.4-1-2Z"></path></svg></div>
       </div>
@@ -624,9 +736,12 @@
         <div class="prob-em"><svg class="mono-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h9l3 3v13H6z"></path><path d="M15 4v4h4"></path><path d="M9 14h6"></path></svg></div>
       </div>
     </div>
+    <!-- 줄 길이를 고르게 세 줄로 끊는다 (26px 기준 약 384 / 372 / 431px).
+         두 줄로 두면 384 / 799px로 한쪽이 두 배 길어진다. -->
     <div class="prob-callout">
-      레피가 보는 건 아이디어가 부족한 게 아니에요.<br>
-      올릴 수 있는 문장이 되기까지, 그 <strong>마지막 한 걸음의 무게</strong>예요.
+      아이디어가 부족해서가 아니에요.<br>
+      올릴 수 있는 문장이 되기까지,<br>
+      그 <strong>마지막 한 걸음</strong>이 무거울 뿐이에요.
     </div>
   </div>
 </section>
@@ -639,47 +754,36 @@
       <span class="sl-text">해결</span>
       <span class="sl-num">02</span>
     </div>
-    <h2 class="sh">당신이 쓴 그대로,<br>올릴 수 있게만 다듬어요.</h2>
+    <h2 class="sh">전하고 싶은 의미는 그대로,<br>표현은 더 선명하게.</h2>
     <div class="sol-steps">
       <div class="sol-step">
         <div class="sol-n">01</div>
         <div>
           <div class="sol-title">쓰던 글이나 메모를 그대로 가져와요</div>
-          <p class="sol-desc">대충 적어둔 홍보 메모, 메시지로 보낸 글, 음성으로 남긴 아이디어 — 잘 쓰지 않아도 됩니다.</p>
+          <p class="sol-desc">대충 적어둔 홍보 메모, 메시지로 보낸 글, 음성으로 남긴 아이디어 — 잘 쓰지 않아도 괜찮아요.</p>
         </div>
       </div>
       <div class="sol-step">
         <div class="sol-n">02</div>
         <div>
           <div class="sol-title">레피에게 건네요</div>
-          <p class="sol-desc">프롬프트를 입력하거나 AI 사용법을 따로 익힐 필요가 없습니다. 있는 내용을 그대로 넣으면 됩니다.</p>
+          <p class="sol-desc">프롬프트를 쓰거나 AI 사용법을 따로 익힐 필요가 없어요. 있는 그대로 넣으면 돼요.</p>
         </div>
       </div>
       <div class="sol-step">
         <div class="sol-n">03</div>
         <div>
-          <div class="sol-title">가격도 날짜도, 사실은 그대로 지켜요</div>
-          <p class="sol-desc">사용자가 입력한 사실 정보를 기준으로 유지합니다. 레피가 바꾸는 것은 표현과 흐름뿐입니다.</p>
+          <div class="sol-title">표현과 흐름만, 올리기 좋게 다듬어요</div>
+          <p class="sol-desc">너무 딱딱하지도, 너무 광고 같지도 않게. 가게 분위기에 맞춰 다듬어드려요.</p>
         </div>
       </div>
       <div class="sol-step">
         <div class="sol-n">04</div>
         <div>
-          <div class="sol-title">표현과 흐름만, 올리기 좋게 다듬어요</div>
-          <p class="sol-desc">너무 딱딱하거나 너무 광고 같지 않게, 업장 분위기에 맞게 다듬어드립니다.</p>
-        </div>
-      </div>
-      <div class="sol-step">
-        <div class="sol-n">05</div>
-        <div>
           <div class="sol-title">마지막은 언제나 당신이 정해요</div>
-          <p class="sol-desc">최종 게시 전 내용은 사용자가 직접 확인합니다. 레피는 결정을 대신하지 않습니다.</p>
+          <p class="sol-desc">올리기 전에 내용은 직접 확인해주세요. 레피는 결정을 대신하지 않아요.</p>
         </div>
       </div>
-    </div>
-    <div class="sol-note">
-      <strong>레피는 새 글을 무에서 생성하는 도구가 아닙니다.</strong><br>
-      사용자가 이미 가진 소재를 게시 가능한 표현으로 정리하는 것이 레피의 역할입니다.
     </div>
   </div>
 </section>
@@ -693,44 +797,45 @@
       <span class="sl-num">03</span>
     </div>
     <h2 class="sh">기능을 자랑하기보다,<br>당신의 하루에 맞췄어요.</h2>
-    <div class="feat-grid">
-      <div class="feat-card">
-        <div class="feat-icon"><svg class="mono-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l4.2-1 10-10a2.1 2.1 0 0 0-3-3l-10 10L4 20z"></path><path d="M13.5 7.5l3 3"></path></svg></div>
-        <div class="feat-title">게시 전 문장 정리</div>
-        <p class="feat-desc">거칠게 쓴 초안이나 메모를 SNS에 올릴 수 있는 문장으로 다듬습니다.</p>
-        <span class="feat-tag tag-live">베타 제공</span>
+
+    <!-- 실사 사진 자리. 아래 주석을 풀고 src·alt를 채우면 된다.
+         가로로 넓은 사진이 아래 항목 행과 폭이 맞는다. alt는 반드시 채울 것.
+    <figure class="feat-photo">
+      <img src="파일명.jpg" alt="사진에 무엇이 담겼는지 설명하는 문장" />
+    </figure>
+    -->
+
+    <!-- tabindex는 키보드로도 펼칠 수 있게 하려고 넣었다.
+         마우스가 없는 환경에서 설명문에 닿을 방법이 이것뿐이다. -->
+    <div class="feat-row">
+      <div class="feat-item" tabindex="0">
+        <h3 class="feat-title">게시 전 문장 정리</h3>
+        <div class="feat-body"><p class="feat-desc">거칠게 쓴 초안이나 메모를 SNS에 올릴 수 있는 문장으로 다듬어요.</p></div>
       </div>
-      <div class="feat-card">
-        <div class="feat-icon"><svg class="mono-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="1.8"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path><path d="M12 14v2"></path></svg></div>
-        <div class="feat-title">핵심 정보 유지</div>
-        <p class="feat-desc">가격, 날짜, 메뉴명, 구성, 예약 조건처럼 틀리면 안 되는 정보는 사용자가 입력한 내용을 기준으로 유지합니다.</p>
-        <span class="feat-tag tag-live">베타 제공</span>
+      <div class="feat-item" tabindex="0">
+        <h3 class="feat-title">핵심 정보 유지</h3>
+        <div class="feat-body"><p class="feat-desc">가격, 날짜, 메뉴명, 구성, 예약 조건처럼 틀리면 안 되는 정보는 적어주신 그대로 지켜요.</p></div>
       </div>
-      <div class="feat-card">
-        <div class="feat-icon"><svg class="mono-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 3L5 14h6l-1 7 9-12h-6l0-6z"></path></svg></div>
-        <div class="feat-title">프롬프트 없는 실행</div>
-        <p class="feat-desc">"과하지 않게", "우리 가게 톤으로" — 매번 같은 요청을 길게 입력하지 않아도 됩니다.</p>
-        <span class="feat-tag tag-live">베타 제공</span>
+      <div class="feat-item" tabindex="0">
+        <h3 class="feat-title">프롬프트 없는 실행</h3>
+        <div class="feat-body"><p class="feat-desc">"과하지 않게", "우리 가게 톤으로" — 매번 같은 부탁을 길게 쓰지 않아도 돼요.</p></div>
       </div>
-      <div class="feat-card">
-        <div class="feat-icon"><svg class="mono-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 0 1 13.6-5.7"></path><path d="M17.6 6.3H14"></path><path d="M17.6 6.3V2.7"></path><path d="M20 12a8 8 0 0 1-13.6 5.7"></path><path d="M6.4 17.7H10"></path><path d="M6.4 17.7v3.6"></path></svg></div>
-        <div class="feat-title">작업 흐름 안에서 사용</div>
-        <p class="feat-desc">별도 창 이동 없이, 글을 넣고 정리된 결과를 확인하는 흐름이 한 곳에서 이어집니다.</p>
-        <span class="feat-tag tag-live">베타 제공</span>
+      <div class="feat-item" tabindex="0">
+        <h3 class="feat-title">작업 흐름 안에서 사용</h3>
+        <div class="feat-body"><p class="feat-desc">창을 옮겨 다니지 않아도 돼요. 글을 넣고 결과를 보는 흐름이 한 곳에서 이어져요.</p></div>
       </div>
-      <div class="feat-card">
-        <div class="feat-icon"><svg class="mono-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18.5c3-5.8 6.2-8.8 9.4-9"></path><path d="M7 20c4.8-.2 8.6-2.3 11.5-6.5"></path><path d="M15 4c2.8.6 4.7 2.7 5 5.5"></path><path d="M13 9.5c.5-2.4 1.2-4.2 2-5.5"></path></svg></div>
-        <div class="feat-title">브랜드 톤 프로필</div>
-        <p class="feat-desc">사용자의 선택, 수정, 삭제 이력을 바탕으로 업장별 말투와 선호 표현을 쌓아가는 기능을 준비합니다.</p>
-        <span class="feat-tag tag-soon">고도화 예정</span>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon"><svg class="mono-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="4" width="6" height="11" rx="3"></rect><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0"></path><path d="M12 18v3"></path><path d="M9 21h6"></path></svg></div>
-        <div class="feat-title">음성 저장 기반 게시 전환</div>
-        <p class="feat-desc">영업 중 떠오른 홍보 아이디어를 음성으로 남기면, 나중에 게시 가능한 글로 정리하는 흐름을 준비합니다.</p>
-        <span class="feat-tag tag-soon">예정 기능</span>
+      <div class="feat-item" tabindex="0">
+        <h3 class="feat-title">음성으로 남기기</h3>
+        <span class="feat-tag tag-next">정식 출시 예정</span>
+        <div class="feat-body"><p class="feat-desc">손이 바쁠 땐 말로 남겨두세요. 나중에 올릴 글로 정리해드려요.</p></div>
       </div>
     </div>
+    <!-- 아직 시점이 없는 기능은 카드로 두지 않는다. 되는 것과 나란히 놓으면
+         지금 쓸 수 있는 기능으로 오해된다. -->
+    <p class="feat-later">
+      <span class="feat-tag tag-soon">고도화 예정</span>
+      <span><b>브랜드 톤 프로필</b> — 레피를 사용하면서 사장님만의 말투와 표현을 쌓아가요.</span>
+    </p>
   </div>
 </section>
 
@@ -752,7 +857,7 @@
           <svg class="faq-chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 8l5 5 5-5"/></svg>
         </button>
         <div class="faq-body">
-          <div class="faq-body-inner">ChatGPT나 Gemini도 문장을 바꿀 수 있습니다. 다만 범용 AI는 사용자가 프롬프트를 직접 작성하고, 원하는 톤을 설명하고, 결과를 다시 판단해야 합니다. 레피는 소상공인의 SNS 게시 전 정리 흐름에 맞춰, 사용자가 AI 사용법을 따로 익히지 않아도 작성한 글을 게시 가능한 표현으로 정리하는 데 집중합니다.</div>
+          <div class="faq-body-inner">ChatGPT나 Gemini도 문장을 바꿔줘요. 다만 매번 프롬프트를 직접 쓰고, 원하는 말투를 설명하고, 나온 결과가 괜찮은지 다시 판단해야 해요. 레피는 그 과정을 없앴어요. AI 사용법을 몰라도, 써두신 글을 넣으면 올릴 수 있는 문장으로 정리해드려요.</div>
         </div>
       </div>
 
@@ -763,7 +868,7 @@
           <svg class="faq-chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 8l5 5 5-5"/></svg>
         </button>
         <div class="faq-body">
-          <div class="faq-body-inner">레피의 기본 방향은 새 글을 무에서 생성하는 것이 아닙니다. 사용자가 이미 작성한 글이나 메모한 홍보 소재를 바탕으로, 표현과 흐름을 정리하는 것이 레피의 역할입니다.</div>
+          <div class="faq-body-inner">아니에요. 레피는 없는 글을 지어내지 않아요. 이미 써두신 글이나 메모해둔 홍보 소재를 바탕으로, 표현과 흐름만 정리해드려요.</div>
         </div>
       </div>
 
@@ -774,7 +879,7 @@
           <svg class="faq-chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 8l5 5 5-5"/></svg>
         </button>
         <div class="faq-body">
-          <div class="faq-body-inner">공방, 핸드메이드 판매자, 디저트·카페, 온라인 셀러, 네일샵, 미용실, 꽃집처럼 SNS 게시가 고객 접점에 영향을 주는 소규모 업장에 우선 적합합니다. SNS를 직접 운영하고 있지만 게시 전 표현 정리가 부담스러운 분이라면 업종과 관계없이 써보실 수 있습니다.</div>
+          <div class="faq-body-inner">공방, 핸드메이드, 디저트·카페, 온라인 셀러, 네일샵, 미용실, 꽃집처럼 SNS가 곧 손님을 만나는 창구인 작은 가게에 특히 잘 맞아요. SNS를 직접 하고 계신데 글 다듬는 게 부담스러우시다면, 업종과 상관없이 써보셔도 돼요.</div>
         </div>
       </div>
 
@@ -785,7 +890,7 @@
           <svg class="faq-chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 8l5 5 5-5"/></svg>
         </button>
         <div class="faq-body">
-          <div class="faq-body-inner">현재는 초기 무료 베타를 기준으로 운영합니다. 기본 게시글 정리 기능을 먼저 사용해보고, 향후 페르소나 커스텀, 업종별 게시 양식, 고급 템플릿 등 프리미엄 기능이 추가될 예정입니다. 요금 전환이 있다면 사전에 공지드립니다.</div>
+          <div class="faq-body-inner">지금은 초기 무료 베타로 운영하고 있어요. 기본 정리 기능을 먼저 써보시고, 앞으로 말투 커스텀이나 업종별 양식 같은 기능이 더해질 예정이에요. 요금이 생긴다면 미리 알려드릴게요.</div>
         </div>
       </div>
 
@@ -796,7 +901,7 @@
           <svg class="faq-chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 8l5 5 5-5"/></svg>
         </button>
         <div class="faq-body">
-          <div class="faq-body-inner">레피는 매출 증가를 보장하지 않습니다. 레피의 목표는 게시 전 문장 정리 부담을 줄이고, 소상공인이 SNS 게시를 더 쉽게 실행할 수 있도록 돕는 것입니다. 실제 매출, 방문, 문의 변화는 업종, 상품, 사진, 지역, 고객 반응 등에 따라 달라질 수 있습니다.</div>
+          <div class="faq-body-inner">늘어난다고 약속드릴 수는 없어요. 레피가 하는 일은 글 다듬는 부담을 덜어서, SNS를 더 자주 올릴 수 있게 돕는 것까지예요. 실제 매출이나 방문, 문의는 업종, 상품, 사진, 동네, 손님 반응에 따라 달라져요.</div>
         </div>
       </div>
 
@@ -807,7 +912,7 @@
           <svg class="faq-chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 8l5 5 5-5"/></svg>
         </button>
         <div class="faq-body">
-          <div class="faq-body-inner">레피는 사용자가 입력한 가격, 날짜, 메뉴명, 이벤트 조건 같은 핵심 정보를 유지하는 방향으로 설계합니다. 다만 최종 게시 전 사실 정보는 반드시 사용자가 직접 확인해야 합니다.</div>
+          <div class="faq-body-inner">가격, 날짜, 메뉴명, 이벤트 조건처럼 틀리면 안 되는 건 적어주신 그대로 지키도록 만들었어요. 다만 올리기 전에 사실 관계는 꼭 한 번 직접 확인해주세요.</div>
         </div>
       </div>
 
@@ -818,7 +923,7 @@
           <svg class="faq-chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 8l5 5 5-5"/></svg>
         </button>
         <div class="faq-body">
-          <div class="faq-body-inner">베타 테스트에서는 원문, 정리 결과, 사용자 수정본, 피드백을 사전 동의 범위 내에서 서비스 개선과 사용성 검증에 활용할 수 있습니다. 수집 항목과 처리 방법은 베타 참여 동의 시 구체적으로 안내드립니다.</div>
+          <div class="faq-body-inner">베타 기간에는 원문, 정리 결과, 고치신 내용, 피드백을 미리 동의해주신 범위 안에서 서비스 개선과 사용성 검증에 활용할 수 있어요. 어떤 항목을 모으고 어떻게 다루는지는 베타 참여에 동의하실 때 구체적으로 안내드릴게요.</div>
         </div>
       </div>
 
@@ -834,7 +939,7 @@
       <span class="sl-num">05</span>
     </div>
     <h2 class="sh">내 게시글로<br>직접 테스트해보세요.</h2>
-    <p class="test-desc">작성한 글의 내용은 유지하고, 표현과 흐름만 자연스럽게 다듬어드립니다.</p>
+    <p class="test-desc">써주신 내용은 그대로 두고, 표현과 흐름만 자연스럽게 다듬어드려요.</p>
 
     <div class="test-form">
       <label class="test-label" for="original-text">원문</label>
@@ -874,7 +979,7 @@
     <div class="cta-grid">
       <div>
         <h2 class="cta-h">올리려다 접어둔 글,<br>레피에게 먼저 보여주세요.</h2>
-        <p class="cta-sub">망설이던 초안 한두 개면 충분해요. 레피가 어떻게 다듬는지, 부담 없이 먼저 만나보세요.</p>
+        <p class="cta-sub">망설이던 초안 한두 개면 충분해요.<br>레피가 어떻게 다듬는지, 부담 없이 먼저 만나보세요.</p>
       </div>
       <form id="betaForm" onsubmit="handleSubmit(event)" novalidate>
         <div class="fg">
@@ -927,7 +1032,10 @@
 <footer>
   <div class="container">
     <div class="foot-inner">
-      <div class="foot-logo">Lepi<span>.</span></div>
+      <div class="foot-brand">
+        <div class="foot-logo">Lepi<span>.</span></div>
+        <p class="foot-slogan">전하고 싶은 의미는 그대로,<br>표현은 더 선명하게.</p>
+      </div>
       <div class="foot-disc">
         <p>레피는 사용자가 입력한 내용을 바탕으로 SNS 게시글 표현을 정리하는 AI 보조 도구이며, 가격·일정·이벤트 조건 등 사실 정보와 최종 게시 여부는 사용자가 직접 확인해야 합니다.</p>
         <p>베타 기간 중 수집되는 원문, 정리 결과, 수정본, 피드백은 사전 동의 범위 내에서 서비스 개선과 사용성 검증에 활용될 수 있습니다.</p>
@@ -966,7 +1074,7 @@
     var agree = form.querySelector('[name="agree"]').checked;
 
     if (!name || !email || !category || !agree) {
-      alert('필수 항목을 모두 입력해주세요.');
+      alert('필수 항목을 모두 입력해 주세요.');
       return;
     }
 
@@ -999,7 +1107,7 @@
         throw new Error("베타 신청 전송 실패");
       }
 
-      label.textContent = '신청 완료. 감사합니다!';
+      label.textContent = '신청되었습니다. 감사합니다';
       btn.querySelector('.submit-circle').innerHTML =
         '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
       btn.classList.add('success');
@@ -1011,7 +1119,7 @@
       console.error("베타 신청 오류:", error);
 
       alert(
-        '신청을 처리하는 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'
+        '신청을 보내지 못했습니다. 잠시 후 다시 시도해 주세요.'
       );
 
       label.textContent = '무료 베타 신청하기';
@@ -1040,7 +1148,7 @@
       errorMessage.textContent = "";
 
       if (!text) {
-        errorMessage.textContent = "다듬을 게시글을 입력해 주세요.";
+        errorMessage.textContent = "다듬을 글을 먼저 입력해 주세요.";
         errorMessage.hidden = false;
         originalText.focus();
         return;
@@ -1073,7 +1181,7 @@
 
         if (!response.ok) {
           throw new Error(
-            data.error || "게시글 변환에 실패했습니다."
+            data.error || "글을 다듬지 못했습니다. 잠시 후 다시 시도해 주세요."
           );
         }
 
@@ -1083,7 +1191,7 @@
       } catch (error) {
         console.error("게시글 변환 오류:", error);
         errorMessage.textContent =
-          error.message || "서버와 연결할 수 없습니다.";
+          error.message || "서버에 연결하지 못했습니다. 인터넷 연결을 확인해 주세요.";
 
         errorMessage.hidden = false;
 
