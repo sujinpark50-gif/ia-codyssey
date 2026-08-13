@@ -482,6 +482,16 @@
     .test-error {
       margin-top: 20px; font-size: 14px; color: #9c4a3c; max-width: 720px;
     }
+    .test-notice {
+      margin-top: 24px; font-size: 14.5px; color: var(--fg);
+      max-width: 720px; line-height: 1.7;
+    }
+    .test-notice a {
+      color: var(--fg); text-decoration: underline;
+      text-decoration-color: var(--accent); text-underline-offset: 4px;
+      text-decoration-thickness: 2px;
+    }
+    .test-notice a:hover { color: var(--accent); }
 
     /* ── CTA ── */
     #cta {
@@ -996,6 +1006,12 @@
     </div>
 
     <p id="error-message" class="test-error" hidden></p>
+
+    <!-- 체험은 한 번만. 결과를 본 직후가 신청으로 넘어갈 가장 좋은 순간이라
+         막다른 안내로 두지 않고 신청 폼으로 가는 링크를 붙인다. -->
+    <p id="test-notice" class="test-notice" hidden>
+      레피를 더 이용하고 싶으시면 <a href="#cta">베타 참여를 신청해 주세요</a>.
+    </p>
   </div>
 </section>
 
@@ -1162,10 +1178,23 @@
   const refineButton = document.getElementById("refine-button");
   const refineLabel = document.getElementById("refine-label");
 
-  // 변환 한 번이 곧 OpenAI 비용이라 연타를 막는다.
-  // 남은 시간을 버튼에 띄워야 고장난 것으로 오해하지 않는다.
+  const testNotice = document.getElementById("test-notice");
+
+  // 변환 한 번이 곧 OpenAI 비용이다. 성공하면 체험을 잠그고 신청으로 안내하며,
+  // 실패했을 때만 10초 뒤 다시 시도할 수 있게 한다 —
+  // 네트워크 오류로 한 번뿐인 기회를 잃으면 안 되기 때문이다.
   const COOLDOWN_SECONDS = 10;
   let cooldownTimer = null;
+
+  function lockAfterTrial() {
+    clearInterval(cooldownTimer);
+    refineButton.disabled = true;
+    refineLabel.textContent = "체험 완료";
+
+    if (testNotice) {
+      testNotice.hidden = false;
+    }
+  }
 
   function startCooldown() {
     let left = COOLDOWN_SECONDS;
@@ -1217,6 +1246,7 @@
       refineLabel.textContent = "레피로 다듬는 중...";
 
       const controller = new AbortController();
+      let succeeded = false;
 
       const timeout = setTimeout(() => {
        controller.abort();
@@ -1245,6 +1275,7 @@
 
         resultText.textContent = data.result;
         resultArea.hidden = false;
+        succeeded = true;
 
       } catch (error) {
         console.error("게시글 변환 오류:", error);
@@ -1255,9 +1286,13 @@
 
       } finally {
         clearTimeout(timeout);
-        // 성공이든 실패든 요청이 나간 뒤에는 쉬게 한다.
-        // (빈 입력은 fetch 전에 return하므로 여기 오지 않는다.)
-        startCooldown();
+
+        if (succeeded) {
+          lockAfterTrial();
+        } else {
+          // 실패한 경우에만 다시 시도할 여지를 남긴다.
+          startCooldown();
+        }
       }
     });
   }
