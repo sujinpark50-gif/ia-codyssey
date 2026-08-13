@@ -462,7 +462,11 @@
     }
     .test-textarea::placeholder { color: var(--muted); opacity: 0.7; }
     .test-textarea:focus { border-color: var(--fg); }
-    button.arr-btn:disabled { opacity: 0.4; cursor: default; pointer-events: none; }
+    /* 쿨다운 중에는 남은 시간이 라벨에 뜬다. 버튼 전체를 흐리게 하면
+       그 글자까지 묻히므로(0.4 × 0.5 = 0.2), 동그라미만 흐리고 글자는 살린다. */
+    button.arr-btn:disabled { cursor: default; pointer-events: none; }
+    button.arr-btn:disabled .arr-circle { opacity: 0.3; }
+    button.arr-btn:disabled .arr-label { opacity: 0.85; }
     .test-result {
       margin-top: 48px; padding: 28px 32px;
       border: 1px solid var(--fg); max-width: 720px;
@@ -1156,6 +1160,33 @@
   }
   
   const refineButton = document.getElementById("refine-button");
+  const refineLabel = document.getElementById("refine-label");
+
+  // 변환 한 번이 곧 OpenAI 비용이라 연타를 막는다.
+  // 남은 시간을 버튼에 띄워야 고장난 것으로 오해하지 않는다.
+  const COOLDOWN_SECONDS = 10;
+  let cooldownTimer = null;
+
+  function startCooldown() {
+    let left = COOLDOWN_SECONDS;
+    refineButton.disabled = true;
+    refineLabel.textContent = left + "초 후 다시 시도";
+
+    clearInterval(cooldownTimer);
+    cooldownTimer = setInterval(function () {
+      left -= 1;
+
+      if (left > 0) {
+        refineLabel.textContent = left + "초 후 다시 시도";
+        return;
+      }
+
+      clearInterval(cooldownTimer);
+      refineButton.disabled = false;
+      refineLabel.textContent = "레피로 다듬기";
+    }, 1000);
+  }
+
   const originalText = document.getElementById("original-text");
   const resultArea = document.getElementById("result-area");
   const resultText = document.getElementById("result-text");
@@ -1182,7 +1213,6 @@
         return;
       }
 
-      const refineLabel = document.getElementById("refine-label");
       refineButton.disabled = true;
       refineLabel.textContent = "레피로 다듬는 중...";
 
@@ -1225,8 +1255,9 @@
 
       } finally {
         clearTimeout(timeout);
-        refineButton.disabled = false;
-        refineLabel.textContent = "레피로 다듬기";
+        // 성공이든 실패든 요청이 나간 뒤에는 쉬게 한다.
+        // (빈 입력은 fetch 전에 return하므로 여기 오지 않는다.)
+        startCooldown();
       }
     });
   }
