@@ -468,13 +468,15 @@
     button.arr-btn:disabled { cursor: default; pointer-events: none; }
     button.arr-btn:disabled .arr-circle { opacity: 0.3; }
     button.arr-btn:disabled .arr-label { opacity: 0.85; }
+    /* 라벨은 상자 밖, 상자는 그 아래. "원문" 라벨과 왼쪽 끝이 맞는다. */
+    .test-result-wrap { margin-top: 48px; max-width: 720px; }
+    /* 결과 라벨은 원문 라벨보다 강하게 — 사용자가 기다린 자리다.
+       오커는 크림 위 3.90:1이라 12px 텍스트 기준(4.5:1)에 미달한다.
+       색 대신 진하기로 세운다 — 딥포레스트는 12.5:1. */
+    .test-label-strong { font-size: 13px; color: var(--fg); }
     .test-result {
-      margin-top: 48px; padding: 28px 32px;
-      border: 1px solid var(--fg); max-width: 720px;
-    }
-    .test-result-label {
-      font-size: 10px; font-weight: 500; text-transform: uppercase;
-      letter-spacing: 0.2em; color: var(--muted); margin-bottom: 16px;
+      padding: 28px 32px;
+      border: 1px solid var(--fg);
     }
     .test-result-text {
       font-size: 15px; line-height: 1.8; color: var(--fg);
@@ -1001,9 +1003,13 @@
       </button>
     </div>
 
-    <div id="result-area" class="test-result" hidden>
-      <div class="test-result-label">변환 결과</div>
-      <div id="result-text" class="test-result-text"></div>
+    <!-- 라벨을 상자 밖에 둔다. 안에 두면 패딩 32px만큼 밀려서
+         위쪽 "원문" 라벨과 왼쪽 끝이 어긋난다. -->
+    <div id="result-area" class="test-result-wrap" hidden>
+      <div class="test-label test-label-strong">변환 결과</div>
+      <div class="test-result">
+        <div id="result-text" class="test-result-text"></div>
+      </div>
     </div>
 
     <p id="error-message" class="test-error" hidden></p>
