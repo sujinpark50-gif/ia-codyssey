@@ -211,12 +211,13 @@
       text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted);
       margin-bottom: 40px;
     }
-    .badge-dot {
-      width: 6px; height: 6px; border-radius: 50%;
+    /* 깜빡이는 점을 짧은 선으로 바꿨다. 점멸은 서버 모니터링 UI의 기호인데
+       여기서는 감시하는 대상이 없다 — 기능인 척하는 장식이었다.
+       섹션 라벨(.sl-line)이 쓰는 것과 같은 선이라 페이지 문법에 맞는다. */
+    .badge-rule {
+      width: 24px; height: 1px; flex-shrink: 0;
       background: var(--accent);
-      animation: blink 2.6s ease-in-out infinite;
     }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
     /* 두 줄이 각각 한 줄로 유지되도록 크기를 제한한다.
        왼쪽 칸은 최대 488px(컨테이너 1120 − 패딩 64 − 갭 80, ÷2)이고
        "차마 못 올린 글."은 들여쓰기 포함 약 7.0em이 필요하다 → 상한 64px.
@@ -676,7 +677,7 @@
     <div class="hero-grid">
       <div>
         <div class="hero-badge">
-          <span class="badge-dot"></span>
+          <span class="badge-rule"></span>
           무료 베타 운영 중
         </div>
         <h1 class="hero-h1">
