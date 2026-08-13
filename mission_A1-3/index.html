@@ -380,12 +380,11 @@
     .feat-later b { color: var(--fg); font-weight: 500; }
     .feat-later .feat-tag { flex-shrink: 0; }
 
-    /* 세 등급을 테두리 진하기로 구분한다.
-       글자색은 셋 다 4.5:1을 넘는 값만 쓴다 — --border(2.92:1)는 테두리 전용. */
+    /* 글자색은 4.5:1을 넘는 값만 쓴다 — --border(2.92:1)는 테두리 전용.
+       "지금 되는 기능"에는 라벨을 붙이지 않으므로 등급은 둘뿐이다. */
 
-    .tag-live { border-color: var(--fg); color: var(--fg); }      /* 지금 됨 */
-    .tag-next { border-color: var(--muted); color: var(--muted); } /* 정식 출시 때 */
-    .tag-soon { border-color: var(--border); color: var(--muted); }/* 아직 미정 */
+    .tag-next { border-color: var(--muted); color: var(--muted); } /* 정식 출시 예정 */
+    .tag-soon { border-color: var(--border); color: var(--muted); }/* 고도화 예정 */
 
     /* ── FAQ ── */
     .faq-list { max-width: 720px; }
