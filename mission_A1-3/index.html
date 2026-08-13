@@ -15,6 +15,10 @@
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="레피(Lepi) — 전하고 싶은 의미는 그대로, 표현은 더 선명하게." />
   <meta name="twitter:description" content="소상공인이 직접 쓴 글이나 메모를 SNS에 올릴 수 있는 표현으로 정리해드려요." />
+  <!-- 로고 "Lepi."의 마침표를 그대로 쓴 파비콘. 외부 파일 없이 SVG를 인라인으로
+       넣어 요청을 하나 줄인다. 딥포레스트 바탕에 샌드 점(6.0:1). -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23283618'/%3E%3Ccircle cx='16' cy='16' r='7' fill='%23DDA15E'/%3E%3C/svg%3E" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;300;400&display=swap" rel="stylesheet" />
@@ -74,6 +78,27 @@
       text-wrap: pretty;
     }
 
+    /* ── 키보드 접근 ──
+       마우스 클릭에는 테두리가 안 뜨고 탭 이동에만 뜨도록 :focus-visible을 쓴다.
+       어두운 면(#cta·footer)에서는 오커가 3.4:1로 약해 샌드로 바꾼다. */
+    a:focus-visible, button:focus-visible, input:focus-visible,
+    select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+    #cta a:focus-visible, #cta button:focus-visible, #cta input:focus-visible,
+    #cta select:focus-visible, #cta textarea:focus-visible,
+    footer a:focus-visible {
+      outline-color: var(--accent-dark);
+    }
+    .skip-link {
+      position: absolute; left: 16px; top: -60px; z-index: 200;
+      background: var(--fg); color: var(--bg);
+      padding: 10px 18px; font-size: 13px; text-decoration: none;
+      transition: top 0.2s var(--ease);
+    }
+    .skip-link:focus { top: 16px; }
+
     /* ── Layout ── */
     .container { max-width: 1120px; margin: 0 auto; padding: 0 32px; }
     section { padding: 120px 0; border-bottom: 1px solid var(--divider); }
@@ -125,11 +150,9 @@
       transition: letter-spacing 0.7s var(--ease);
     }
     .sl:hover .sl-text { letter-spacing: 0.32em; }
-    .sl-num {
-      margin-left: auto;
-      font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
-      font-size: 11px; color: var(--muted);
-    }
+    /* 섹션 번호(01~06)는 제거했다. 문제·해결·특징·FAQ·체험·베타는 순서가 없는
+       병렬 목록이라, 번호를 붙이면 없는 순서를 있는 것처럼 말하게 된다.
+       해결 섹션 안의 단계 번호(.sol-n)는 실제 순서이므로 남긴다. */
 
     /* ── Section Heading ── */
     .sh {
@@ -465,7 +488,6 @@
        읽어야 하는 텍스트는 전부 그 위로, 장식용 선은 낮게 둔다. */
     #cta .sl-line { background: rgba(254,250,224,0.3); }
     #cta .sl-text { color: rgba(254,250,224,0.62); }
-    #cta .sl-num  { color: rgba(254,250,224,0.5); }
     .cta-grid {
       display: grid; grid-template-columns: 1fr 1fr;
       gap: 80px; align-items: start;
@@ -617,6 +639,10 @@
 </head>
 <body>
 
+<!-- 키보드 사용자가 nav를 건너뛰고 본문으로 바로 갈 수 있게 한다.
+     평소엔 화면 밖에 있다가 탭 포커스를 받으면 나타난다. -->
+<a href="#hero" class="skip-link">본문으로 건너뛰기</a>
+
 <!-- NAV -->
 <nav>
   <div class="container">
@@ -627,6 +653,8 @@
     </div>
   </div>
 </nav>
+
+<main>
 
 <!-- HERO -->
 <section id="hero">
@@ -690,7 +718,6 @@
     <div class="sl">
       <div class="sl-line"></div>
       <span class="sl-text">문제</span>
-      <span class="sl-num">01</span>
     </div>
     <h2 class="sh">다 써놓고도,<br>'올리기' 앞에서 멈춰요.</h2>
     <div class="prob-list">
@@ -751,7 +778,6 @@
     <div class="sl">
       <div class="sl-line"></div>
       <span class="sl-text">해결</span>
-      <span class="sl-num">02</span>
     </div>
     <h2 class="sh">전하고 싶은 의미는 그대로,<br>표현은 더 선명하게.</h2>
     <div class="sol-steps">
@@ -793,7 +819,6 @@
     <div class="sl">
       <div class="sl-line"></div>
       <span class="sl-text">특징</span>
-      <span class="sl-num">03</span>
     </div>
     <h2 class="sh">기능을 자랑하기보다,<br>당신의 하루에 맞췄어요.</h2>
 
@@ -844,7 +869,6 @@
     <div class="sl">
       <div class="sl-line"></div>
       <span class="sl-text">FAQ</span>
-      <span class="sl-num">04</span>
     </div>
     <h2 class="sh" style="margin-bottom: 0;">혹시, 이런 게 궁금하셨나요?</h2>
     <div class="faq-list" style="margin-top: 40px;">
@@ -935,7 +959,6 @@
     <div class="sl">
       <div class="sl-line"></div>
       <span class="sl-text">직접 체험</span>
-      <span class="sl-num">05</span>
     </div>
     <h2 class="sh">내 게시글로<br>직접 테스트해보세요.</h2>
     <p class="test-desc">써주신 내용은 그대로 두고, 표현과 흐름만 자연스럽게 다듬어드려요.</p>
@@ -973,7 +996,6 @@
     <div class="sl">
       <div class="sl-line"></div>
       <span class="sl-text">무료 베타</span>
-      <span class="sl-num">06</span>
     </div>
     <div class="cta-grid">
       <div>
@@ -1026,6 +1048,8 @@
     </div>
   </div>
 </section>
+
+</main>
 
 <!-- FOOTER -->
 <footer>
