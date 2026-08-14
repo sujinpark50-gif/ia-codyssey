@@ -6,15 +6,24 @@
   <title>레피(Lepi) — SNS 게시 전 정리 솔루션</title>
   <meta name="description" content="전하고 싶은 의미는 그대로, 표현은 더 선명하게. 소상공인이 직접 쓴 글이나 메모를 SNS에 올릴 수 있는 표현으로 정리해주는 게시 전 정리 도구입니다." />
 
-  <!-- 카톡·슬랙 링크 미리보기용. og:url과 og:image는 배포 주소가 정해지면 채운다. -->
+  <!-- 카톡·슬랙 링크 미리보기용. 크롤러는 상대 경로를 못 읽으므로 절대 주소로 적는다.
+       배포 루트가 mission_A1-3라 og-image.png는 도메인 바로 아래에 놓인다. -->
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="ko_KR" />
   <meta property="og:site_name" content="레피(Lepi)" />
+  <meta property="og:url" content="https://ia-codyssey-two.vercel.app/" />
   <meta property="og:title" content="레피(Lepi) — 전하고 싶은 의미는 그대로, 표현은 더 선명하게." />
   <meta property="og:description" content="소상공인이 직접 쓴 글이나 메모를 SNS에 올릴 수 있는 표현으로 정리해드려요." />
-  <meta name="twitter:card" content="summary" />
+  <meta property="og:image" content="https://ia-codyssey-two.vercel.app/og-image.png" />
+  <!-- 카톡은 크기를 명시하지 않으면 큰 카드 대신 작은 섬네일로 떨어뜨릴 때가 있다. -->
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="쓰긴 썼는데, 차마 못 올린 글. — 레피가 올릴 수 있게 다듬어드려요." />
+  <!-- 이미지가 생겼으므로 summary(작은 정사각 섬네일)에서 큰 카드로 올린다. -->
+  <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="레피(Lepi) — 전하고 싶은 의미는 그대로, 표현은 더 선명하게." />
   <meta name="twitter:description" content="소상공인이 직접 쓴 글이나 메모를 SNS에 올릴 수 있는 표현으로 정리해드려요." />
+  <meta name="twitter:image" content="https://ia-codyssey-two.vercel.app/og-image.png" />
   <!-- 로고 "Lepi."의 마침표를 그대로 쓴 파비콘. 외부 파일 없이 SVG를 인라인으로
        넣어 요청을 하나 줄인다. 딥포레스트 바탕에 샌드 점(6.0:1). -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23283618'/%3E%3Ccircle cx='16' cy='16' r='7' fill='%23DDA15E'/%3E%3C/svg%3E" />
