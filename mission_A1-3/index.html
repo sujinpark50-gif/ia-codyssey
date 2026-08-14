@@ -643,7 +643,12 @@
       .feat-body, .feat-item:hover .feat-body { grid-template-rows: 1fr; }
       .cta-grid { grid-template-columns: 1fr; gap: 48px; }
       .foot-inner { flex-direction: column; gap: 20px; }
-      .prob-row { grid-template-columns: 40px 1fr; }
+      /* 문제와 해결은 같은 문법의 목록이다 — 번호 한 칸, 그 옆에 제목과 설명.
+         그런데 좁은 화면에서 문제만 번호칸을 40px로 줄여, 본문이 해결보다 8px
+         넓고 시작 위치도 72px과 80px로 어긋났다. 스크롤로 이어 읽는 자리라
+         해결 쪽 48px에 맞춘다. 세 번째 칸(.prob-em)은 바로 아래에서 감추지만
+         칸 자체는 남으므로, 두 칸 격자로 다시 잡아야 빈 32px이 생기지 않는다. */
+      .prob-row { grid-template-columns: 48px 1fr; }
       .prob-em { display: none; }
     }
     @media (max-width: 600px) {
@@ -671,6 +676,17 @@
          들여쓰기 24px를 걷어내면 본문 한 줄에 들어가는 글자도 늘어난다. */
       .feat-item { border-left: none; padding-left: 0; }
       .feat-photo { margin-bottom: 40px; }
+      /* 번호를 제목 위로 올리고 본문 들여쓰기를 없앤다. 매달린 들여쓰기는
+         번호칸 48px에 간격 32px까지 80px을 본문에서 떼어가는데, 본문 폭이
+         335px(375px 기기)뿐인 자리에서 그 80px은 한 줄에 들어가는 글자를
+         다섯 자 남짓 줄인다. keep-all로 띄어쓰기에서만 끊는 터라 칸이 좁을수록
+         줄 끝이 들쭉날쭉해지기도 한다. 게다가 같은 화면을 이어 내려갈 때
+         특징 항목은 제목 선에 맞아 있어 문제·해결만 혼자 밀려 보였다.
+         번호는 위로 올려도 순서를 읽는 데 지장이 없다. */
+      .prob-row, .sol-step { grid-template-columns: 1fr; gap: 10px; }
+      /* 나란히 놓였을 때 11px 번호를 17px 제목의 중심에 맞추려던 값이다.
+         위아래로 서면 두 줄 사이만 벌리므로 뺀다. */
+      .prob-n, .sol-n { padding-top: 0; }
       .prob-callout { margin-top: 48px; }
       .faq-btn { grid-template-columns: 36px 1fr 18px; gap: 14px; }
       .faq-body-inner { padding-left: 50px; }
