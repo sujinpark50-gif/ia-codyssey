@@ -265,7 +265,7 @@
     /* ── PROBLEM ── */
     .prob-list { display: flex; flex-direction: column; }
     .prob-row {
-      display: grid; grid-template-columns: 48px 1fr 32px;
+      display: grid; grid-template-columns: 48px 1fr;
       gap: 32px; align-items: start;
       padding: 28px 0;
       border-top: 1px solid var(--rule);
@@ -280,7 +280,12 @@
     }
     /* 위치 이동은 뺐다. 색 변화만 남긴다 —
        색이 진해지는 것은 "지금 이 줄을 읽고 있다"는 표시이고,
-       옆으로 미는 것은 "누르면 뭔가 있다"는 신호다. 앞만 남긴다. */
+       옆으로 미는 것은 "누르면 뭔가 있다"는 신호다. 앞만 남긴다.
+       한때 이 줄에 아이콘을 하나씩 붙여 호버 때 함께 밝혔는데, 시계·전구·
+       돋보기처럼 개념을 그림으로 옮긴 것들이라 아무 정보도 더하지 않았다
+       (그래서 좁은 화면에서는 통째로 숨기고 있었다). 호버 반응은 번호와
+       설명문의 색으로 충분하다 — 설명문 한 줄 전체가 5.52:1에서 12.53:1로
+       진해지는 쪽이 22px 아이콘 하나보다 넓게 움직인다. */
     .prob-row:hover .prob-n { color: var(--fg); }
     .prob-title {
       font-size: 17px; font-weight: 400; margin-bottom: 6px;
@@ -290,24 +295,6 @@
       transition: color 0.5s var(--ease);
     }
     .prob-row:hover .prob-desc { color: var(--fg); }
-    .prob-em {
-      padding-top: 2px;
-      color: var(--fg);
-      opacity: 0.38;
-      transition: opacity 0.5s var(--ease);
-    }
-    .mono-icon {
-      display: block;
-      width: 22px;
-      height: 22px;
-      color: currentColor;
-      stroke: currentColor;
-      stroke-width: 1.45;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      fill: none;
-    }
-    .prob-row:hover .prob-em { opacity: 1; }
     /* 문제 섹션의 결론. 테두리 대신 서체로 무게를 준다.
        둘째 줄이 약 28.9em이라 26px × 28.9 ≈ 751px → 폭 780px 안에 한 줄로 들어간다. */
     .prob-callout {
@@ -654,13 +641,9 @@
       .feat-body, .feat-item:hover .feat-body { grid-template-rows: 1fr; }
       .cta-grid { grid-template-columns: 1fr; gap: 48px; }
       .foot-inner { flex-direction: column; gap: 20px; }
-      /* 문제와 해결은 같은 문법의 목록이다 — 번호 한 칸, 그 옆에 제목과 설명.
-         그런데 좁은 화면에서 문제만 번호칸을 40px로 줄여, 본문이 해결보다 8px
-         넓고 시작 위치도 72px과 80px로 어긋났다. 스크롤로 이어 읽는 자리라
-         해결 쪽 48px에 맞춘다. 세 번째 칸(.prob-em)은 바로 아래에서 감추지만
-         칸 자체는 남으므로, 두 칸 격자로 다시 잡아야 빈 32px이 생기지 않는다. */
-      .prob-row { grid-template-columns: 48px 1fr; }
-      .prob-em { display: none; }
+      /* 문제·해결의 번호칸을 좁은 화면에서 따로 손보던 규칙은 걷어냈다.
+         아이콘 칸이 사라지면서 기본 격자가 두 섹션 모두 48px 1fr로 같아져,
+         여기서 다시 잡아줄 것이 없다. */
     }
     @media (max-width: 600px) {
       .container { padding: 0 20px; }
@@ -792,7 +775,6 @@
           <div class="prob-title">손이 열 개라도 모자라요</div>
           <div class="prob-desc">판매하고 응대하고 예약 받다 보면, 글 한 줄 다듬을 틈이 없어요.</div>
         </div>
-        <div class="prob-em"><svg class="mono-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"></circle><path d="M12 7v5l3 2"></path></svg></div>
       </div>
       <div class="prob-row">
         <div class="prob-n">02</div>
@@ -800,7 +782,6 @@
           <div class="prob-title">AI는 또 따로 배워야 해요</div>
           <div class="prob-desc">매번 프롬프트를 새로 쓰고, 원하는 말투를 일일이 설명해야 해요.</div>
         </div>
-        <div class="prob-em"><svg class="mono-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M8 14c-1.4-1.1-2.2-2.8-2.2-4.6A6.2 6.2 0 0 1 12 3.2a6.2 6.2 0 0 1 6.2 6.2c0 1.8-.8 3.5-2.2 4.6-.7.6-1 1.2-1 2H9c0-.8-.3-1.4-1-2Z"></path></svg></div>
       </div>
       <div class="prob-row">
         <div class="prob-n">03</div>
@@ -808,7 +789,6 @@
           <div class="prob-title">결국 다시 읽어보게 돼요</div>
           <div class="prob-desc">맞게 썼는지, 너무 광고 같진 않은지, 다시 읽고 고민하는 몫이 남아요.</div>
         </div>
-        <div class="prob-em"><svg class="mono-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="5.5"></circle><path d="M15 15l4 4"></path><path d="M10.5 8v5"></path><path d="M8 10.5h5"></path></svg></div>
       </div>
       <div class="prob-row">
         <div class="prob-n">04</div>
@@ -816,7 +796,6 @@
           <div class="prob-title">옮겨 붙이다 흐름이 끊겨요</div>
           <div class="prob-desc">여기서 쓰고 저기서 다듬고 또 옮겨 붙이다, 어느새 손을 놓게 돼요.</div>
         </div>
-        <div class="prob-em"><svg class="mono-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="4" width="10" height="16" rx="1.6"></rect><path d="M9.5 8h5"></path><path d="M9.5 12h5"></path><path d="M9.5 16h3"></path></svg></div>
       </div>
       <div class="prob-row">
         <div class="prob-n">05</div>
@@ -824,7 +803,6 @@
           <div class="prob-title">그러다 임시저장함에 잠들어요</div>
           <div class="prob-desc">올리려던 글이 메모장에, 임시저장함에 그대로 남아버려요.</div>
         </div>
-        <div class="prob-em"><svg class="mono-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h9l3 3v13H6z"></path><path d="M15 4v4h4"></path><path d="M9 14h6"></path></svg></div>
       </div>
     </div>
     <!-- 줄 길이를 고르게 세 줄로 끊는다 (26px 기준 약 384 / 372 / 431px).
