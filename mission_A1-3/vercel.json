@@ -6,6 +6,10 @@
       "use": "@vercel/static"
     },
     {
+      "src": "og-image.png",
+      "use": "@vercel/static"
+    },
+    {
       "src": "api/index.py",
       "use": "@vercel/python"
     }
