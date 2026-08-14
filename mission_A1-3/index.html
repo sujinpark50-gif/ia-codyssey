@@ -202,6 +202,15 @@
       display: flex; align-items: center;
       padding: 80px 0;
     }
+    /* 세로 가운데 정렬을 위해 #hero만 flex인데, 그 탓에 .container가 flex
+       아이템이 된다. 블록이던 다른 섹션과 달리 주축으로 늘어나지 않고 내용
+       크기만큼만 잡히고, margin: 0 auto가 남는 공간을 나눠 가운데로 민다.
+       그래서 히어로만 다른 섹션보다 좁고 안쪽에서 시작한다 — 폭에 상관없이
+       일어나며, 내용이 가용 폭에 얼마나 못 미치느냐에 따라 어긋나는 양이
+       달라진다. 데스크톱에서는 2열 격자가 1120px을 다 채우지 못해서,
+       900px 이하에서는 .hero-right가 숨어 1열이 되면서 더 크게 벌어진다.
+       스크롤로 이어 보는 자리라 시작 선은 모든 섹션이 같아야 한다. */
+    #hero > .container { width: 100%; }
     .hero-grid {
       display: grid; grid-template-columns: 1fr 1fr;
       gap: 80px; align-items: end; width: 100%;
