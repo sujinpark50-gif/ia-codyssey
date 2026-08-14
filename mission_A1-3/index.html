@@ -300,7 +300,9 @@
     }
     .prob-row:hover .prob-desc { color: var(--fg); }
     /* 문제 섹션의 결론. 테두리 대신 서체로 무게를 준다.
-       둘째 줄이 약 28.9em이라 26px × 28.9 ≈ 751px → 폭 780px 안에 한 줄로 들어간다. */
+       줄은 <br>로 직접 끊는다. 가장 긴 줄이 한글 열여섯 자 남짓이라 26px에서도
+       460px 안팎이고, 위 목록(720px)보다 짧게 끝난다. max-width는 문구가
+       길어질 때를 대비한 안전선일 뿐 지금 문장은 닿지 않는다. */
     .prob-callout {
       margin-top: 72px;
       font-family: var(--serif);
