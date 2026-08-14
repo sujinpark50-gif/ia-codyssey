@@ -239,7 +239,7 @@
     }
     /* 두 줄이 각각 한 줄로 유지되도록 크기를 제한한다.
        왼쪽 칸은 최대 488px(컨테이너 1120 − 패딩 64 − 갭 80, ÷2)이고
-       "차마 못 올린 글."은 들여쓰기 포함 약 7.0em이 필요하다 → 상한 64px.
+       "차마 못 올린 글."은 약 6.8em이 필요하다 → 상한 64px.
        vw 계수도 900~1120px 구간에서 같은 제약을 받으므로 함께 낮춘다. */
     .hero-h1 {
       font-family: var(--serif);
@@ -248,7 +248,6 @@
       letter-spacing: -0.02em; margin-bottom: 24px;
     }
     .hero-h1 em { font-style: normal; display: block; }
-    .hero-h1 .indent { padding-left: 0.2em; }
     /* 둘째 줄 "레피가 올릴 수 있게 다듬어드려요."가 약 15.3em이라
        27px × 15.3 ≈ 413px. 폭 480px 안에 한 줄로 들어간다. */
     .hero-promise {
@@ -742,7 +741,7 @@
         </div>
         <h1 class="hero-h1">
           <em>쓰긴 썼는데,</em>
-          <em class="indent">차마 못 올린 글.</em>
+          <em>차마 못 올린 글.</em>
         </h1>
         <!-- 줄바꿈을 의미 단위로 고정한다. 자동 줄바꿈에 맡기면
              "올릴 수 / 있게"처럼 구가 갈라진다. -->
