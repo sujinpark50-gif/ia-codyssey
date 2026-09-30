@@ -646,6 +646,113 @@
     .foot-disc { font-size: 12px; color: rgba(254,250,224,0.58); line-height: 1.75; }
     .foot-disc p + p { margin-top: 6px; }
 
+    /* ── CASES ── */
+    /* 섹션 설명 한 줄. 히어로 보조문(.hero-sub)과 같은 결이지만
+       밑줄 표시의 뜻을 여기서 알려주므로 본문색으로 조금 더 세운다. */
+    .cases-lead {
+      font-size: 15px; line-height: 1.8; color: var(--muted);
+      max-width: 560px; margin: -32px 0 72px;
+    }
+    .cases-lead .kept { color: var(--fg); }
+
+    .case-list { list-style: none; }
+    /* 사례 사이는 문제 목록과 같은 블러시 선. 섹션 구분선(--divider)보다 진하고
+       nav 테두리(--border)보다 옅은 층이다. */
+    .case {
+      display: grid; grid-template-columns: 5fr 7fr;
+      gap: 64px; align-items: start;
+      padding: 72px 0; border-top: 1px solid var(--rule);
+    }
+    .case:first-child { padding-top: 0; border-top: none; }
+
+    /* 사진은 원래 비율 그대로 둔다. 셀카(가로)와 소품 사진(세로)을
+       같은 틀로 자르면 모자 사례의 두 사람이 잘려 나간다. */
+    .case-photo img {
+      display: block; width: 100%; height: auto;
+      max-height: 560px; object-fit: cover;
+    }
+
+    /* 상품명과 가격은 본문 밖 정보다 (엔진 v1.3: product_card). */
+    .case-card {
+      display: flex; flex-wrap: wrap; align-items: baseline;
+      gap: 4px 16px; margin-bottom: 32px;
+    }
+    .case-name { font-size: 15px; font-weight: 500; color: var(--fg); }
+    .case-price { font-size: 13.5px; color: var(--muted); }
+
+    /* Before: 사장님이 쓴 그대로. 한 번 읽고 넘어가는 자리라
+       바탕면(--surface) 위에 작게 둔다. 반말·띄어쓰기도 손대지 않는다. */
+    .case-label {
+      font-size: 12.5px; font-weight: 500; color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .case-memo {
+      background: var(--surface);
+      padding: 20px 24px;
+      font-size: 14px; line-height: 1.85; color: var(--fg);
+    }
+    .case-memo + .case-memo { margin-top: 8px; }
+    .case-memo-add { font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+
+    /* 밑줄 = 레피가 버리지 않고 결과에 살려 쓴 사장님의 말.
+       이 섹션에서 유일하게 색을 쓰는 곳이다. 오커 글자는 크림 위 3.9:1로
+       본문 기준에 못 미치므로 글자는 그대로 두고 밑줄에만 오커를 쓴다
+       (.test-notice a와 같은 방식). */
+    .kept {
+      text-decoration: underline;
+      text-decoration-color: var(--accent);
+      text-decoration-thickness: 2px;
+      text-underline-offset: 5px;
+      text-decoration-skip-ink: none;
+    }
+
+    /* After: 메모에서 한 칸 띄우고, 세로선 하나로 "여기부터 레피가 정리한 글"을
+       표시한다. 카드 상자를 하나 더 두르지 않는 것은 Before 상자와 무게를 겨루지
+       않게 하려는 것이다. */
+    .case-result {
+      margin-top: 36px; padding-left: 24px;
+      border-left: 1px solid var(--fg);
+    }
+    .case-result .case-label { color: var(--fg); }
+    /* 헤드라인은 섹션 제목(.sh)과 같은 명조·300. 글 전체에서 가장 큰 돌이다.
+       줄은 쉼표에서 <br>로 직접 끊는다. balance에 맡기면 "바람 / 부는"처럼
+       구가 갈라진다 — 페이지의 다른 <br> 요소와 같은 규칙이다. */
+    .case-headline {
+      font-family: var(--serif);
+      font-size: clamp(21px, 2.3vw, 27px);
+      font-weight: 300; line-height: 1.45;
+      letter-spacing: -0.01em; color: var(--fg);
+      margin-bottom: 22px;
+    }
+    .case-body p {
+      font-size: 15px; line-height: 1.85; color: var(--fg);
+      text-wrap: pretty;
+    }
+    .case-body p + p { margin-top: 14px; }
+
+    .cases-foot {
+      margin-top: 16px; padding-top: 48px;
+      border-top: 1px solid var(--rule);
+      display: flex; flex-wrap: wrap; justify-content: space-between;
+      align-items: center; gap: 32px;
+    }
+    .cases-disc {
+      font-size: 12.5px; line-height: 1.75; color: var(--muted);
+      max-width: 520px; text-wrap: pretty;
+    }
+
+    @media (max-width: 900px) {
+      .case { grid-template-columns: 1fr; gap: 36px; }
+      .case-photo img { max-height: 480px; }
+      .cases-lead { margin-bottom: 56px; }
+    }
+    @media (max-width: 600px) {
+      .case { padding: 56px 0; }
+      .cases-lead { margin-top: -24px; margin-bottom: 48px; }
+      .case-memo { padding: 16px 18px; }
+      .case-result { padding-left: 18px; }
+    }
+
     /* ── RESPONSIVE ── */
     @media (max-width: 900px) {
       .hero-grid { grid-template-columns: 1fr; gap: 48px; }
@@ -875,6 +982,142 @@
           <p class="sol-desc">올리기 전에 내용은 직접 확인해주세요. 레피는 결정을 대신하지 않아요.</p>
         </div>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- CASES -->
+<section id="cases">
+  <div class="container">
+    <div class="sl">
+      <div class="sl-line"></div>
+      <span class="sl-text">사례</span>
+    </div>
+    <h2 class="sh">메모 몇 줄이,<br>올릴 수 있는 글이 됐어요.</h2>
+    <p class="cases-lead">
+      사장님이 적은 말은 지우지 않아요. 그중 가장 사장님다운 한마디를 앞에 세워요.
+      <span class="kept">밑줄</span>은 레피가 버리지 않고 그대로 살려 쓴 말이에요.
+    </p>
+
+    <ol class="case-list">
+
+      <!-- 1. 밀짚모자 -->
+      <li class="case">
+        <figure class="case-photo">
+          <img src="images/case-straw-hat.jpg" width="1400" height="1050" loading="lazy"
+               alt="밀짚모자를 쓴 두 사람이 강과 산이 내려다보이는 전망대에서 웃으며 찍은 셀카">
+        </figure>
+        <div>
+          <div class="case-card">
+            <span class="case-name">밀짚모자</span>
+            <span class="case-price">철원 주상절리 입장 상품권으로 구매</span>
+          </div>
+          <p class="case-label">사장님 메모</p>
+          <p class="case-memo"><span class="kept">못생긴</span> 밀짚모자인데 철원 주상절리입장료내면 한사람당 <span class="kept">5천원 상품권</span>주는데 그걸 이용하면 주변상점에서 살수 있거든 <span class="kept">너무 햇볕이 뜨거워서 어쩔수 없이</span> 샀는데 <span class="kept">국내 여행갈때마다 필요할때 들고갔더니</span> <span class="kept">추억템</span>이 됐어</p>
+          <div class="case-result">
+            <p class="case-label">레피가 정리한 글</p>
+            <p class="case-headline">예쁘진 않아도,<br>여행마다 따라다니면 추억이&nbsp;되는&nbsp;모자.</p>
+            <div class="case-body">
+              <p>솔직히 말하면, 못생긴 모자입니다.</p>
+              <p>그런데 철원 주상절리에서 햇볕이 너무 뜨거운 날엔 어쩔 수 없이 이 모자를 찾게 됩니다. 입장료를 내면 받는 5천 원 상품권으로 살 수 있거든요.</p>
+              <p>저는 그 뒤로 국내 여행 갈 때마다 필요할 때면 이 모자를 들고 다녔습니다. 그러다 보니 추억템이 됐어요.</p>
+            </div>
+          </div>
+        </div>
+      </li>
+
+      <!-- 2. 선운사 소원의 종 -->
+      <li class="case">
+        <figure class="case-photo">
+          <img src="images/case-seonunsa-bell.jpg" width="1050" height="1400" loading="lazy"
+               alt="선운사 소원나무에 걸린 색색의 작은 도자기 종과 소원을 적은 나무 패">
+        </figure>
+        <div>
+          <div class="case-card">
+            <span class="case-name">선운사 소원의 종</span>
+            <span class="case-price">10,000원</span>
+          </div>
+          <p class="case-label">사장님 메모</p>
+          <p class="case-memo">선운사 종은 만원인데 소원나무에 저렇게 대부분 <span class="kept">가족의 건강과 성공을 기원하는</span> 거라 나도 시댁어른이랑 남편이랑 <span class="kept">간 김에</span> 구매했어. 사서 <span class="kept">몸에 지니지 않더라도</span> 저렇게 바람에 <span class="kept">풍경처럼 흔들리면서</span> <span class="kept">촤르르</span> 소리나니까 <span class="kept">마음이 평안해지면서 꼭 소원이 이루어진것 같더라</span></p>
+          <div class="case-result">
+            <p class="case-label">레피가 정리한 글</p>
+            <p class="case-headline">빌고 지나간 소원을,<br>바람 부는 자리에 오래 남겨두는 종.</p>
+            <div class="case-body">
+              <p>촤르르.<br>바람이 불 때마다 풍경처럼 흔들리며 나는 소리입니다.</p>
+              <p>선운사 소원나무에는 이런 종이 가득 걸려 있습니다. 대부분 가족의 건강과 성공을 비는 소원이에요. 꼭 몸에 지니지 않아도 괜찮습니다.</p>
+              <p>저는 그 소리를 듣고 있으면 마음이 평안해지고, 꼭 소원이 이루어진 것 같습니다.</p>
+              <p>가족과 함께 오신 김에, 하나 걸어두고 가세요.</p>
+            </div>
+          </div>
+        </div>
+      </li>
+
+      <!-- 3. 잉어킹 액막이 -->
+      <li class="case">
+        <figure class="case-photo">
+          <img src="images/case-magikarp.jpg" width="480" height="600" loading="lazy"
+               alt="팝업 매장 천장에 밧줄로 매달린 빨간 잉어킹 액막이 장식">
+        </figure>
+        <div>
+          <div class="case-card">
+            <span class="case-name">잉어킹 액막이</span>
+            <span class="case-price">가챠 1회 10,000원</span>
+          </div>
+          <p class="case-label">사장님 메모</p>
+          <p class="case-memo">남편이랑 포켓몬팝업이 있다고 해서 놀러갔더니 잉어킹액막이가 있더라고 그런데 <span class="kept">가챠로밖에</span> 안팔아서 <span class="kept">만원이라는 큰 금액</span>이어도 <span class="kept">한번 도전해</span>봤더니 성공해서 한번에 뽑았어 몇달뒤에 <span class="kept">이사 예정이어서 가지고 싶었는데</span> 좋은 추억이었어</p>
+          <div class="case-memo">
+            <p class="case-memo-add">결과를 보고 덧붙인 말</p>
+            <p><span class="kept">별일 없이 잘 지나가자는 마음을 걸어두는 작은 액막이</span> 이런 글귀도 있으면 좋지</p>
+          </div>
+          <div class="case-result">
+            <p class="case-label">레피가 정리한 글</p>
+            <p class="case-headline">별일 없이 잘 지나가자는<br>마음을 걸어두는 작은 액막이.</p>
+            <div class="case-body">
+              <p>이사를 앞두고 있다면, 이런 거 하나쯤 갖고 싶어집니다.</p>
+              <p>잉어킹 액막이는 가챠로만 만날 수 있습니다. 한&nbsp;번에 만 원이라, 가볍게 돌리긴 어려운 금액이죠. 그래도 새집에 들어가기 전이라면, 한 번쯤 도전해볼 만합니다.</p>
+            </div>
+          </div>
+        </div>
+      </li>
+
+      <!-- 4. 닉스고 인형 키링 -->
+      <li class="case">
+        <figure class="case-photo">
+          <img src="images/case-knicksgo.jpg" width="1050" height="1400" loading="lazy"
+               alt="보라색 굴레와 10번 안장을 두른 회색 닉스고 말 인형 키링과 한국마사회 상자">
+        </figure>
+        <div>
+          <div class="case-card">
+            <span class="case-name">닉스고 인형 키링</span>
+            <span class="case-price">8,000원</span>
+          </div>
+          <p class="case-label">사장님 메모</p>
+          <p class="case-memo">저는 <span class="kept">현역 시절</span> 닉스고를 <span class="kept">응원했</span>습니다. <span class="kept">세계적인 무대에서 좋은 성적을 거두던 한국마사회 소유의 말</span>이라는 점도 특별하게 느껴졌고요. 지금은 경주에서 은퇴해 <span class="kept">씨수말</span>로 지내고 있지만, 마사회 공식 굿즈에서 실제 닉스고의 외형을 본떠 만든 인형을 발견했습니다. 여러 마사회 굿즈 중에서도 <span class="kept">가장 실제 말처럼 생겼고, 무엇보다 귀여웠</span>습니다. 가격은 8천 원. 그래서 하나 <span class="kept">데려</span>왔습니다.</p>
+          <div class="case-result">
+            <p class="case-label">레피가 정리한 글</p>
+            <p class="case-headline">응원하던 말의 경주는 끝나도,<br>그때의 기억은 곁에 둘 수 있으니까.</p>
+            <div class="case-body">
+              <p>세계적인 무대에서 좋은 성적을 거두던 한국마사회 소유의 말, 닉스고.<br>저도 현역 시절 응원했던 말입니다.</p>
+              <p>지금은 경주장을 떠나 씨수말로 지내고 있지만, 그 모습을 본뜬 인형이 마사회 공식 굿즈로 나와 있습니다. 여러 굿즈 중에서도 가장 실제 말처럼 생겼고, 무엇보다 귀엽습니다.</p>
+              <p>그 시절을 기억하는 분이라면, 하나 데려가셔도 좋겠습니다.</p>
+            </div>
+          </div>
+        </div>
+      </li>
+
+    </ol>
+
+    <div class="cases-foot">
+      <p class="cases-disc">
+        위 글은 실제 구매 경험을 바탕으로, 판매하는 입장이 되어 정리한 시연 예시예요.
+        제조사나 판매처의 공식 문구가 아니에요.
+      </p>
+      <a href="#test" class="arr-btn">
+        <div class="arr-circle">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+        </div>
+        <span class="arr-label">내 게시글로 테스트</span>
+      </a>
     </div>
   </div>
 </section>
