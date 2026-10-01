@@ -304,7 +304,9 @@ class handler(BaseHTTPRequestHandler):
                 run_story_engine(client, original_text, scenario_mode)
             )
 
-        except json.JSONDecodeError:
+        # UTF-8이 아닌 본문(예: 윈도우 터미널의 CP949)은 json.loads에서
+        # UnicodeDecodeError가 난다. 이것도 요청 쪽 잘못이라 400으로 돌린다.
+        except (json.JSONDecodeError, UnicodeDecodeError):
             self.send_json(
                 400,
                 {
