@@ -505,6 +505,8 @@
     /* 사례 카드의 간격은 사진 옆 넓은 칸 기준이라, 테두리 상자 안에서는 줄인다. */
     .test-result .case-card { margin-bottom: 20px; }
     .test-result .case-headline { margin-bottom: 18px; }
+    /* Writer가 문단 안에 넣은 줄바꿈(\n)을 화면에서도 줄바꿈으로 보여준다. */
+    .test-result .case-body p { white-space: pre-line; }
     .test-questions {
       padding-left: 20px; margin: 0 0 16px;
       font-size: 15px; line-height: 1.8; color: var(--fg);
