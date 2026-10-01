@@ -1066,6 +1066,11 @@
       상품 메모를 적어주세요. 그 안의 이야기를 찾아 상품 글로 정리해드려요.<br>
       메모에 있는 이야기로만 쓰니까, 이 상품을 고른 이유나 있었던 일을 한두 줄 꼭 넣어주세요.
     </p>
+    <!-- 주소에 ?test를 붙였을 때만 보인다. 구매자로 쓴 메모를
+         판매자 글로 바꿔 보는 내부 확인용이라 방문자에게는 숨긴다. -->
+    <p id="test-mode-note" class="test-notice" hidden>
+      테스트 모드 · 산 사람이 쓴 메모를 판매자 글로 바꿔요. 횟수 제한이 없어요.
+    </p>
 
     <div class="test-form">
       <label class="test-label" for="original-text">원문</label>
@@ -1516,6 +1521,15 @@
 
   const testNotice = document.getElementById("test-notice");
 
+  // 테스트 모드(주소 ?test): 구매자 메모를 판매자 시점(DEMO_SELLER)으로 쓰고,
+  // 반복해서 확인할 수 있게 체험 잠금을 걸지 않는다.
+  const TEST_MODE = new URLSearchParams(location.search).has("test");
+  const testModeNote = document.getElementById("test-mode-note");
+
+  if (TEST_MODE && testModeNote) {
+    testModeNote.hidden = false;
+  }
+
   // 변환 한 번이 곧 OpenAI 비용이다. 성공하면 체험을 잠그고 신청으로 안내하며,
   // 실패했을 때만 10초 뒤 다시 시도할 수 있게 한다 —
   // 네트워크 오류로 한 번뿐인 기회를 잃으면 안 되기 때문이다.
@@ -1524,6 +1538,13 @@
 
   function lockAfterTrial() {
     clearInterval(cooldownTimer);
+
+    if (TEST_MODE) {
+      refineButton.disabled = false;
+      refineLabel.textContent = "이야기 입히기";
+      return;
+    }
+
     refineButton.disabled = true;
     refineLabel.textContent = "체험 완료";
 
@@ -1658,9 +1679,9 @@
           headers: {
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({
-            text: text
-          }),
+          body: JSON.stringify(
+            TEST_MODE ? { text: text, mode: "demo" } : { text: text }
+          ),
           signal: controller.signal
         });
 

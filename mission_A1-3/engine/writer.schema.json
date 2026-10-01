@@ -1,0 +1,91 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "product_card": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "price_display": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "price_display"
+      ]
+    },
+    "sentences": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "paragraph": {
+            "type": "integer"
+          },
+          "text": {
+            "type": "string"
+          },
+          "source_type": {
+            "type": "string",
+            "enum": [
+              "memo",
+              "invitation"
+            ]
+          },
+          "source": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "paragraph",
+          "text",
+          "source_type",
+          "source"
+        ]
+      }
+    },
+    "headline_candidates": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "scene",
+              "contrast",
+              "meaning"
+            ]
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "text"
+        ]
+      }
+    },
+    "headline": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "product_card",
+    "sentences",
+    "headline_candidates",
+    "headline"
+  ]
+}

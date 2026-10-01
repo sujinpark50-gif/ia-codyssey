@@ -1,0 +1,279 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "scenario_mode": {
+      "type": "string",
+      "enum": [
+        "REAL_SELLER",
+        "DEMO_SELLER"
+      ]
+    },
+    "meta_instructions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "output_conditions": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "product": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "price": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "facts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "photo_facts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "name",
+        "price",
+        "facts",
+        "photo_facts"
+      ]
+    },
+    "conflicts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "item": {
+            "type": "string"
+          },
+          "raw_input_says": {
+            "type": "string"
+          },
+          "photo_says": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "item",
+          "raw_input_says",
+          "photo_says"
+        ]
+      }
+    },
+    "experiences": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "explicit_emotions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "seller_intent": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "content": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "explicit",
+            "demo_hypothesis",
+            "unknown"
+          ]
+        }
+      },
+      "required": [
+        "content",
+        "source"
+      ]
+    },
+    "seller_additions_applied": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "functional_reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "personal_reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "purchase_meaning": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "interpretations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "content": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "content",
+          "evidence"
+        ]
+      }
+    },
+    "seller_voice_exclusions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "material": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "convertible_to": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "material",
+          "reason",
+          "convertible_to"
+        ]
+      }
+    },
+    "distinctive_phrases": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "strongest_material": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "content": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "scene",
+                "phrase",
+                "fact",
+                "intent"
+              ]
+            },
+            "why": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "content",
+            "type",
+            "why"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "story_core": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "unknowns": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "story_readiness": {
+      "type": "string",
+      "enum": [
+        "READY",
+        "NEED_MORE_INFO",
+        "NO_STORY_FOUND"
+      ]
+    },
+    "questions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "scenario_mode",
+    "meta_instructions",
+    "output_conditions",
+    "product",
+    "conflicts",
+    "experiences",
+    "explicit_emotions",
+    "seller_intent",
+    "seller_additions_applied",
+    "functional_reason",
+    "personal_reason",
+    "purchase_meaning",
+    "interpretations",
+    "seller_voice_exclusions",
+    "distinctive_phrases",
+    "strongest_material",
+    "story_core",
+    "unknowns",
+    "story_readiness",
+    "questions"
+  ]
+}

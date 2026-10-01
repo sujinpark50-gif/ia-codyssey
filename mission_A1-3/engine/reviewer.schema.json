@@ -1,0 +1,118 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "verdict": {
+      "type": "string",
+      "enum": [
+        "PASS",
+        "REVISE"
+      ]
+    },
+    "evidence_map": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "sentence": {
+            "type": "string"
+          },
+          "source": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "sentence",
+          "source"
+        ]
+      }
+    },
+    "repeated_words": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "word": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "word",
+          "count"
+        ]
+      }
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "severity": {
+            "type": "string",
+            "enum": [
+              "BLOCK",
+              "MAJOR",
+              "MINOR"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "invented_content",
+              "abstract_to_scene",
+              "interpretation_as_fact",
+              "meta_instruction_leak",
+              "seller_voice_violation",
+              "chance_outcome_implied",
+              "efficacy_claim",
+              "repeated_word",
+              "repeated_meaning",
+              "flow_break",
+              "grammar",
+              "unclear_addressee",
+              "weak_headline",
+              "generic_copy",
+              "spec_misplaced",
+              "other"
+            ]
+          },
+          "quote": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": "string"
+          },
+          "fix": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "severity",
+          "type",
+          "quote",
+          "evidence",
+          "fix"
+        ]
+      }
+    },
+    "summary": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "verdict",
+    "evidence_map",
+    "repeated_words",
+    "issues",
+    "summary"
+  ]
+}
