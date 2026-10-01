@@ -10,6 +10,10 @@
       "use": "@vercel/static"
     },
     {
+      "src": "images/case-*.jpg",
+      "use": "@vercel/static"
+    },
+    {
       "src": "api/index.py",
       "use": "@vercel/python",
       "config": {
