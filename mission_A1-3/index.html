@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>레피(Lepi) — SNS 게시 전 정리 솔루션</title>
-  <meta name="description" content="전하고 싶은 의미는 그대로, 표현은 더 선명하게. 소상공인이 직접 쓴 글이나 메모를 SNS에 올릴 수 있는 표현으로 정리해주는 게시 전 정리 도구입니다." />
+  <title>레피 | 메모 몇 줄로 쓰는 상품 스토리</title>
+  <meta name="description" content="사장님이 적은 메모에서 상품의 이야기를 찾아 상세페이지와 SNS 글로 정리해드려요. 없는 이야기는 만들지 않아요. 무료 베타 운영 중." />
 
   <!-- 카톡·슬랙 링크 미리보기용. 크롤러는 상대 경로를 못 읽으므로 절대 주소로 적는다.
        배포 루트가 mission_A1-3라 og-image.png는 도메인 바로 아래에 놓인다. -->
@@ -13,16 +13,16 @@
   <meta property="og:site_name" content="레피(Lepi)" />
   <meta property="og:url" content="https://ia-codyssey-two.vercel.app/" />
   <meta property="og:title" content="레피 — 전하고 싶은 의미는 그대로, 표현은 더 선명하게." />
-  <meta property="og:description" content="소상공인이 직접 쓴 글이나 메모를 SNS에 올릴 수 있는 표현으로 정리해드려요." />
+  <meta property="og:description" content="사장님이 적은 메모에서 상품의 이야기를 찾아 상세페이지와 SNS 글로 정리해드려요. 없는 이야기는 만들지 않아요. 무료 베타 운영 중." />
   <meta property="og:image" content="https://ia-codyssey-two.vercel.app/og-image.png" />
   <!-- 카톡은 크기를 명시하지 않으면 큰 카드 대신 작은 섬네일로 떨어뜨릴 때가 있다. -->
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="쓰긴 썼는데, 차마 못 올린 글. — 레피가 올릴 수 있게 다듬어드려요." />
+  <meta property="og:image:alt" content="물건은 흔해도, 고른 이유는 저마다. 그 이유를 담아, 레피가 상품에 이야기를 입혀드려요." />
   <!-- 이미지가 생겼으므로 summary(작은 정사각 섬네일)에서 큰 카드로 올린다. -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="레피 — 전하고 싶은 의미는 그대로, 표현은 더 선명하게." />
-  <meta name="twitter:description" content="소상공인이 직접 쓴 글이나 메모를 SNS에 올릴 수 있는 표현으로 정리해드려요." />
+  <meta name="twitter:description" content="사장님이 적은 메모에서 상품의 이야기를 찾아 상세페이지와 SNS 글로 정리해드려요. 없는 이야기는 만들지 않아요. 무료 베타 운영 중." />
   <meta name="twitter:image" content="https://ia-codyssey-two.vercel.app/og-image.png" />
   <!-- 로고 "Lepi."의 마침표를 그대로 쓴 파비콘. 외부 파일 없이 SVG를 인라인으로
        넣어 요청을 하나 줄인다. 딥포레스트 바탕에 샌드 점(6.0:1). -->
@@ -78,11 +78,11 @@
     /* 줄 길이를 고르게 나눈다. 단 <br>로 줄을 직접 잡아둔 요소
        (.sh · .hero-promise · .prob-callout · .cta-h · .cta-sub)는 제외한다.
        balance는 브라우저가 줄을 재분배하는 기능이라 수동 줄바꿈과 충돌한다. */
-    .prob-title, .sol-title, .feat-title, .faq-q-text, .stat-val, .test-desc {
+    .prob-title, .sol-title, .feat-title, .faq-q-text, .test-desc {
       text-wrap: balance;
     }
     /* 여러 줄 본문은 마지막 줄에 한 단어만 남는 것을 막는다. */
-    .hero-note, .prob-desc, .sol-desc, .feat-desc,
+    .prob-desc, .sol-desc, .feat-desc,
     .faq-body-inner, .fc-label, .test-result-text, .foot-disc p {
       text-wrap: pretty;
     }
@@ -217,7 +217,7 @@
        그래서 히어로만 다른 섹션보다 좁고 안쪽에서 시작한다 — 폭에 상관없이
        일어나며, 내용이 가용 폭에 얼마나 못 미치느냐에 따라 어긋나는 양이
        달라진다. 데스크톱에서는 2열 격자가 1120px을 다 채우지 못해서,
-       900px 이하에서는 .hero-right가 숨어 1열이 되면서 더 크게 벌어진다.
+       900px 이하에서는 1열이 되면서 더 크게 벌어진다.
        스크롤로 이어 보는 자리라 시작 선은 모든 섹션이 같아야 한다. */
     #hero > .container { width: 100%; }
     .hero-grid {
@@ -239,17 +239,19 @@
     }
     /* 두 줄이 각각 한 줄로 유지되도록 크기를 제한한다.
        왼쪽 칸은 최대 488px(컨테이너 1120 − 패딩 64 − 갭 80, ÷2)이고
-       "차마 못 올린 글."은 약 6.8em이 필요하다 → 상한 64px.
-       vw 계수도 900~1120px 구간에서 같은 제약을 받으므로 함께 낮춘다. */
+       긴 줄 "고른 이유는 저마다."가 실측 8.46em이다 → 상한 56px.
+       vw 계수도 900~1120px 구간에서 같은 제약을 받는다. 901px에서 칸이
+       378px인데 세로 스크롤바(약 15px)가 있으면 371px이라, 4.7vw(42px)로 여유를 둔다.
+       600px 이하는 아래에서 따로 잡는다. */
     .hero-h1 {
       font-family: var(--serif);
-      font-size: clamp(42px, 5.6vw, 64px);
+      font-size: clamp(36px, 4.7vw, 56px);
       font-weight: 300; line-height: 1.16;
       letter-spacing: -0.02em; margin-bottom: 24px;
     }
     .hero-h1 em { font-style: normal; display: block; }
-    /* 둘째 줄 "레피가 올릴 수 있게 다듬어드려요."가 약 15.3em이라
-       27px × 15.3 ≈ 413px. 폭 480px 안에 한 줄로 들어간다. */
+    /* 둘째 줄 "레피가 상품에 이야기를 입혀드려요."가 약 15.4em이라
+       27px × 15.4 ≈ 416px. 폭 480px 안에 한 줄로 들어간다. */
     .hero-promise {
       font-family: var(--serif);
       font-size: clamp(18px, 2.3vw, 27px);
@@ -263,21 +265,27 @@
       line-height: 1.8; max-width: 380px; margin-bottom: 48px;
     }
     .hero-btns { display: flex; gap: 20px; flex-wrap: wrap; }
-    /* hero right */
-    .hero-right { display: flex; flex-direction: column; gap: 0; }
-    .hero-stat {
-      padding: 24px 0;
-      border-top: 1px solid var(--rule);
+    /* hero right — 사례 미리보기. 메모·결과 모양은 사례 섹션(.case-*)을
+       그대로 쓰고, 첫 화면 한 칸에 들어가도록 사진 높이와 간격만 줄인다. */
+    .hero-right { display: flex; flex-direction: column; }
+    /* 원본 4:3을 3:2로 조금만 자른다. 두 사람 얼굴은 가운데 있어 남는다. */
+    .hero-case-photo img {
+      display: block; width: 100%; height: auto;
+      aspect-ratio: 3 / 2; object-fit: cover;
+      margin-bottom: 24px;
     }
-    .hero-stat:last-of-type { border-bottom: 1px solid var(--rule); margin-bottom: 20px; }
-    .stat-label {
-      font-size: 11.5px; font-weight: 500;
-      text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted);
-      margin-bottom: 6px;
+    .hero-right .case-memo { font-size: 13.5px; line-height: 1.8; }
+    .hero-right .case-result { margin-top: 24px; }
+    .hero-right .case-headline {
+      font-size: clamp(19px, 2vw, 23px); margin-bottom: 0;
     }
-    .stat-val { font-size: 14px; color: var(--fg); }
-    /* 라벨(.hero-badge 11.5px)보다는 커야 한다 — 이건 라벨이 아니라 문장이다. */
-    .hero-note { font-size: 12.5px; color: var(--muted); letter-spacing: 0.02em; }
+    .hero-case-more {
+      align-self: flex-start; margin-top: 24px;
+      font-size: 13px; color: var(--muted);
+      text-decoration: underline; text-decoration-color: var(--rule);
+      text-underline-offset: 5px;
+    }
+    .hero-case-more:hover { color: var(--fg); }
 
     /* ── PROBLEM ── */
     /* 720px은 이 페이지의 기준 폭이다 — .sol-steps · .faq-list · .test-form이
@@ -494,6 +502,16 @@
       font-size: 15px; line-height: 1.8; color: var(--fg);
       white-space: pre-wrap;
     }
+    /* 사례 카드의 간격은 사진 옆 넓은 칸 기준이라, 테두리 상자 안에서는 줄인다. */
+    .test-result .case-card { margin-bottom: 20px; }
+    .test-result .case-headline { margin-bottom: 18px; }
+    /* Writer가 문단 안에 넣은 줄바꿈(\n)을 화면에서도 줄바꿈으로 보여준다. */
+    .test-result .case-body p { white-space: pre-line; }
+    .test-questions {
+      padding-left: 20px; margin: 0 0 16px;
+      font-size: 15px; line-height: 1.8; color: var(--fg);
+    }
+    .test-questions li + li { margin-top: 6px; }
     .test-error {
       margin-top: 20px; font-size: 14px; color: #9c4a3c; max-width: 720px;
     }
@@ -756,7 +774,8 @@
     /* ── RESPONSIVE ── */
     @media (max-width: 900px) {
       .hero-grid { grid-template-columns: 1fr; gap: 48px; }
-      .hero-right { display: none; }
+      /* 사례 미리보기는 좁은 화면에서도 숨기지 않는다. 첫 화면에서 결과를
+         보여주려고 둔 칸이라, 1열에서는 버튼 아래로 내려온다. */
       /* 터치 기기엔 호버가 없다 — 접힌 설명문에 닿을 방법이 사라지므로
          가로 확장을 버리고 전부 펼친 격자로 되돌린다. */
       .feat-row { display: grid; grid-template-columns: 1fr 1fr; column-gap: 36px; row-gap: 40px; }
@@ -779,6 +798,9 @@
       .container { padding: 0 20px; }
       section { padding: 80px 0; }
       #hero { min-height: auto; padding: 60px 0; }
+      /* 1열에서는 본문 폭(기기 폭 − 40px)에 비례시킨다. 8.46em 줄이
+         320px 기기(본문 280px)에서 30.7px로 여유 있게 들어가고, 600px에서 48px이다. */
+      .hero-h1 { font-size: clamp(30px, 9.6vw, 48px); }
       /* 섹션 제목은 <br>로 줄을 잡아둬서 자동 줄바꿈에 맡길 수 없다.
          대신 폭에 따라 글자가 줄어들게 해서, 잡아둔 두 줄이 좁은 화면에서도
          그대로 유지되게 한다. 가장 긴 줄 "전하고 싶은 의미는 그대로,"가
@@ -847,15 +869,15 @@
           무료 베타 운영 중
         </div>
         <h1 class="hero-h1">
-          <em>쓰긴 썼는데,</em>
-          <em>차마 못 올린 글.</em>
+          <em>물건은 흔해도,</em>
+          <em>고른 이유는 저마다.</em>
         </h1>
         <!-- 줄바꿈을 의미 단위로 고정한다. 자동 줄바꿈에 맡기면
-             "올릴 수 / 있게"처럼 구가 갈라진다. -->
-        <p class="hero-promise">그 마지막 한 줄,<br><b>레피가 올릴 수 있게 다듬어드려요.</b></p>
+             "이야기를 / 입혀드려요"처럼 구가 갈라진다. -->
+        <p class="hero-promise">그 이유를 담아,<br><b>레피가 상품에 이야기를 입혀드려요.</b></p>
         <p class="hero-sub">
-          가격도 날짜도 그대로 두고, 표현만 더 선명하게.<br>
-          망설이던 그 글을, 오늘은 올릴 수 있도록.
+          없는 이야기는 만들지 않아요.<br>
+          내용은 사장님 메모에서, 표현은 더 선명하게.
         </p>
         <!-- 신청 버튼은 여기 두지 않는다. nav가 sticky라 "무료 베타 신청"이
              모든 폭에서 오른쪽 위에 상시 떠 있고(600px 이하에서 숨는 건 FAQ뿐),
@@ -867,120 +889,26 @@
             <div class="arr-circle">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
             </div>
-            <span class="arr-label">내 게시글로 테스트</span>
+            <span class="arr-label">내 메모로 테스트</span>
           </a>
         </div>
       </div>
+      <!-- 첫 화면에서 설명보다 결과를 먼저 보여준다. 사례 섹션의 밀짚모자를
+           메모와 헤드라인만 남겨 줄인 것이다. 사례 섹션이 바로 아래라 같은
+           사례가 연달아 보이지 않도록, 사례 목록에서는 밀짚모자를 맨 끝에 둔다. 밑줄(.kept)은 뜻을 풀어주는
+           사례 섹션 도입문이 여기엔 없어 링크처럼 보이므로 빼둔다. -->
       <div class="hero-right">
-        <div class="hero-stat">
-          <div class="stat-label">무엇을 하나요</div>
-          <div class="stat-val">올리기 직전의 글을 다듬어요</div>
+        <figure class="hero-case-photo">
+          <img src="images/case-straw-hat.jpg" width="1400" height="1050"
+               alt="밀짚모자를 쓴 두 사람이 강과 산이 내려다보이는 전망대에서 웃으며 찍은 셀카">
+        </figure>
+        <p class="case-label">사장님 메모 · 밀짚모자</p>
+        <p class="case-memo">못생긴 밀짚모자인데 철원 주상절리입장료내면 한사람당 5천원 상품권주는데 그걸 이용하면 주변상점에서 살수 있거든 너무 햇볕이 뜨거워서 어쩔수 없이 샀는데 국내 여행갈때마다 필요할때 들고갔더니 추억템이 됐어</p>
+        <div class="case-result">
+          <p class="case-label">레피가 정리한 글</p>
+          <p class="case-headline">예쁘진 않아도,<br>여행마다 따라다니면 추억이&nbsp;되는&nbsp;모자.</p>
         </div>
-        <div class="hero-stat">
-          <div class="stat-label">누구를 위해</div>
-          <div class="stat-val">혼자 SNS까지 챙기는 사장님</div>
-        </div>
-        <div class="hero-stat">
-          <div class="stat-label">지금은</div>
-          <div class="stat-val">무료 베타, 조용히 초대하는 중</div>
-        </div>
-        <p class="hero-note">AI를 몰라도 괜찮아요 &nbsp;·&nbsp; 쓰던 그대로 넣기만 하면 돼요</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- PROBLEM -->
-<section id="problem">
-  <div class="container">
-    <div class="sl">
-      <div class="sl-line"></div>
-      <span class="sl-text">문제</span>
-    </div>
-    <h2 class="sh">다 써놓고도,<br>'올리기' 앞에서 멈춰요.</h2>
-    <div class="prob-list">
-      <div class="prob-row">
-        <div class="prob-n">01</div>
-        <div>
-          <div class="prob-title">손이 열 개라도 모자라요</div>
-          <div class="prob-desc">판매하고 응대하고 예약 받다 보면, 글 한 줄 다듬을 틈이 없어요.</div>
-        </div>
-      </div>
-      <div class="prob-row">
-        <div class="prob-n">02</div>
-        <div>
-          <div class="prob-title">AI는 또 따로 배워야 해요</div>
-          <div class="prob-desc">매번 프롬프트를 새로 쓰고, 원하는 말투를 일일이 설명해야 해요.</div>
-        </div>
-      </div>
-      <div class="prob-row">
-        <div class="prob-n">03</div>
-        <div>
-          <div class="prob-title">결국 다시 읽어보게 돼요</div>
-          <div class="prob-desc">맞게 썼는지, 너무 광고 같진 않은지, 다시 읽고 고민하는 몫이 남아요.</div>
-        </div>
-      </div>
-      <div class="prob-row">
-        <div class="prob-n">04</div>
-        <div>
-          <div class="prob-title">옮겨 붙이다 흐름이 끊겨요</div>
-          <div class="prob-desc">여기서 쓰고 저기서 다듬고 또 옮겨 붙이다, 어느새 손을 놓게 돼요.</div>
-        </div>
-      </div>
-      <div class="prob-row">
-        <div class="prob-n">05</div>
-        <div>
-          <div class="prob-title">그러다 임시저장함에 잠들어요</div>
-          <div class="prob-desc">올리려던 글이 메모장에, 임시저장함에 그대로 남아버려요.</div>
-        </div>
-      </div>
-    </div>
-    <!-- 줄 길이를 고르게 세 줄로 끊는다 (26px 기준 약 384 / 372 / 431px).
-         두 줄로 두면 384 / 799px로 한쪽이 두 배 길어진다. -->
-    <div class="prob-callout">
-      아이디어가 부족해서가 아니에요.<br>
-      올릴 수 있는 문장이 되기까지,<br>
-      그 <strong>마지막 한 걸음</strong>이 무거울 뿐이에요.
-    </div>
-  </div>
-</section>
-
-<!-- SOLUTION -->
-<section id="solution">
-  <div class="container">
-    <div class="sl">
-      <div class="sl-line"></div>
-      <span class="sl-text">해결</span>
-    </div>
-    <h2 class="sh">전하고 싶은 의미는 그대로,<br>표현은 더 선명하게.</h2>
-    <div class="sol-steps">
-      <div class="sol-step">
-        <div class="sol-n">01</div>
-        <div>
-          <div class="sol-title">쓰던 글이나 메모를 그대로 가져와요</div>
-          <p class="sol-desc">대충 적어둔 홍보 메모, 메시지로 보낸 글, 음성으로 남긴 아이디어 — 잘 쓰지 않아도 괜찮아요.</p>
-        </div>
-      </div>
-      <div class="sol-step">
-        <div class="sol-n">02</div>
-        <div>
-          <div class="sol-title">레피에게 건네요</div>
-          <p class="sol-desc">프롬프트를 쓰거나 AI 사용법을 따로 익힐 필요가 없어요. 있는 그대로 넣으면 돼요.</p>
-        </div>
-      </div>
-      <div class="sol-step">
-        <div class="sol-n">03</div>
-        <div>
-          <div class="sol-title">표현과 흐름만, 올리기 좋게 다듬어요</div>
-          <p class="sol-desc">너무 딱딱하지도, 너무 광고 같지도 않게. 가게 분위기에 맞춰 다듬어드려요.</p>
-        </div>
-      </div>
-      <div class="sol-step">
-        <div class="sol-n">04</div>
-        <div>
-          <div class="sol-title">마지막은 언제나 당신이 정해요</div>
-          <p class="sol-desc">올리기 전에 내용은 직접 확인해주세요. 레피는 결정을 대신하지 않아요.</p>
-        </div>
+        <a href="#cases" class="hero-case-more">사례 네 가지 더 보기 ↓</a>
       </div>
     </div>
   </div>
@@ -995,38 +923,13 @@
     </div>
     <h2 class="sh">메모 몇 줄이,<br>올릴 수 있는 글이 됐어요.</h2>
     <p class="cases-lead">
-      사장님이 적은 말은 지우지 않아요. 그중 가장 사장님다운 한마디를 앞에 세워요.
-      <span class="kept">밑줄</span>은 레피가 버리지 않고 그대로 살려 쓴 말이에요.
+      메모에서 이야기를 찾고, 그중 가장 사장님다운 한마디를 앞에 세워요.<br>
+      <span class="kept">밑줄</span>은 레피가 메모에서 찾아 글에 쓴 재료예요.
     </p>
 
     <ol class="case-list">
 
-      <!-- 1. 밀짚모자 -->
-      <li class="case">
-        <figure class="case-photo">
-          <img src="images/case-straw-hat.jpg" width="1400" height="1050" loading="lazy"
-               alt="밀짚모자를 쓴 두 사람이 강과 산이 내려다보이는 전망대에서 웃으며 찍은 셀카">
-        </figure>
-        <div>
-          <div class="case-card">
-            <span class="case-name">밀짚모자</span>
-            <span class="case-price">철원 주상절리 입장 상품권으로 구매</span>
-          </div>
-          <p class="case-label">사장님 메모</p>
-          <p class="case-memo"><span class="kept">못생긴</span> 밀짚모자인데 철원 주상절리입장료내면 한사람당 <span class="kept">5천원 상품권</span>주는데 그걸 이용하면 주변상점에서 살수 있거든 <span class="kept">너무 햇볕이 뜨거워서 어쩔수 없이</span> 샀는데 <span class="kept">국내 여행갈때마다 필요할때 들고갔더니</span> <span class="kept">추억템</span>이 됐어</p>
-          <div class="case-result">
-            <p class="case-label">레피가 정리한 글</p>
-            <p class="case-headline">예쁘진 않아도,<br>여행마다 따라다니면 추억이&nbsp;되는&nbsp;모자.</p>
-            <div class="case-body">
-              <p>솔직히 말하면, 못생긴 모자입니다.</p>
-              <p>그런데 철원 주상절리에서 햇볕이 너무 뜨거운 날엔 어쩔 수 없이 이 모자를 찾게 됩니다. 입장료를 내면 받는 5천 원 상품권으로 살 수 있거든요.</p>
-              <p>저는 그 뒤로 국내 여행 갈 때마다 필요할 때면 이 모자를 들고 다녔습니다. 그러다 보니 추억템이 됐어요.</p>
-            </div>
-          </div>
-        </div>
-      </li>
-
-      <!-- 2. 선운사 소원의 종 -->
+      <!-- 1. 선운사 소원의 종 -->
       <li class="case">
         <figure class="case-photo">
           <img src="images/case-seonunsa-bell.jpg" width="1050" height="1400" loading="lazy"
@@ -1052,7 +955,7 @@
         </div>
       </li>
 
-      <!-- 3. 잉어킹 액막이 -->
+      <!-- 2. 잉어킹 액막이 -->
       <li class="case">
         <figure class="case-photo">
           <img src="images/case-magikarp.jpg" width="480" height="600" loading="lazy"
@@ -1080,7 +983,7 @@
         </div>
       </li>
 
-      <!-- 4. 닉스고 인형 키링 -->
+      <!-- 3. 닉스고 인형 키링 -->
       <li class="case">
         <figure class="case-photo">
           <img src="images/case-knicksgo.jpg" width="1050" height="1400" loading="lazy"
@@ -1105,6 +1008,31 @@
         </div>
       </li>
 
+      <!-- 4. 밀짚모자 -->
+      <li class="case">
+        <figure class="case-photo">
+          <img src="images/case-straw-hat.jpg" width="1400" height="1050" loading="lazy"
+               alt="밀짚모자를 쓴 두 사람이 강과 산이 내려다보이는 전망대에서 웃으며 찍은 셀카">
+        </figure>
+        <div>
+          <div class="case-card">
+            <span class="case-name">밀짚모자</span>
+            <span class="case-price">철원 주상절리 입장 상품권으로 구매</span>
+          </div>
+          <p class="case-label">사장님 메모</p>
+          <p class="case-memo"><span class="kept">못생긴</span> 밀짚모자인데 철원 주상절리입장료내면 한사람당 <span class="kept">5천원 상품권</span>주는데 그걸 이용하면 주변상점에서 살수 있거든 <span class="kept">너무 햇볕이 뜨거워서 어쩔수 없이</span> 샀는데 <span class="kept">국내 여행갈때마다 필요할때 들고갔더니</span> <span class="kept">추억템</span>이 됐어</p>
+          <div class="case-result">
+            <p class="case-label">레피가 정리한 글</p>
+            <p class="case-headline">예쁘진 않아도,<br>여행마다 따라다니면 추억이&nbsp;되는&nbsp;모자.</p>
+            <div class="case-body">
+              <p>솔직히 말하면, 못생긴 모자입니다.</p>
+              <p>그런데 철원 주상절리에서 햇볕이 너무 뜨거운 날엔 어쩔 수 없이 이 모자를 찾게 됩니다. 입장료를 내면 받는 5천 원 상품권으로 살 수 있거든요.</p>
+              <p>저는 그 뒤로 국내 여행 갈 때마다 필요할 때면 이 모자를 들고 다녔습니다. 그러다 보니 추억템이 됐어요.</p>
+            </div>
+          </div>
+        </div>
+      </li>
+
     </ol>
 
     <div class="cases-foot">
@@ -1116,8 +1044,169 @@
         <div class="arr-circle">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
         </div>
-        <span class="arr-label">내 게시글로 테스트</span>
+        <span class="arr-label">내 메모로 테스트</span>
       </a>
+    </div>
+  </div>
+</section>
+
+<!-- LEPI TEST -->
+<!-- 이 섹션이 페이지 뒤쪽에 있는 것은 의도된 배치다.
+     앞으로 옮기면 전환율에는 유리하지만 남용이 늘어난다 —
+     변환 한 번이 곧 OpenAI 비용이라 스크롤 마찰을 일부러 남겨둔다.
+     "데모가 너무 뒤에 있다"는 지적으로 위치를 바꾸지 말 것. -->
+<section id="test">
+  <div class="container">
+    <div class="sl">
+      <div class="sl-line"></div>
+      <span class="sl-text">직접 체험</span>
+    </div>
+    <h2 class="sh">내 메모로<br>직접 테스트해보세요.</h2>
+    <p class="test-desc">
+      상품 메모를 적어주세요. 그 안의 이야기를 찾아 상품 글로 정리해드려요.<br>
+      메모에 있는 이야기로만 쓰니까, 이 상품을 고른 이유나 있었던 일을 한두 줄 꼭 넣어주세요.
+    </p>
+
+    <div class="test-form">
+      <label class="test-label" for="original-text">원문</label>
+
+      <textarea
+        id="original-text"
+        class="test-textarea"
+        placeholder="예: 못생긴 밀짚모자인데, 햇볕이 너무 뜨거워서 어쩔 수 없이 샀어요. 그 뒤로 여행 갈 때마다 들고 다녔더니 추억템이 됐어요."
+        rows="8"
+        maxlength="500"
+      ></textarea>
+
+      <button id="refine-button" type="button" class="arr-btn">
+        <div class="arr-circle">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+        </div>
+        <span class="arr-label" id="refine-label">이야기 입히기</span>
+      </button>
+    </div>
+
+    <!-- 라벨을 상자 밖에 둔다. 안에 두면 패딩 32px만큼 밀려서
+         위쪽 "원문" 라벨과 왼쪽 끝이 어긋난다. -->
+    <!-- 결과는 사례 섹션과 같은 모양(상품 카드 · 헤드라인 · 본문)으로 보여준다.
+         위 사례와 나란히 비교되는 자리라 같은 클래스를 그대로 쓴다.
+         되묻는 질문(NEED_MORE_INFO)과 안내(NO_STORY_FOUND)도 이 상자에 뜬다. -->
+    <div id="result-area" class="test-result-wrap" hidden>
+      <div id="result-label" class="test-label test-label-strong">레피가 입힌 이야기</div>
+      <div class="test-result">
+        <div id="result-card" class="case-card" hidden>
+          <span id="result-name" class="case-name"></span>
+          <span id="result-price" class="case-price"></span>
+        </div>
+        <p id="result-headline" class="case-headline" hidden></p>
+        <div id="result-body" class="case-body" hidden></div>
+        <ol id="result-questions" class="test-questions" hidden></ol>
+        <p id="result-hint" class="test-result-text" hidden></p>
+      </div>
+    </div>
+
+    <p id="error-message" class="test-error" hidden></p>
+
+    <!-- 체험은 한 번만. 결과를 본 직후가 신청으로 넘어갈 가장 좋은 순간이라
+         막다른 안내로 두지 않고 신청 폼으로 가는 링크를 붙인다. -->
+    <p id="test-notice" class="test-notice" hidden>
+      레피를 더 이용하고 싶으시면 <a href="#cta">베타 참여를 신청해 주세요</a>.
+    </p>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section id="problem">
+  <div class="container">
+    <div class="sl">
+      <div class="sl-line"></div>
+      <span class="sl-text">문제</span>
+    </div>
+    <h2 class="sh">설명은 했는데,<br>왜 사야 하는지가 없어요.</h2>
+    <div class="prob-list">
+      <div class="prob-row">
+        <div class="prob-n">01</div>
+        <div>
+          <div class="prob-title">쓰다 보면 설명서가 돼요</div>
+          <div class="prob-desc">상품명, 가격, 크기. 사실만 적다 보면 흔한 물건처럼 보여요.</div>
+        </div>
+      </div>
+      <div class="prob-row">
+        <div class="prob-n">02</div>
+        <div>
+          <div class="prob-title">좋은 이유는 말로 꺼내기 어려워요</div>
+          <div class="prob-desc">왜 좋은지는 아는데, 막상 글로 옮기면 뻔한 말이 돼요.</div>
+        </div>
+      </div>
+      <div class="prob-row">
+        <div class="prob-n">03</div>
+        <div>
+          <div class="prob-title">AI에 맡기면 광고가 돼요</div>
+          <div class="prob-desc">'특별한 순간', '작은 행복'. 내 가게 말투가 아닌 문장이 돌아와요.</div>
+        </div>
+      </div>
+      <div class="prob-row">
+        <div class="prob-n">04</div>
+        <div>
+          <div class="prob-title">없는 이야기가 끼어들어요</div>
+          <div class="prob-desc">하지 않은 약속, 없는 효능까지. 다시 읽고 지우는 몫이 남아요.</div>
+        </div>
+      </div>
+      <div class="prob-row">
+        <div class="prob-n">05</div>
+        <div>
+          <div class="prob-title">결국 가격만 남은 글이 올라가요</div>
+          <div class="prob-desc">이유는 빠지고, 상품명과 가격만 적힌 글이 올라가요.</div>
+        </div>
+      </div>
+    </div>
+    <!-- 의미 단위로 세 줄로 끊는다. 두 줄로 두면 가운데 긴 구절이
+         한쪽에 몰려 한 줄이 다른 줄의 두 배 가까이 길어진다. -->
+    <div class="prob-callout">
+      물건이 평범해서가 아니에요.<br>
+      손님이 그걸 왜 자기 것으로 만드는지,<br>
+      그 <strong>한 문장</strong>이 빠져 있을 뿐이에요.
+    </div>
+  </div>
+</section>
+
+<!-- SOLUTION -->
+<section id="solution">
+  <div class="container">
+    <div class="sl">
+      <div class="sl-line"></div>
+      <span class="sl-text">해결</span>
+    </div>
+    <h2 class="sh">전하고 싶은 의미는 그대로,<br>표현은 더 선명하게.</h2>
+    <div class="sol-steps">
+      <div class="sol-step">
+        <div class="sol-n">01</div>
+        <div>
+          <div class="sol-title">메모를 그대로 가져와요</div>
+          <p class="sol-desc">상품 사진 한 장, 대충 적은 메모 몇 줄이면 돼요. 잘 쓰지 않아도 괜찮아요.</p>
+        </div>
+      </div>
+      <div class="sol-step">
+        <div class="sol-n">02</div>
+        <div>
+          <div class="sol-title">레피가 이야기를 입혀요</div>
+          <p class="sol-desc">메모 속 사실과 경험에서 출발해요. 없는 이야기는 보태지 않고, 모자라면 되물어요.</p>
+        </div>
+      </div>
+      <div class="sol-step">
+        <div class="sol-n">03</div>
+        <div>
+          <div class="sol-title">사장님 말로 정리해요</div>
+          <p class="sol-desc">헤드라인 한 문장과 본문으로. '못생긴' 같은 사장님 말은 광고 문구로 바꾸지 않아요.</p>
+        </div>
+      </div>
+      <div class="sol-step">
+        <div class="sol-n">04</div>
+        <div>
+          <div class="sol-title">마지막은 언제나 당신이 정해요</div>
+          <p class="sol-desc">올리기 전에 내용은 직접 확인해주세요. 레피는 결정을 대신하지 않아요.</p>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -1262,58 +1351,6 @@
     </div>
   </div>
 </section>
-<!-- LEPI TEST -->
-<!-- 이 섹션이 페이지 뒤쪽에 있는 것은 의도된 배치다.
-     앞으로 옮기면 전환율에는 유리하지만 남용이 늘어난다 —
-     변환 한 번이 곧 OpenAI 비용이라 스크롤 마찰을 일부러 남겨둔다.
-     "데모가 너무 뒤에 있다"는 지적으로 위치를 바꾸지 말 것. -->
-<section id="test">
-  <div class="container">
-    <div class="sl">
-      <div class="sl-line"></div>
-      <span class="sl-text">직접 체험</span>
-    </div>
-    <h2 class="sh">내 게시글로<br>직접 테스트해보세요.</h2>
-    <p class="test-desc">써주신 내용은 그대로 두고, 표현과 흐름만 자연스럽게 다듬어드려요.</p>
-
-    <div class="test-form">
-      <label class="test-label" for="original-text">원문</label>
-
-      <textarea
-        id="original-text"
-        class="test-textarea"
-        placeholder="다듬고 싶은 게시글을 입력해 주세요."
-        rows="8"
-        maxlength="500"
-      ></textarea>
-
-      <button id="refine-button" type="button" class="arr-btn">
-        <div class="arr-circle">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
-        </div>
-        <span class="arr-label" id="refine-label">레피로 다듬기</span>
-      </button>
-    </div>
-
-    <!-- 라벨을 상자 밖에 둔다. 안에 두면 패딩 32px만큼 밀려서
-         위쪽 "원문" 라벨과 왼쪽 끝이 어긋난다. -->
-    <div id="result-area" class="test-result-wrap" hidden>
-      <div class="test-label test-label-strong">변환 결과</div>
-      <div class="test-result">
-        <div id="result-text" class="test-result-text"></div>
-      </div>
-    </div>
-
-    <p id="error-message" class="test-error" hidden></p>
-
-    <!-- 체험은 한 번만. 결과를 본 직후가 신청으로 넘어갈 가장 좋은 순간이라
-         막다른 안내로 두지 않고 신청 폼으로 가는 링크를 붙인다. -->
-    <p id="test-notice" class="test-notice" hidden>
-      레피를 더 이용하고 싶으시면 <a href="#cta">베타 참여를 신청해 주세요</a>.
-    </p>
-  </div>
-</section>
-
 <!-- CTA -->
 <section id="cta">
   <div class="container">
@@ -1323,8 +1360,8 @@
     </div>
     <div class="cta-grid">
       <div>
-        <h2 class="cta-h">올리려다 접어둔 글,<br>레피에게 먼저 보여주세요.</h2>
-        <p class="cta-sub">망설이던 초안 한두 개면 충분해요.<br>레피가 어떻게 다듬는지, 부담 없이 먼저 만나보세요.</p>
+        <h2 class="cta-h">설명만 적어둔 상품,<br>레피에게 먼저 보여주세요.</h2>
+        <p class="cta-sub">상품 하나, 메모 몇 줄이면 충분해요.<br>레피가 어떤 이야기를 입히는지, 부담 없이 먼저 만나보세요.</p>
       </div>
       <form id="betaForm" onsubmit="handleSubmit(event)" novalidate>
         <div class="fg">
@@ -1511,45 +1548,109 @@
 
       clearInterval(cooldownTimer);
       refineButton.disabled = false;
-      refineLabel.textContent = "레피로 다듬기";
+      refineLabel.textContent = "이야기 입히기";
     }, 1000);
   }
 
   const originalText = document.getElementById("original-text");
   const resultArea = document.getElementById("result-area");
-  const resultText = document.getElementById("result-text");
+  const resultLabel = document.getElementById("result-label");
+  const resultCard = document.getElementById("result-card");
+  const resultName = document.getElementById("result-name");
+  const resultPrice = document.getElementById("result-price");
+  const resultHeadline = document.getElementById("result-headline");
+  const resultBody = document.getElementById("result-body");
+  const resultQuestions = document.getElementById("result-questions");
+  const resultHint = document.getElementById("result-hint");
   const errorMessage = document.getElementById("error-message");
+
+  // 모델 출력은 전부 textContent로만 넣는다. innerHTML을 쓰면
+  // 메모에 섞인 태그가 결과를 거쳐 페이지에서 실행될 수 있다.
+  function clearResult() {
+    resultCard.hidden = true;
+    resultHeadline.hidden = true;
+    resultBody.hidden = true;
+    resultQuestions.hidden = true;
+    resultHint.hidden = true;
+    resultBody.replaceChildren();
+    resultQuestions.replaceChildren();
+  }
+
+  function showStory(data) {
+    const card = data.product_card || {};
+
+    resultLabel.textContent = "레피가 입힌 이야기";
+    resultName.textContent = card.name || "";
+    resultPrice.textContent = card.price || "";
+    resultCard.hidden = !(card.name || card.price);
+
+    resultHeadline.textContent = data.headline;
+    resultHeadline.hidden = false;
+
+    data.body.forEach(function (paragraph) {
+      const p = document.createElement("p");
+      p.textContent = paragraph;
+      resultBody.appendChild(p);
+    });
+    resultBody.hidden = false;
+  }
+
+  // 되묻기와 안내는 체험 횟수에 넣지 않는다. 레피가 스토리를 입히지
+  // 않은 것이라, 여기서 잠그면 한 번뿐인 체험이 질문 하나로 끝난다.
+  function showQuestions(questions) {
+    resultLabel.textContent = "레피가 묻는 말";
+
+    questions.forEach(function (question) {
+      const li = document.createElement("li");
+      li.textContent = question;
+      resultQuestions.appendChild(li);
+    });
+    resultQuestions.hidden = questions.length === 0;
+
+    resultHint.textContent =
+      "답을 메모에 덧붙여 다시 눌러 주세요. 이번 시도는 체험 횟수에 들어가지 않아요.";
+    resultHint.hidden = false;
+  }
+
+  function showNoStory() {
+    resultLabel.textContent = "레피의 안내";
+    resultHint.textContent =
+      "이 메모만으로는 이야기를 입히기 어려워요. 누가, 어떤 때 이 물건을 고르는지 한두 줄 더 적어 주세요.";
+    resultHint.hidden = false;
+  }
 
   if (
     refineButton &&
     originalText &&
     resultArea &&
-    resultText &&
+    resultHeadline &&
     errorMessage
   ) {
     refineButton.addEventListener("click", async function () {
       const text = originalText.value.trim();
 
       resultArea.hidden = true;
+      clearResult();
       errorMessage.hidden = true;
       errorMessage.textContent = "";
 
       if (!text) {
-        errorMessage.textContent = "다듬을 글을 먼저 입력해 주세요.";
+        errorMessage.textContent = "상품 메모를 먼저 입력해 주세요.";
         errorMessage.hidden = false;
         originalText.focus();
         return;
       }
 
       refineButton.disabled = true;
-      refineLabel.textContent = "레피로 다듬는 중...";
+      refineLabel.textContent = "이야기를 입히는 중…";
 
       const controller = new AbortController();
       let succeeded = false;
 
+      // 분석과 작성, 모델 호출이 두 번이라 한 번일 때보다 오래 걸린다.
       const timeout = setTimeout(() => {
        controller.abort();
-      }, 10000); // 10초
+      }, 60000); // 60초
 
       try {
         const response = await fetch("/api", {
@@ -1568,18 +1669,27 @@
 
         if (!response.ok) {
           throw new Error(
-            data.error || "글을 다듬지 못했습니다. 잠시 후 다시 시도해 주세요."
+            data.error || "이야기를 입히지 못했습니다. 잠시 후 다시 시도해 주세요."
           );
         }
 
-        resultText.textContent = data.result;
+        if (data.status === "READY") {
+          showStory(data);
+          succeeded = true;
+        } else if (data.status === "NEED_MORE_INFO") {
+          showQuestions(data.questions || []);
+        } else {
+          showNoStory();
+        }
+
         resultArea.hidden = false;
-        succeeded = true;
 
       } catch (error) {
-        console.error("게시글 변환 오류:", error);
+        console.error("스토리 변환 오류:", error);
         errorMessage.textContent =
-          error.message || "서버에 연결하지 못했습니다. 인터넷 연결을 확인해 주세요.";
+          error.name === "AbortError"
+            ? "응답이 늦어지고 있어요. 잠시 후 다시 시도해 주세요."
+            : error.message || "서버에 연결하지 못했습니다. 인터넷 연결을 확인해 주세요.";
 
         errorMessage.hidden = false;
 
@@ -1589,7 +1699,7 @@
         if (succeeded) {
           lockAfterTrial();
         } else {
-          // 실패한 경우에만 다시 시도할 여지를 남긴다.
+          // 스토리를 받지 못한 경우에만 다시 시도할 여지를 남긴다.
           startCooldown();
         }
       }
