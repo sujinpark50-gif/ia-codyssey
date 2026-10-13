@@ -42,8 +42,8 @@ services:
         value: https://copa.codyssey.kr/v1
       - key: OPENAI_MAX_RETRIES
         value: "1"
-      - key: DOCS_ENABLED            # 과제 요건(배포 URL 의 /docs)은 배포 승인 시 "true" 로 바꾼다 (docs/DEPLOYMENT.md M6)
-        value: "false"
+      - key: DOCS_ENABLED            # 과제 요건: 배포 URL 의 /docs. 문서만 공개, 보호 API 는 Firebase 토큰 검증 유지
+        value: "true"
       - key: ALLOWED_ORIGINS         # CORS: Vercel 운영 도메인만 (Preview·'*' 허용 안 함)
         value: https://adair-mission-intelligenceweb.vercel.app
       - key: CHAT_RATE_PER_MINUTE

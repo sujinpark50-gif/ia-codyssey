@@ -364,3 +364,27 @@ IAM 역할 반영에는 몇 분이 걸릴 수 있다. 3단계에서 `PermissionD
 
 롤백: Vercel Instant Rollback → `f1a8949`(프록시) / Render Rollback → `798b453` + 브랜치 `feat/m5-deployment` / Firebase 도메인 추가는 해 없음(정리 단계에서 제거).
 비용: Vercel Hobby·Render Free·Firebase Spark 0원. 무료 제약: Render 15분 미사용 시 잠듦(첫 요청 지연), Firestore 일 50,000 읽기.
+
+### 0단계 기록 — 운영 변경 전 상태 (2026-10-13)
+
+| 항목 | 값 |
+|---|---|
+| Render 운영 배포 | `dep-db724f3bc2fs73f1o9e0` (`798b453`) — 롤백 기준 |
+| Render 환경변수 이름 (18) | ALLOWED_EMAILS, CHAT_DAILY_LIMIT, CHAT_RATE_PER_HOUR, CHAT_RATE_PER_MINUTE, DATA_BACKEND, DOCS_ENABLED, FIREBASE_AUTH_DOMAIN, FIREBASE_PROJECT_ID, FIREBASE_WEB_API_KEY, FIREBASE_WEB_APP_ID, FIRESTORE_DATABASE_ID, GOOGLE_APPLICATION_CREDENTIALS, OPENAI_API_KEY, OPENAI_BASE_URL, OPENAI_MAX_RETRIES, OPENAI_MODEL, PYTHON_VERSION, SUMMARY_CACHE_TTL_S (값은 기록하지 않음) |
+| Render Secret File | `adair-mi-sa.json` |
+| Render 브랜치 | 서비스·Blueprint `feat/m5-deployment` (서비스는 Blueprint 브랜치를 따름), Blueprint Auto Sync Yes, 서비스 Auto-Deploy Off |
+| Vercel Production | `f1a8949` (프록시), Build/Output/Install 기본값, 환경변수 없음 |
+| Firebase 승인 도메인 (4) | localhost, adair-mission-intelligence.firebaseapp.com, adair-mission-intelligence.web.app, adair-mission-intelligence.onrender.com |
+
+### CORS 환경변수 읽기 (코드 확인)
+
+- M5 `798b453`: `CORS_ORIGINS` 만 읽는다.
+- M6: `ALLOWED_ORIGINS` 와 `CORS_ORIGINS` 를 모두 읽고, 둘 다 있는데 집합이 다르면 시작을 거부한다(같으면 정상).
+
+### 7단계 안전 절차 (원자성에 의존하지 않음)
+
+Blueprint 브랜치 변경 시 환경변수 동기화와 배포의 순서는 Render 문서에 없고, "변수 삭제 + 배포"를 한 번의 저장으로 처리하는 것도 원자적이라는 보장이 없다. 그래서:
+1. (6단계 검증 뒤) `CORS_ORIGINS` 값을 운영 도메인 하나(`https://adair-mission-intelligenceweb.vercel.app`)로 줄인다 → M5 재시작. render.yaml 의 `ALLOWED_ORIGINS` 와 같은 값.
+2. Blueprint 브랜치 → `main`. 동기화·배포가 어떤 순서로 일어나도 M5·M6 코드 모두 정상 기동 (M5 는 CORS_ORIGINS, M6 은 두 값이 같으므로 허용).
+3. M6 기동 확인 뒤 `CORS_ORIGINS` 삭제 (M6 은 ALLOWED_ORIGINS 사용).
+"배포 실패 시 기존 버전 유지"는 보장된 사실로 보지 않고 실제 배포 때 확인할 항목으로 둔다.
