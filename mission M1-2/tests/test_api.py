@@ -13,11 +13,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from fastapi.testclient import TestClient  # noqa: E402
+from support import TestClient  # noqa: E402
 
 from app.config import Settings  # noqa: E402
 from app.importer import import_documents, load_documents  # noqa: E402
-from app.main import create_app  # noqa: E402
+from support import create_app  # noqa: E402
 from app.repository import (DataRepository, DocumentExists, FirestoreRepository,  # noqa: E402
                             InMemoryRepository, RepositoryUnavailable)
 

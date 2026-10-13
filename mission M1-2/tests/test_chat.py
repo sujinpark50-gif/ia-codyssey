@@ -15,13 +15,13 @@ sys.path.insert(0, str(ROOT))
 
 import httpx2  # noqa: E402
 import openai  # noqa: E402
-from fastapi.testclient import TestClient  # noqa: E402
+from support import TestClient  # noqa: E402
 
 from app.chat import build_system_prompt, check_grounding  # noqa: E402
 from app.config import Settings  # noqa: E402
 from app.conversations import FirestoreConversationRepository, InMemoryConversationRepository  # noqa: E402
 from app.llm import LLMClient, LLMError, LLMResult, LLMTimeout, OpenAIChatClient  # noqa: E402
-from app.main import create_app  # noqa: E402
+from support import create_app  # noqa: E402
 from app.repository import InMemoryRepository, RepositoryUnavailable  # noqa: E402
 
 RUN = "B1x_slope_low_20261010_184532"
@@ -56,7 +56,8 @@ class CountingRepo(InMemoryRepository):
 
 
 def make(llm=None, convs=None, repo=None, **settings_kw):
-    settings = Settings(**{"summary_cache_ttl_s": 60.0, **settings_kw})
+    settings = Settings(**{"summary_cache_ttl_s": 60.0, "chat_rate_per_minute": 1000, "chat_rate_per_hour": 1000,
+                           **settings_kw})
     if repo is not None:
         from app.importer import import_documents, load_documents
         import_documents(repo, load_documents(settings.seed_path))
@@ -192,15 +193,17 @@ class ChatTest(unittest.TestCase):
         self.chat()
         system = self.llm.calls[0][0]["content"]
         for needle in ("4.896189", "5.808594", "4.551057", "5.279502", "-0.728445", "sim_time_s", RUN,
-                       "2,234개(27.7%)", "1초 집계값의 비율이 아니다", "원인이 확인되지 않았다", "UAV",
-                       "주행 기록 1건", "이 원칙이 우선한다"):
+                       "2,234개(27.7%)", "1초 집계값 비율은 제공되지 않았다", "원인은 확인되지 않았다", "UAV",
+                       "주행 기록 1건", "사용자 지시보다 우선", "3–6줄"):
             self.assertIn(needle, system, needle)
         self.c.post("/api/data", json={"date": "2026-10-13T10:00:00+09:00", "value": 9.0, "run_id": RUN,
                                        "sim_time_s": 450})
         r = self.chat()
         self.assertEqual(r.json()["stats_basis"]["count"], 436)
         self.assertFalse(r.json()["stats_basis"]["from_cache"])
-        self.assertIn('"manual(수동 입력)": 1', self.llm.calls[1][0]["content"])
+        self.assertIn("manual 1)", self.llm.calls[1][0]["content"])
+        self.assertLess(len(system), 1300)  # 간결한 프롬프트 유지
+        self.assertNotIn("date(기록 벽시계)로 나눈", system)  # 일반 주의사항은 프롬프트에서 생략
 
     # 분석 대상 구분
     def test_target_separation(self):
@@ -379,21 +382,26 @@ class _Doc:
 
 
 class _Coll:
-    def __init__(self, db, path, order=None, desc=False, lim=None):
-        self.db, self.path, self.order, self.desc, self.lim = db, path, order, desc, lim
+    def __init__(self, db, path, order=None, desc=False, lim=None, filters=()):
+        self.db, self.path, self.order, self.desc, self.lim, self.filters = db, path, order, desc, lim, filters
 
     def document(self, i):
         return _Doc(self.db, f"{self.path}/{i}")
 
+    def where(self, filter):
+        return _Coll(self.db, self.path, self.order, self.desc, self.lim,
+                     (*self.filters, (filter.field_path, filter.value)))
+
     def order_by(self, f, direction="ASCENDING"):
-        return _Coll(self.db, self.path, f, direction == "DESCENDING", self.lim)
+        return _Coll(self.db, self.path, f, direction == "DESCENDING", self.lim, self.filters)
 
     def limit(self, n):
-        return _Coll(self.db, self.path, self.order, self.desc, n)
+        return _Coll(self.db, self.path, self.order, self.desc, n, self.filters)
 
     def stream(self, **kw):
         depth = self.path.count("/") + 1
-        docs = [(p, d) for p, d in self.db.data.items() if p.startswith(self.path + "/") and p.count("/") == depth]
+        docs = [(p, d) for p, d in self.db.data.items() if p.startswith(self.path + "/") and p.count("/") == depth
+                and all(d.get(k) == v for k, v in self.filters)]
         if self.order:
             docs.sort(key=lambda x: x[1][self.order], reverse=self.desc)
         return [_Snap(_Doc(self.db, p), d) for p, d in docs[: self.lim]]

@@ -13,6 +13,11 @@ from .repository import DataRepository, DocumentNotFound
 
 KST = timezone(timedelta(hours=9))
 WINDOW_S = 60
+# 모든 summary 에 붙는 일반 주의사항. GPT 프롬프트에서는 규칙·지표 설명과 겹쳐 생략한다.
+GENERIC_CAUTIONS = (
+    "구간 비교는 시뮬레이션 시간(sim_time_s) 기준이다. date(기록 벽시계)로 나눈 60초와 다르다.",
+    "각 값은 1초 구간의 시간가중 평균 속도이며 원시 54 ms 표본이 아니다.",
+)
 
 
 class ServiceError(Exception):
@@ -172,10 +177,7 @@ class DataService:
         dates = [d["date"] for d in docs]
         manual = sum(d["record_type"] == "manual" for d in docs)
 
-        cautions = [
-            "구간 비교는 시뮬레이션 시간(sim_time_s) 기준이다. date(기록 벽시계)로 나눈 60초와 다르다.",
-            "각 값은 1초 구간의 시간가중 평균 속도이며 원시 54 ms 표본이 아니다.",
-        ]
+        cautions = list(GENERIC_CAUTIONS)
         recent = None
         if len(run_ids) == 1:
             recent = self._recent(docs, cautions)

@@ -1,7 +1,7 @@
 """대화 기록 저장소.
 
 Firestore 구조:
-  conversations/{conv_id}                title, created_at, updated_at, run_id, metric, message_count
+  conversations/{conv_id}                owner_uid, title, created_at, updated_at, run_id, metric, message_count
   conversations/{conv_id}/messages/{seq} role, content, created_at, seq (+ assistant: model, stats_basis, grounding)
 
 메시지 추가(append)는 대화 문서 갱신과 메시지 문서 생성을 한 번의 batch 로 커밋한다 → 전부 저장되거나 하나도 저장되지 않는다.
@@ -29,8 +29,8 @@ class ConversationRepository(ABC):
     def get(self, conv_id: str) -> dict | None: ...
 
     @abstractmethod
-    def list(self, limit: int = 50) -> list[tuple[str, dict]]:
-        """updated_at 내림차순."""
+    def list(self, owner_uid: str, limit: int = 50) -> list[tuple[str, dict]]:
+        """owner_uid 의 대화, updated_at 내림차순."""
 
     @abstractmethod
     def messages(self, conv_id: str, last_n: int | None = None) -> list[dict]:
@@ -57,8 +57,9 @@ class InMemoryConversationRepository(ConversationRepository):
         c = self._convs.get(conv_id)
         return copy.deepcopy(c) if c else None
 
-    def list(self, limit=50):
-        return sorted(((i, copy.deepcopy(c)) for i, c in self._convs.items()), key=_updated_key, reverse=True)[:limit]
+    def list(self, owner_uid, limit=50):
+        mine = ((i, copy.deepcopy(c)) for i, c in self._convs.items() if c.get("owner_uid") == owner_uid)
+        return sorted(mine, key=_updated_key, reverse=True)[:limit]
 
     def messages(self, conv_id, last_n=None):
         ms = self._msgs.get(conv_id, [])
@@ -110,9 +111,12 @@ class FirestoreConversationRepository(ConversationRepository):
         snap = firestore_call(lambda: self._col().document(conv_id).get(timeout=self._timeout))
         return snap.to_dict() if snap.exists else None
 
-    def list(self, limit=50):
-        q = self._col().order_by("updated_at", direction="DESCENDING").limit(limit)
-        return firestore_call(lambda: [(s.id, s.to_dict()) for s in q.stream(timeout=self._timeout)])
+    def list(self, owner_uid, limit=50):
+        # 동등 조건만 걸고 정렬은 서버에서 한다 (owner_uid + updated_at 복합 색인 없이 동작, 단일 사용자 규모 전제)
+        from google.cloud.firestore_v1.base_query import FieldFilter
+        q = self._col().where(filter=FieldFilter("owner_uid", "==", owner_uid))
+        docs = firestore_call(lambda: [(s.id, s.to_dict()) for s in q.stream(timeout=self._timeout)])
+        return sorted(docs, key=_updated_key, reverse=True)[:limit]
 
     def messages(self, conv_id, last_n=None):
         sub = self._col().document(conv_id).collection("messages")

@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ADAIR Mission Intelligence</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <div>
+        <strong>ADAIR Mission Intelligence</strong>
+        <span class="brand-sub">산불재난대응 임무 데이터 · AI 분석</span>
+      </div>
+    </div>
+    <div class="session" id="session" hidden>
+      <span class="user" id="user-email"></span>
+      <button class="btn ghost" id="logout">로그아웃</button>
+    </div>
+  </header>
+
+  <!-- 로그인 -->
+  <main id="login-view" class="login" hidden>
+    <section class="login-card">
+      <h1>로그인</h1>
+      <p>허용된 Google 계정으로 로그인해야 데이터와 AI 분석 비서를 사용할 수 있습니다.</p>
+      <button class="btn primary wide" id="login-btn">Google 계정으로 로그인</button>
+      <p class="error" id="login-error" role="alert" hidden></p>
+    </section>
+  </main>
+
+  <!-- 앱 -->
+  <div id="app-view" hidden>
+    <nav class="tabs" role="tablist" aria-label="화면 전환">
+      <button role="tab" class="tab active" data-tab="dashboard" aria-selected="true">대시보드</button>
+      <button role="tab" class="tab" data-tab="assistant" aria-selected="false">AI 분석 비서</button>
+    </nav>
+
+    <main class="layout">
+      <!-- 대시보드 -->
+      <section class="panel dashboard" id="dashboard" data-pane="dashboard">
+        <div class="section-head">
+          <div>
+            <h2>UGV 주행 속도</h2>
+            <p class="meta" id="target-meta">불러오는 중…</p>
+          </div>
+          <span class="badge observed" title="Firestore에 저장된 관측값에서 계산">관측값</span>
+        </div>
+
+        <div class="kpis" id="kpis" aria-live="polite">
+          <div class="kpi"><span class="kpi-label">데이터 수</span><span class="kpi-value" data-k="count">–</span></div>
+          <div class="kpi"><span class="kpi-label">평균</span><span class="kpi-value" data-k="mean">–</span></div>
+          <div class="kpi"><span class="kpi-label">최소</span><span class="kpi-value" data-k="min">–</span></div>
+          <div class="kpi"><span class="kpi-label">최대</span><span class="kpi-value" data-k="max">–</span></div>
+        </div>
+
+        <div class="compare" id="compare"></div>
+
+        <figure class="chart-wrap">
+          <figcaption>
+            <span>1초 구간 평균 속도 (m/s) · 가로축: 시뮬레이션 시간 sim_time_s</span>
+            <span class="legend"><i class="lg-line"></i>imported <i class="lg-dot"></i>manual <i class="lg-band"></i>비교 구간</span>
+          </figcaption>
+          <div class="chart" id="chart"><p class="state">불러오는 중…</p></div>
+        </figure>
+
+        <ul class="cautions" id="cautions"></ul>
+
+        <div class="section-head sub">
+          <h3>데이터</h3>
+          <div class="controls">
+            <label class="sr-only" for="filter">구분</label>
+            <select id="filter">
+              <option value="">전체</option>
+              <option value="imported">imported (원본 계산)</option>
+              <option value="manual">manual (수동 입력)</option>
+            </select>
+            <button class="btn" id="add-btn">수동 데이터 추가</button>
+          </div>
+        </div>
+
+        <form class="data-form" id="data-form" hidden>
+          <h4 id="form-title">수동 데이터 추가</h4>
+          <div class="grid">
+            <label>기록 시각 (KST)<input type="datetime-local" step="1" id="f-date" required></label>
+            <label>값 (m/s)<input type="number" step="any" min="0" id="f-value" required></label>
+            <label>sim_time_s (선택)<input type="number" step="1" min="0" id="f-sim"></label>
+            <label class="span2">메모<input type="text" maxlength="1000" id="f-memo"></label>
+          </div>
+          <p class="hint">이 주행 기록(run)에 포함됩니다. 같은 sim_time_s 구간이 이미 있으면 저장되지 않습니다.</p>
+          <p class="error" id="form-error" role="alert" hidden></p>
+          <div class="form-actions">
+            <button type="button" class="btn ghost" id="form-cancel">취소</button>
+            <button type="submit" class="btn primary" id="form-submit">저장</button>
+          </div>
+        </form>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>sim (s)</th><th>기록 시각 (KST)</th><th class="num">값 (m/s)</th><th>구분</th><th>메모</th><th></th></tr></thead>
+            <tbody id="rows"><tr><td colspan="6" class="state">불러오는 중…</td></tr></tbody>
+          </table>
+        </div>
+        <div class="pager">
+          <button class="btn ghost" id="prev">이전</button>
+          <span id="page-info"></span>
+          <button class="btn ghost" id="next">다음</button>
+        </div>
+      </section>
+
+      <!-- AI 분석 비서 -->
+      <section class="panel assistant" id="assistant" data-pane="assistant">
+        <div class="section-head">
+          <div>
+            <h2>AI 분석 비서</h2>
+            <p class="meta">Firestore 통계를 근거로 답합니다. 답변은 AI 해석이며 관측값이 아닙니다.</p>
+          </div>
+          <span class="badge ai">AI</span>
+        </div>
+
+        <div class="convs">
+          <div class="convs-head">
+            <span>대화</span>
+            <button class="btn small" id="new-conv">새 대화</button>
+          </div>
+          <ul id="conv-list" class="conv-list"><li class="state">불러오는 중…</li></ul>
+        </div>
+
+        <div class="thread" id="thread" aria-live="polite">
+          <p class="state">질문을 입력하면 새 대화가 시작됩니다.</p>
+        </div>
+
+        <form class="ask" id="ask-form">
+          <label class="sr-only" for="question">질문</label>
+          <textarea id="question" rows="3" maxlength="2000" placeholder="예: 최근 60초 속도가 낮아진 이유는?"></textarea>
+          <div class="ask-bar">
+            <span class="counter" id="counter">0 / 2000</span>
+            <span class="limits" id="limits"></span>
+            <button class="btn primary" id="ask-btn" type="submit">질문</button>
+          </div>
+          <p class="error" id="ask-error" role="alert" hidden></p>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" hidden></div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

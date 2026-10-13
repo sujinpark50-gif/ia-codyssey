@@ -1,6 +1,20 @@
 # M4 보안 설계안 — 단일 사용자 MVP
 
-상태: **설계안, 미구현.** 배포 전에 구현한다.
+상태 (2026-10-13, `feat/m4-web-ui`):
+
+| 항목 | 상태 |
+|---|---|
+| 1. Firebase 로그인 + 허용 이메일 (`app/auth.py`) | 구현·테스트 (실제 RSA 서명 토큰으로 검증 로직 시험) |
+| 2. 호출 제한 (`app/ratelimit.py`) | 구현·테스트. Firestore 일일 카운터는 실제 Firestore 미확인 |
+| 3. 메시지·이력·본문 크기·대화 수 제한 | 구현·테스트 |
+| 4. 대화 `owner_uid` 소유권 | 구현·테스트 |
+| 5. 최소 권한 키 교체 | 절차만 문서화 (사용자 승인 후 진행) |
+| 6. `/docs` 끄기 (`DOCS_ENABLED=false`) | 구현, 운영 설정에서 적용 예정 |
+
+설계와 달라진 점:
+- 대화 목록은 `owner_uid` 동등 조건만 Firestore에서 걸고 정렬은 서버에서 한다. 복합 색인이 필요 없다.
+- 공개 인증서는 Cache-Control max-age 동안 서버 메모리에 캐시한다. 인증서를 받지 못하면 401이 아니라 503으로 응답한다.
+- 인증 설정(`FIREBASE_PROJECT_ID`)이 없으면 모든 API가 503이다. 인증을 건너뛰는 모드는 없다.
 
 ## 현재 위험 (M3 기준)
 
@@ -68,7 +82,16 @@
 
 ## 5. Firebase 최소 권한
 
+서버가 쓰는 Firestore 작업은 문서 읽기·쓰기·삭제, 쿼리, count 집계, 트랜잭션(`usage`)이다. 모두 `roles/datastore.user`에 들어 있다.
+토큰 검증은 공개 인증서만 쓰므로 IAM 권한이 필요 없다. Firebase Authentication 관리 권한도 필요 없다(서버는 사용자를 만들거나 바꾸지 않는다).
+
 1. Google Cloud IAM에서 새 서비스 계정(예: `adair-mi-api`)을 만들고 **Cloud Datastore 사용자(`roles/datastore.user`)** 역할 하나만 준다.
+   gcloud 예시 (실행 전 승인 필요):
+   ```
+   gcloud iam service-accounts create adair-mi-api --project adair-mission-intelligence
+   gcloud projects add-iam-policy-binding adair-mission-intelligence      --member serviceAccount:adair-mi-api@adair-mission-intelligence.iam.gserviceaccount.com --role roles/datastore.user
+   gcloud iam service-accounts keys create <저장소 밖 경로>.json      --iam-account adair-mi-api@adair-mission-intelligence.iam.gserviceaccount.com
+   ```
 2. 새 키로 연결 확인(`scripts/check_firestore.py`)을 한 뒤, 지금의 firebase-adminsdk 키는 콘솔에서 **삭제(폐기)**한다.
 3. Render에는 키 JSON을 Secret File로 올리고 `GOOGLE_APPLICATION_CREDENTIALS`로 경로를 지정한다.
 4. Firestore 보안 규칙은 "모두 거부"를 유지한다. 브라우저는 Firestore에 직접 접근하지 않고 API만 거친다. Admin SDK는 규칙과 상관없이 접근한다.

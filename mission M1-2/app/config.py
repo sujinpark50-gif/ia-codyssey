@@ -49,6 +49,20 @@ class Settings:
     chat_history_max_messages: int = 10
     chat_history_max_chars: int = 8000
     summary_cache_ttl_s: float = 60.0
+    # M4 인증·제한
+    allowed_emails: tuple[str, ...] = ()  # 비어 있으면 아무도 통과하지 못한다
+    firebase_web_api_key: str | None = None  # Firebase 웹 설정값 (공개 식별자, 비밀 아님)
+    firebase_auth_domain: str | None = None
+    firebase_web_app_id: str | None = None
+    chat_rate_per_minute: int = 5
+    chat_rate_per_hour: int = 30
+    chat_max_concurrent: int = 1
+    chat_daily_limit: int = 200
+    usage_collection: str = "usage"
+    max_request_bytes: int = 16_384
+    max_conversations_per_user: int = 100
+    max_messages_per_conversation: int = 200
+    docs_enabled: bool = True  # 운영에서는 false
 
     def __post_init__(self):
         if self.data_backend not in BACKENDS:
@@ -80,4 +94,17 @@ class Settings:
             chat_history_max_messages=int(get("CHAT_HISTORY_MAX_MESSAGES") or 10),
             chat_history_max_chars=int(get("CHAT_HISTORY_MAX_CHARS") or 8000),
             summary_cache_ttl_s=float(get("SUMMARY_CACHE_TTL_S") or 60.0),
+            allowed_emails=tuple(e.strip().lower() for e in (get("ALLOWED_EMAILS") or "").split(",") if e.strip()),
+            firebase_web_api_key=(get("FIREBASE_WEB_API_KEY") or "").strip() or None,
+            firebase_auth_domain=(get("FIREBASE_AUTH_DOMAIN") or "").strip() or None,
+            firebase_web_app_id=(get("FIREBASE_WEB_APP_ID") or "").strip() or None,
+            chat_rate_per_minute=int(get("CHAT_RATE_PER_MINUTE") or 5),
+            chat_rate_per_hour=int(get("CHAT_RATE_PER_HOUR") or 30),
+            chat_max_concurrent=int(get("CHAT_MAX_CONCURRENT") or 1),
+            chat_daily_limit=int(get("CHAT_DAILY_LIMIT") or 200),
+            usage_collection=get("FIRESTORE_USAGE_COLLECTION") or "usage",
+            max_request_bytes=int(get("MAX_REQUEST_BYTES") or 16_384),
+            max_conversations_per_user=int(get("MAX_CONVERSATIONS_PER_USER") or 100),
+            max_messages_per_conversation=int(get("MAX_MESSAGES_PER_CONVERSATION") or 200),
+            docs_enabled=_bool(get("DOCS_ENABLED"), True),
         )
