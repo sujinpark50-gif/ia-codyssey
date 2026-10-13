@@ -165,3 +165,100 @@ class Summary(BaseModel):
     max: float
     recent_comparison: RecentComparison | None
     cautions: list[str]
+
+
+# ---------------------------------------------------------------- M3 채팅·대화
+CONV_ID_PATTERN = r"^conv-[0-9a-f]{32}$"
+MAX_MESSAGE_CHARS = 2000
+
+
+class ChatRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    message: str = Field(description=f"사용자 질문 (공백 제외 1자 이상, {MAX_MESSAGE_CHARS}자 이하)")
+    conversation_id: str | None = Field(None, pattern=CONV_ID_PATTERN, description="없으면 새 대화")
+    run_id: str | None = Field(None, max_length=200, pattern=ID_PATTERN)
+    metric: str | None = Field(None, max_length=100, pattern=ID_PATTERN)
+
+    @field_validator("message")
+    @classmethod
+    def _message(cls, v: str):
+        v = v.strip()
+        if not v:
+            raise ValueError("message가 비어 있습니다")
+        if len(v) > MAX_MESSAGE_CHARS:
+            raise ValueError(f"message는 {MAX_MESSAGE_CHARS}자 이하여야 합니다")
+        return v
+
+
+class ChatTarget(BaseModel):
+    run_id: str
+    metric: str
+    unit: str
+
+
+class StatsBasis(BaseModel):
+    """답변에 사용한 통계 기준 (Firestore data 의 summary 스냅샷)."""
+    source: str
+    computed_at: str
+    from_cache: bool
+    count: int
+    mean: float
+    min: float
+    max: float
+    start: str
+    end: str
+    recent_comparison: RecentComparison | None
+
+
+class Grounding(BaseModel):
+    ok: bool
+    unverified_numbers: list[str] = Field(description="답변에 있으나 제공한 통계·대화에서 찾지 못한 수치")
+    assertive_cause_phrases: list[str] = Field(description="고장·결함·위반 등을 단정하는 표현")
+
+
+class ChatResponse(BaseModel):
+    conversation_id: str
+    created_conversation: bool
+    answer: str
+    target: ChatTarget
+    stats_basis: StatsBasis
+    grounding: Grounding
+    model: str
+    history_messages_used: int
+
+
+class ConversationCreate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    title: str | None = Field(None, max_length=100)
+    run_id: str | None = Field(None, max_length=200, pattern=ID_PATTERN)
+    metric: str | None = Field(None, max_length=100, pattern=ID_PATTERN)
+
+
+class ConversationOut(BaseModel):
+    id: str
+    title: str
+    created_at: str
+    updated_at: str
+    run_id: str
+    metric: str
+    message_count: int
+
+
+class MessageOut(BaseModel):
+    seq: int
+    role: Literal["user", "assistant"]
+    content: str
+    created_at: str
+    model: str | None = None
+    stats_basis: StatsBasis | None = None
+    grounding: Grounding | None = None
+
+
+class ConversationDetail(ConversationOut):
+    messages: list[MessageOut]
+
+
+class ConversationList(BaseModel):
+    items: list[ConversationOut]

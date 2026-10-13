@@ -62,21 +62,24 @@ ADAIR 프로젝트의 Gazebo·PX4 시뮬레이션 및 테스트 로그를 활용
 |---|---|---|
 | M1-2 | 원본 검증, 속도 재계산, 1초 시계열 435개 생성 | 완료 — `docs/DATA_VALIDATION.md` |
 | M2 | FastAPI 데이터 API, 저장소 계층(메모리·Firestore), 적재기, 통계 요약 | 완료 — 실제 Firestore `data` 컬렉션에 435건 적재·검증 (2026-10-13) |
-| M3 이후 | 대화 기록, GPT 분석, 웹 화면, 배포 | 미착수 |
+| M3 | GPT 분석 비서 `POST /api/chat`, 대화 기록 API, 통계 캐시 | 구현·모의 테스트 완료, 실제 API 연결 1회 확인 — `docs/CHAT.md` |
+| M4 이후 | 웹 화면, 배포 | 미착수 |
 
 ## 폴더 구조
 
 ```
 mission M1-2/
-├─ app/                 FastAPI 앱 (config, models, repository, service, importer, api/)
+├─ app/                 FastAPI 앱 (config, models, repository, service, importer, llm, chat, conversations, api/)
 ├─ scripts/
 │  ├─ prepare_data.py   원본 → 1초 시계열 (표준 라이브러리만)
-│  └─ load_data.py      1초 시계열 → 저장소 적재 (기본: 메모리 모의 적재)
+│  ├─ load_data.py      1초 시계열 → 저장소 적재 (기본: 메모리 모의 적재)
+│  ├─ check_firestore.py Firestore 연결 확인
+│  └─ check_llm.py      GPT API 연결 확인 (실제 호출 1회)
 ├─ data/
 │  ├─ raw/              원본 CSV·JSON (커밋하지 않음, 직접 준비)
 │  ├─ ugv_speed_1s.csv / .json, source_manifest.json, validation_summary.json
-├─ docs/                DATA_VALIDATION.md, DATA_SCHEMA.md, API.md
-└─ tests/               test_prepare_data.py (M1-2), test_api.py (M2)
+├─ docs/                DATA_VALIDATION.md, DATA_SCHEMA.md, API.md, CHAT.md
+└─ tests/               test_prepare_data.py (M1-2), test_api.py (M2), test_chat.py (M3)
 ```
 
 명령은 모두 `mission M1-2` 폴더에서 실행합니다.
@@ -122,7 +125,8 @@ python scripts/prepare_data.py
 ```
 
 - `test_prepare_data.py` 12개: 원본 품질, 속도 계산, 집계, 재현성, 원본 해시. **`data/raw/`에 원본이 있어야 합니다.**
-- `test_api.py` 17개: API 동작, 수정 정책, 통계 검산, 중복 적재 방지, Firestore 장애 처리, CORS, Swagger. Firestore 연결이나 원본 없이 돌아갑니다.
+- `test_api.py` 23개: API 동작, 수정 정책, 통계 검산, 중복 적재 방지, Firestore 장애 처리, CORS, Swagger. Firestore 연결이나 원본 없이 돌아갑니다.
+- `test_chat.py` 19개: 채팅, 대화 기록, GPT 오류·저장 실패 처리, 통계 프롬프트, 근거 검사, 키 노출 방지, Codyssey 호환 요청 형식. 가짜 GPT·가짜 전송 계층을 쓰며 실제 API를 부르지 않습니다.
 
 ## 5. API 실행
 
@@ -157,3 +161,7 @@ python scripts/load_data.py --backend firestore --verify-only     # 쓰기 없�
 - Firestore의 `imported` 데이터(원본에서 계산한 435개)는 API로 수정·삭제할 수 없습니다. 서버가 403으로 거부합니다. 추가·수정·삭제는 `manual` 데이터만 가능합니다.
 - 이 저장소는 공개 저장소입니다. 원본에서 계산한 파생 산출물(1초 속도값, 원본 행 번호, 파일 해시, 시험 식별자·월드·차량 이름)은 저장소에 포함되어 있습니다. 소유자가 공개해도 된다고 판단했습니다(2026-10-13).
 - API 키, 서비스 계정 키, `.env`는 커밋하지 않습니다.
+
+## 7. GPT 분석 비서 (M3)
+
+`.env`에 `OPENAI_API_KEY`, `OPENAI_MODEL=gpt-5.4`, `OPENAI_BASE_URL=https://copa.codyssey.kr/v1`을 넣습니다. 서버를 실행한 뒤 `POST /api/chat`으로 질문합니다. 요청 1회가 GPT 호출 1회(유료)입니다. 자세한 내용은 `docs/CHAT.md`.

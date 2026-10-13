@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import time
 import uuid
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -62,9 +63,20 @@ def load_quality(path: Path) -> dict[str, dict]:
 
 
 class DataService:
-    def __init__(self, repo: DataRepository, quality: dict[str, dict] | None = None):
+    """summary 캐시: (run_id, metric) 별로 계산 결과를 cache_ttl_s 초 동안 재사용한다.
+    이 서비스를 거친 추가·수정·삭제는 즉시 캐시를 비운다. 서비스를 거치지 않은 변경
+    (적재 스크립트, Firestore 콘솔 편집)은 TTL 이 지나면 반영된다. cache_ttl_s=0 이면 캐시를 쓰지 않는다."""
+
+    def __init__(self, repo: DataRepository, quality: dict[str, dict] | None = None,
+                 cache_ttl_s: float = 0.0, clock=time.monotonic):
         self.repo = repo
         self.quality = quality or {}
+        self.cache_ttl_s = cache_ttl_s
+        self._clock = clock
+        self._cache: dict[tuple, tuple[float, Summary, datetime]] = {}
+
+    def invalidate_cache(self) -> None:
+        self._cache.clear()
 
     # ---------------------------------------------------------- 조회
     def list(self, *, run_id=None, metric=None, record_type=None, limit=100, offset=0):
@@ -87,6 +99,7 @@ class DataService:
         self._check_sim_slot(doc, exclude_id=None)
         doc_id = f"manual-{uuid.uuid4().hex}"
         self.repo.create(doc_id, doc)
+        self.invalidate_cache()
         return to_out(doc_id, doc)
 
     def update(self, doc_id: str, body: DataUpdate) -> DataOut:
@@ -100,6 +113,8 @@ class DataService:
             self.repo.update(doc_id, merged)
         except DocumentNotFound:
             raise NotFound(f"문서가 없습니다: {doc_id}")
+        finally:
+            self.invalidate_cache()
         return to_out(doc_id, {**current, **merged})
 
     def delete(self, doc_id: str) -> None:
@@ -108,6 +123,8 @@ class DataService:
             self.repo.delete(doc_id)
         except DocumentNotFound:
             raise NotFound(f"문서가 없습니다: {doc_id}")
+        finally:
+            self.invalidate_cache()
 
     @staticmethod
     def _require_manual(doc_id: str, doc: dict) -> None:
@@ -125,6 +142,22 @@ class DataService:
 
     # ---------------------------------------------------------- 요약
     def summary(self, *, run_id: str | None = None, metric: str | None = None) -> Summary:
+        return self.summary_info(run_id=run_id, metric=metric)[0]
+
+    def summary_info(self, *, run_id: str | None = None, metric: str | None = None):
+        """(Summary, 계산 시각 UTC, 캐시 사용 여부)."""
+        key = (run_id, metric)
+        now = self._clock()
+        hit = self._cache.get(key)
+        if self.cache_ttl_s > 0 and hit and hit[0] > now:
+            return hit[1], hit[2], True
+        result = self._compute_summary(run_id=run_id, metric=metric)
+        computed_at = datetime.now(timezone.utc)
+        if self.cache_ttl_s > 0:
+            self._cache[key] = (now + self.cache_ttl_s, result, computed_at)
+        return result, computed_at, False
+
+    def _compute_summary(self, *, run_id: str | None, metric: str | None) -> Summary:
         docs = [d for _, d in self.repo.list(run_id=run_id, metric=metric)]
         if not docs:
             raise NotFound("조건에 맞는 데이터가 없습니다")

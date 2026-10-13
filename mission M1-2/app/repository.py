@@ -116,20 +116,7 @@ class FirestoreRepository(DataRepository):
         return self._call(lambda: self._client.collection(self._collection))
 
     def _call(self, fn, *, doc_level: bool = False):
-        """Google 예외 → 저장소 예외. NotFound 는 문서 단위 호출(doc_level)에서만 '문서 없음'으로 본다.
-        컬렉션·데이터베이스 단위 NotFound(예: 데이터베이스 없음)는 서비스 불가다."""
-        from google.api_core import exceptions as gexc
-        from google.auth import exceptions as aexc
-        try:
-            return fn()
-        except gexc.AlreadyExists as e:
-            raise DocumentExists(safe_error(e))
-        except gexc.NotFound as e:
-            if doc_level:
-                raise DocumentNotFound(safe_error(e))
-            raise RepositoryUnavailable(f"Firestore 요청 실패: NotFound: {safe_error(e)}")
-        except (gexc.GoogleAPIError, aexc.GoogleAuthError, OSError) as e:
-            raise RepositoryUnavailable(f"Firestore 요청 실패: {type(e).__name__}: {safe_error(e)}")
+        return firestore_call(fn, doc_level=doc_level)
 
     def get(self, doc_id):
         col = self._col()
@@ -159,6 +146,23 @@ class FirestoreRepository(DataRepository):
         if not self._call(lambda: ref.get(timeout=self._timeout)).exists:
             raise DocumentNotFound(doc_id)
         self._call(lambda: ref.delete(timeout=self._timeout), doc_level=True)
+
+
+def firestore_call(fn, *, doc_level: bool = False):
+    """Google 예외 → 저장소 예외. NotFound 는 문서 단위 호출(doc_level)에서만 '문서 없음'으로 본다.
+    컬렉션·데이터베이스 단위 NotFound(예: 데이터베이스 없음)는 서비스 불가다."""
+    from google.api_core import exceptions as gexc
+    from google.auth import exceptions as aexc
+    try:
+        return fn()
+    except gexc.AlreadyExists as e:
+        raise DocumentExists(safe_error(e))
+    except gexc.NotFound as e:
+        if doc_level:
+            raise DocumentNotFound(safe_error(e))
+        raise RepositoryUnavailable(f"Firestore 요청 실패: NotFound: {safe_error(e)}")
+    except (gexc.GoogleAPIError, aexc.GoogleAuthError, OSError) as e:
+        raise RepositoryUnavailable(f"Firestore 요청 실패: {type(e).__name__}: {safe_error(e)}")
 
 
 _PEM = re.compile(r"-----BEGIN [A-Z ]+-----.*?(-----END [A-Z ]+-----|$)", re.S)

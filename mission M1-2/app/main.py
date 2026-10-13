@@ -12,9 +12,14 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from .api import chat as chat_api
 from .api import data as data_api
+from .chat import ChatSaveFailed, ChatService
 from .config import Settings
+from .conversations import (ConversationRepository, FirestoreConversationRepository,
+                            InMemoryConversationRepository)
 from .importer import import_documents, load_documents
+from .llm import LLMClient, LLMError, build_llm, redact
 from .repository import DataRepository, FirestoreRepository, InMemoryRepository, RepositoryUnavailable
 from .service import DataService, ServiceError, load_quality
 
@@ -34,7 +39,14 @@ def build_repository(settings: Settings) -> tuple[DataRepository, dict | None]:
     return repo, seed
 
 
-def create_app(settings: Settings | None = None, repository: DataRepository | None = None) -> FastAPI:
+def build_conversations(settings: Settings, data_repo: DataRepository) -> ConversationRepository:
+    if isinstance(data_repo, FirestoreRepository):  # 같은 Firebase 클라이언트를 함께 쓴다
+        return FirestoreConversationRepository(settings, client=data_repo._client, init_error=data_repo._init_error)
+    return InMemoryConversationRepository()
+
+
+def create_app(settings: Settings | None = None, repository: DataRepository | None = None,
+               conversations: ConversationRepository | None = None, llm: LLMClient | None = None) -> FastAPI:
     settings = settings or Settings.from_env()
     app = FastAPI(
         title="ADAIR Mission Intelligence API",
@@ -52,11 +64,22 @@ def create_app(settings: Settings | None = None, repository: DataRepository | No
         seed = None
     app.state.settings = settings
     app.state.seed_result = seed
-    app.state.service = DataService(repository, load_quality(settings.quality_path))
+    app.state.service = DataService(repository, load_quality(settings.quality_path),
+                                    cache_ttl_s=settings.summary_cache_ttl_s)
+    app.state.chat = ChatService(app.state.service, conversations or build_conversations(settings, repository),
+                                 llm or build_llm(settings), settings)
+    secrets = (settings.openai_api_key,)
 
     @app.exception_handler(ServiceError)
     async def _service_error(_: Request, e: ServiceError):
+        if isinstance(e, ChatSaveFailed):
+            return JSONResponse(status_code=e.status, content={
+                "detail": e.detail, "saved": False, "answer": e.answer, "conversation_id": e.conversation_id})
         return JSONResponse(status_code=e.status, content={"detail": e.detail})
+
+    @app.exception_handler(LLMError)
+    async def _llm_error(_: Request, e: LLMError):
+        return JSONResponse(status_code=e.status, content={"detail": redact(e, secrets), "saved": False})
 
     @app.exception_handler(RequestValidationError)
     async def _validation_error(_: Request, e: RequestValidationError):
@@ -67,13 +90,16 @@ def create_app(settings: Settings | None = None, repository: DataRepository | No
 
     @app.exception_handler(RepositoryUnavailable)
     async def _repo_unavailable(_: Request, e: RepositoryUnavailable):
-        log.error("저장소 사용 불가: %s", e)
-        return JSONResponse(status_code=503, content={"detail": "데이터 저장소에 연결할 수 없습니다", "reason": str(e)})
+        log.error("저장소 사용 불가: %s", redact(e, secrets))
+        return JSONResponse(status_code=503, content={"detail": "데이터 저장소에 연결할 수 없습니다",
+                                                      "reason": redact(e, secrets)})
 
     @app.get("/health", tags=["meta"])
     def health():
-        return {"status": "ok", "backend": settings.data_backend}
+        return {"status": "ok", "backend": settings.data_backend,
+                "llm": "configured" if not hasattr(app.state.chat.llm, "reason") else "not_configured",
+                "llm_model": app.state.chat.llm.model}
 
-    # M3: conversations 라우터를 같은 /api 아래에 추가할 예정
     app.include_router(data_api.router, prefix="/api")
+    app.include_router(chat_api.router, prefix="/api")
     return app

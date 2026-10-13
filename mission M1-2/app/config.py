@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -40,6 +40,15 @@ class Settings:
     data_collection: str = "data"
     conversations_collection: str = "conversations"  # M3에서 사용 예정
     cors_origins: tuple[str, ...] = ()
+    # M3 GPT 채팅 — 키는 repr·로그에 나오지 않게 repr=False
+    openai_api_key: str | None = field(default=None, repr=False)
+    openai_model: str | None = None  # 기본값 없음: 미설정이면 /api/chat 이 503
+    openai_base_url: str | None = None  # OpenAI 호환 API (예: Codyssey). 없으면 OpenAI 기본 주소
+    openai_timeout_s: float = 30.0
+    openai_max_output_tokens: int = 800
+    chat_history_max_messages: int = 10
+    chat_history_max_chars: int = 8000
+    summary_cache_ttl_s: float = 60.0
 
     def __post_init__(self):
         if self.data_backend not in BACKENDS:
@@ -63,4 +72,12 @@ class Settings:
             data_collection=get("FIRESTORE_DATA_COLLECTION") or "data",
             conversations_collection=get("FIRESTORE_CONVERSATIONS_COLLECTION") or "conversations",
             cors_origins=origins,
+            openai_api_key=(get("OPENAI_API_KEY") or "").strip() or None,
+            openai_model=(get("OPENAI_MODEL") or "").strip() or None,
+            openai_base_url=(get("OPENAI_BASE_URL") or "").strip() or None,
+            openai_timeout_s=float(get("OPENAI_TIMEOUT_S") or 30.0),
+            openai_max_output_tokens=int(get("OPENAI_MAX_OUTPUT_TOKENS") or 800),
+            chat_history_max_messages=int(get("CHAT_HISTORY_MAX_MESSAGES") or 10),
+            chat_history_max_chars=int(get("CHAT_HISTORY_MAX_CHARS") or 8000),
+            summary_cache_ttl_s=float(get("SUMMARY_CACHE_TTL_S") or 60.0),
         )

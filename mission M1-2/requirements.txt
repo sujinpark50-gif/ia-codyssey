@@ -7,3 +7,6 @@ firebase-admin==7.7.0
 python-dotenv==1.2.4
 # 테스트(fastapi.testclient)용
 httpx==0.28.1
+# M3 GPT 채팅 (OpenAI 호환 API)
+httpx2==2.13.1
+openai==3.29.0
