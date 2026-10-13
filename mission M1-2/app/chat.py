@@ -78,14 +78,20 @@ def check_grounding(answer: str, context: str) -> Grounding:
     맥락의 어떤 값을 답변 자릿수로 반올림해 같으면 근거 있음으로 본다. 0~10 정수는 일반 표현으로 보고 넘긴다.
     부호를 뗀 값도 비교한다 (−0.73 과 '0.73 낮아졌다')."""
     ctx = [_value(t)[0] for t in _numbers(context)]
-    unverified = []
-    for tok in _numbers(answer):
+
+    def grounded(tok: str) -> bool:
         v, d = _value(tok)
         if d == 0 and 0 <= abs(v) <= 10:
-            continue
+            return True
         tol = 0.5 * 10 ** (-d) + 1e-12
-        if not any(abs(abs(c) - abs(v)) <= tol for c in ctx):
-            unverified.append(tok)
+        return any(abs(abs(c) - abs(v)) <= tol for c in ctx)
+
+    unverified = []
+    for tok in _numbers(answer):
+        # "390,450" 은 천 단위(390450)일 수도, 구간 [390,450) 의 두 값일 수도 있다 → 둘 중 하나라도 근거가 있으면 통과
+        if grounded(tok) or ("," in tok and all(grounded(p) for p in tok.lstrip("-").split(","))):
+            continue
+        unverified.append(tok)
     cause = [m.group(0) for m in _CAUSE.finditer(answer)]
     return Grounding(ok=not unverified and not cause, unverified_numbers=unverified, assertive_cause_phrases=cause)
 

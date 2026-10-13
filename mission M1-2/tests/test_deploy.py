@@ -166,3 +166,19 @@ class ErrorExposureTest(unittest.TestCase):
         self.assertEqual((r.status_code, r.json()["reason"]), (503, "AUTH_UNAVAILABLE"))
         self.assertNotIn("FIREBASE_PROJECT_ID", r.text)
         self.assertIn("FIREBASE_PROJECT_ID", "\n".join(logs.output))
+
+
+class GroundingIntervalTest(unittest.TestCase):
+    """운영 실호출(2026-10-13)에서 나온 오탐: 구간 표기 [390,450) 를 천 단위 숫자로 읽음."""
+
+    def test_interval_and_thousands(self):
+        from app.chat import build_system_prompt, check_grounding
+        from test_chat import _summary
+        ctx = build_system_prompt(*_summary())
+        real = ("최근 60초 [390,450) 평균은 4.551057 m/s, 이전 60초 [330,390) 평균은 5.279502 m/s로, "
+                "최근 구간이 0.728445 m/s 낮았습니다.")
+        g = check_grounding(real, ctx)
+        self.assertTrue(g.ok, g)
+        self.assertTrue(check_grounding("원시 표본 8,078개 중 2,234개", ctx).ok)   # 천 단위는 그대로 인정
+        bad = check_grounding("구간 [390,999) 와 7,123개", ctx)
+        self.assertEqual(bad.unverified_numbers, ["390,999", "7,123"])          # 근거 없는 값은 계속 표시

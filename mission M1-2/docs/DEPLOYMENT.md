@@ -1,6 +1,6 @@
 # M5 배포 준비
 
-상태: **준비 문서, 미배포.** 서비스 계정 생성·키 폐기·배포는 사용자 승인 후 진행한다.
+상태: **배포됨 (2026-10-13).** 아래 "운영 배포 결과" 참고.
 
 ## 1. 권장 방식: Render Web Service 1개 (FastAPI + 정적 웹)
 
@@ -197,3 +197,37 @@ IAM 역할 반영에는 몇 분이 걸릴 수 있다. 3단계에서 `PermissionD
 5. Firebase 승인된 도메인에 Render 주소 추가
 6. ~~Firestore 규칙 확인·적용~~ — 확인 완료, 이미 모두 거부라 적용할 것 없음
 7. 실제 배포와 배포 후 확인 (GPT 1회 호출 포함 여부)
+
+
+## 운영 배포 결과 (2026-10-13)
+
+| 항목 | 값 |
+|---|---|
+| 서비스 | Render Web Service `adair-mission-intelligence` (Free, Singapore, Blueprint) |
+| 주소 | https://adair-mission-intelligence.onrender.com |
+| 저장소·브랜치·커밋 | 공개 저장소 URL 연결 (`sujinpark50-gif/ia-codyssey`), `feat/m5-deployment`, `662eac3` |
+| Blueprint 경로 | `mission M1-2/render.yaml` — 공백 경로도 정상 인식 |
+| Root Directory | 비움 (따옴표 경로 + `--app-dir`) — 빌드 38초, 정상 기동 |
+| 환경변수 / Secret File | 18개 / `adair-mi-sa.json` (새 최소 권한 계정 키) — Secret File 등록 후 수동 재배포 |
+| Firebase 승인 도메인 | `adair-mission-intelligence.onrender.com` 추가 |
+
+배포 전 사전 점검: GitHub 새 클론 + 새 가상환경 + `render.yaml` 명령·환경변수 그대로 로컬 실행 → 빌드·기동·로그인·435건 조회 PASS.
+
+### 운영 검증
+
+| 항목 | 결과 |
+|---|---|
+| 웹 화면 표시 (`/` 200, 첫 접속 콜드 스타트 약 24초) | PASS |
+| 허용 Google 계정 로그인 | PASS |
+| Firestore 435건, 평균 4.896, 최근/이전 60초 4.551/5.280 | PASS |
+| 그래프(점 435)·표(9쪽) | PASS |
+| 실제 GPT 응답 (gpt-5.4, 1회, 8초, 입력 693·출력 259 토큰, 시스템 프롬프트 1,120자) | PASS — 첫 줄에 시간 기준 sim_time_s, 원인 미확정 구분 |
+| 대화 저장·다시 불러오기·통계 근거·삭제 | PASS |
+| 로그아웃 후 보호 API (`/api/data/summary`, `/api/conversations`, `/api/me`, `/api/chat`) | 401 PASS |
+| 위조 토큰 401, 토큰 없는 삭제 401, 20KB 본문 413, `/docs` 404, 보안 헤더 | PASS |
+| Render 로그 비밀값 (비공개 키·서비스 계정 정보·GPT 키 패턴·이메일) | 0건 PASS |
+| 테스트 데이터 정리 (conversations 0, data 435) | PASS |
+
+### 발견한 문제와 수정
+
+- 근거 검사 오탐: 답변의 구간 표기 `[390,450)`를 천 단위 숫자 `390450`으로 읽어 "통계에 없는 수치"로 표시했다. 쉼표로 나눈 각 값이 근거에 있으면 통과하도록 수정하고 회귀 테스트를 추가했다(83개 통과). **운영 반영은 재배포 승인 후** (`autoDeploy: false`).
