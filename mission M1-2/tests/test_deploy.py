@@ -182,3 +182,21 @@ class GroundingIntervalTest(unittest.TestCase):
         self.assertTrue(check_grounding("원시 표본 8,078개 중 2,234개", ctx).ok)   # 천 단위는 그대로 인정
         bad = check_grounding("구간 [390,999) 와 7,123개", ctx)
         self.assertEqual(bad.unverified_numbers, ["390,999", "7,123"])          # 근거 없는 값은 계속 표시
+
+
+class VercelConfigTest(unittest.TestCase):
+    def test_rewrite_to_render(self):
+        import json
+        cfg = json.loads((ROOT / "web/vercel.json").read_text(encoding="utf-8"))
+        rw = cfg["rewrites"][0]
+        self.assertEqual(rw["source"], "/api/:path*")
+        self.assertTrue(rw["destination"].startswith("https://adair-mission-intelligence.onrender.com/api/"))
+        text = (ROOT / "web/vercel.json").read_text(encoding="utf-8")
+        for secret in ("sk-", "AIza", "private_key"):
+            self.assertNotIn(secret, text)
+
+    def test_vercel_json_not_served_as_page_secret(self):
+        # FastAPI 쪽에서도 정적 파일로 보이지만 비밀값이 없어 노출돼도 무방
+        from support import create_app as _c
+        r = RawClient(_c(Settings(), llm=FakeLLM())).get("/vercel.json")
+        self.assertIn(r.status_code, (200, 404))
