@@ -7,9 +7,12 @@ services:
     runtime: python
     plan: free
     region: singapore
-    rootDir: "mission M1-2"
-    buildCommand: pip install -r requirements.txt
-    startCommand: python -X utf8 -m uvicorn app.main:create_app --factory --host 0.0.0.0 --port $PORT
+    # Root Directory 는 비워 둔다(저장소 루트). 폴더 이름의 공백은 Render 문서에 지원 여부가 없어 명령에서 따옴표로 지정한다.
+    buildCommand: 'pip install -r "mission M1-2/requirements.txt"'
+    startCommand: 'python -X utf8 -m uvicorn app.main:create_app --factory --app-dir "mission M1-2" --host 0.0.0.0 --port $PORT'
+    buildFilter:
+      paths:
+        - "mission M1-2/**"
     healthCheckPath: /health
     autoDeploy: false
     envVars:

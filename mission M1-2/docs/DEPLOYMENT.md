@@ -19,13 +19,23 @@
 | 항목 | 값 |
 |---|---|
 | Runtime | Python, `PYTHON_VERSION=3.12.14` |
-| Root Directory | `mission M1-2` — 경로에 공백이 있다. Render가 처리하지 못하면 폴더 이름 변경이 필요하다 (미확인) |
-| Build | `pip install -r requirements.txt` |
-| Start | `python -X utf8 -m uvicorn app.main:create_app --factory --host 0.0.0.0 --port $PORT` |
+| Root Directory | **비워 둔다** (저장소 루트) — 아래 "공백 경로" 참고 |
+| Build | `pip install -r "mission M1-2/requirements.txt"` |
+| Start | `python -X utf8 -m uvicorn app.main:create_app --factory --app-dir "mission M1-2" --host 0.0.0.0 --port $PORT` |
+| Build filter | `mission M1-2/**` (이 폴더가 바뀔 때만 자동 배포 대상) |
 | Health check | `/health` → `{"status":"ok"}` (내부 정보 없음) |
 | HTTPS | Render가 `*.onrender.com` 인증서를 자동 제공 |
 | Region | singapore (한국에서 가장 가까운 Render 지역) |
 | Auto deploy | 꺼 둠 (`autoDeploy: false`) — 승인한 커밋만 수동 배포 |
+
+### 공백 경로 (`mission M1-2`) 처리
+
+- Render 공식 문서([Monorepo support](https://render.com/docs/monorepo-support), [Blueprint spec](https://render.com/docs/blueprint-spec))에는 Root Directory 값에 공백을 쓸 수 있는지 **언급이 없다.** 커뮤니티 포럼 검색 결과에는 공백 대신 `-`·`_`로 이름을 바꾸라는 답변이 있다고 나오지만, 원문 접속이 되지 않아 확인하지 못했다. → **Root Directory에 공백 경로를 넣는 방식은 미확인.**
+- 채택한 대안 (저장소 구조 변경 없음): Root Directory를 비우고, 명령에서 경로를 따옴표로 지정한다. uvicorn `--app-dir`가 `app` 패키지 위치를 정하고, 앱은 `.env`·`data/`·`web/`을 자기 파일 위치 기준으로 찾으므로 실행 위치와 상관없다.
+  - 로컬 확인 (2026-10-13, 저장소 루트에서 같은 명령): `/health` 200, `/` 200, 미인증 `/api/data` 401, `pip install -r "mission M1-2/requirements.txt"` 정상.
+  - Render(리눅스) 셸의 따옴표 처리는 같은 방식이지만 실제 Render 빌드에서는 확인하지 않았다.
+- 다른 대안: ① 폴더 이름을 `mission-M1-2`로 변경 (코드 수정 없음, README 경로 갱신 필요 — 저장소 구조 변경이라 승인 필요) ② Dockerfile 배포.
+- 저장소 루트를 쓰므로 빌드에 다른 과제 폴더도 함께 받아지지만, 실행에는 쓰이지 않는다.
 
 `render.yaml`은 저장소 루트가 아니라 `mission M1-2/`에 있다. Blueprint로 쓰려면 Render에서 파일 경로를 지정하거나, 대시보드에서 같은 값으로 직접 만든다.
 
@@ -104,11 +114,24 @@ IAM 역할 반영에는 몇 분이 걸릴 수 있다. 3단계에서 `PermissionD
 | 요청 본문 크기 | PASS | 16KB 초과 413 |
 | 보안 응답 헤더 | PASS | nosniff, X-Frame-Options DENY, Referrer-Policy, Permissions-Policy. CSP는 Firebase 로그인 호환성 때문에 넣지 않음 |
 | `/docs` 운영 비활성 | 설정으로 PASS | `DOCS_ENABLED=false` |
-| API 오류의 민감 정보 | 부분 | 키·PEM은 지움. 503 응답의 `reason`에 Firestore 오류 요약이 담김 — 허용된 로그인 사용자만 볼 수 있음 |
-| 호출 제한 — 재시작 | 부분 | 일일 상한은 Firestore에 있어 유지. 분·시간·동시 제한은 메모리라 재시작 시 초기화 |
-| 호출 제한 — 복수 인스턴스 | 부분 | 일일 상한은 공유. 분·시간·동시 제한은 인스턴스마다 따로라 N개면 최대 N배. Render 무료는 1개라 현재 영향 없음 |
+| API 오류의 민감 정보 | PASS | 503 응답은 일반 문구 + `reason`(오류 코드 `STORAGE_UNAVAILABLE`·`AUTH_UNAVAILABLE`) + `error_id`만. 원인은 같은 `error_id`로 서버 로그에만 남기고 GPT 키·서비스 계정 키 경로는 로그에서도 마스킹 (테스트). GPT 상위 오류(502/504)는 키를 지운 상위 메시지를 그대로 전달 |
+| 호출 제한 — 재시작 | 부분 | 아래 "호출 제한의 범위" |
+| 호출 제한 — 복수 인스턴스 | 부분 | 아래 "호출 제한의 범위" |
 | data 스냅샷 캐시 — 복수 인스턴스 | 부분 | 다른 인스턴스의 쓰기는 TTL(60초) 뒤 반영 |
-| Firestore 규칙 vs IAM | 문서화 | 규칙은 클라이언트 SDK만 막고, 서버 권한은 IAM이 정함. 현재 콘솔 규칙 미확인 |
+| Firestore 규칙 vs IAM | 문서화 | 규칙은 클라이언트 SDK만 막고, 서버 권한은 IAM이 정함 |
+| Firestore 규칙 = 모두 거부 | **UNVERIFIED — 콘솔 확인 필요** | 저장소의 `firestore.rules`는 모두 거부. 실제 콘솔에 적용된 규칙은 확인하지 않았다 |
+
+### 호출 제한의 범위
+
+| 제한 | 저장 위치 | 적용 범위 | 재시작 | 인스턴스·프로세스 N개 |
+|---|---|---|---|---|
+| 분당 5회 (`CHAT_RATE_PER_MINUTE`) | 서버 프로세스 메모리 | **단일 프로세스 기준** | 초기화됨 | 프로세스마다 따로 → 사용자당 최대 5×N회/분 |
+| 시간당 30회 (`CHAT_RATE_PER_HOUR`) | 서버 프로세스 메모리 | **단일 프로세스 기준** | 초기화됨 | 최대 30×N회/시간 |
+| 동시 1개 (`CHAT_MAX_CONCURRENT`) | 서버 프로세스 메모리 | **단일 프로세스 기준** | 초기화됨 | 최대 N개 동시 |
+| 일일 200회 (`CHAT_DAILY_LIMIT`) | Firestore `usage/{KST 날짜}` 트랜잭션 | 전체 공유 | 유지 | 공유 (정확히 200회) |
+
+- 이 수치는 uvicorn **워커 1개**(start 명령에 `--workers` 없음), Render **인스턴스 1개**를 전제로 한다. 워커나 인스턴스를 늘리면 위 표처럼 분·시간·동시 제한이 그만큼 느슨해진다. 비용 상한은 일일 제한이 지킨다.
+- 여러 인스턴스에서도 분·시간 제한을 정확히 지키려면 Firestore 트랜잭션 카운터(분·시간 버킷)나 Redis 같은 공유 저장소로 옮겨야 한다 (미구현).
 
 ## 6. Firestore 읽기 최적화
 

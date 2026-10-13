@@ -124,3 +124,45 @@ class DeployFilesTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ErrorExposureTest(unittest.TestCase):
+    """503 응답에 내부 경로·프로젝트 구성·예외 내용이 나가지 않고, 원인은 서버 로그에만 (비밀값 제외)."""
+
+    KEY = "C:/very/secret/path/adair-mission-intelligence-firebase-adminsdk-x.json"
+
+    def test_storage_error_generalized(self):
+        from google.api_core import exceptions as gexc
+
+        from app.repository import FirestoreRepository
+
+        class Down:
+            def collection(self, name):
+                raise gexc.NotFound("The database (default) does not exist for project adair-mission-intelligence "
+                                    "at projects/adair-mission-intelligence/databases/(default)")
+        s = Settings(data_backend="firestore", firebase_credentials=self.KEY, openai_api_key="sk-test-ABCDEF123456")
+        cases = [FirestoreRepository(s, client=Down()), FirestoreRepository(s)]  # 장애 / 키 파일 없음
+        for repo in cases:
+            app = create_app(s, repository=repo, llm=FakeLLM())
+            with self.assertLogs("adair_mi", level="ERROR") as logs:
+                r = TestClient(app).get("/api/data")
+            self.assertEqual(r.status_code, 503)
+            body = r.json()
+            self.assertEqual(set(body), {"detail", "reason", "error_id"})
+            self.assertEqual(body["reason"], "STORAGE_UNAVAILABLE")
+            for leak in ("adair-mission-intelligence", "projects/", "databases", "secret", ".json", "NotFound",
+                         "Firestore", "FIREBASE"):
+                self.assertNotIn(leak, r.text, leak)
+            joined = "\n".join(logs.output)
+            self.assertIn(body["error_id"], joined)        # 같은 번호로 로그에서 원인 추적
+            self.assertNotIn(self.KEY, joined)             # 키 경로는 로그에도 마스킹
+            self.assertNotIn("sk-test-ABCDEF123456", joined)
+
+    def test_auth_unavailable_generalized(self):
+        from app.main import create_app as real_create_app
+        app = real_create_app(Settings(allowed_emails=("a@test.dev",)), llm=FakeLLM())  # FIREBASE_PROJECT_ID 없음
+        with self.assertLogs("adair_mi", level="ERROR") as logs:
+            r = TestClient(app).get("/api/data")
+        self.assertEqual((r.status_code, r.json()["reason"]), (503, "AUTH_UNAVAILABLE"))
+        self.assertNotIn("FIREBASE_PROJECT_ID", r.text)
+        self.assertIn("FIREBASE_PROJECT_ID", "\n".join(logs.output))

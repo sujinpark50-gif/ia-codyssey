@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import logging
+import uuid
 
 from fastapi import Depends, FastAPI, Request
 from fastapi.exceptions import RequestValidationError
@@ -163,10 +164,18 @@ def create_app(settings: Settings | None = None, repository: DataRepository | No
     app.state.chat = ChatService(app.state.service, conversations or build_conversations(settings, repository),
                                  llm or build_llm(settings), settings, limiter)
     app.state.authenticate = Authenticator(verifier or build_verifier(settings), settings.allowed_emails)
-    secrets = (settings.openai_api_key,)
+    secrets = (settings.openai_api_key, settings.firebase_credentials)
+
+    def unavailable(code: str, message: str, cause: object) -> JSONResponse:
+        """503 응답은 일반 문구 + 오류 코드 + 추적 번호만. 원인은 같은 번호로 서버 로그에만 (비밀값 마스킹)."""
+        error_id = uuid.uuid4().hex[:12]
+        log.error("%s [error_id=%s]: %s", code, error_id, redact(cause, secrets))
+        return JSONResponse(status_code=503, content={"detail": message, "reason": code, "error_id": error_id})
 
     @app.exception_handler(AuthError)
     async def _auth_error(_: Request, e: AuthError):
+        if e.status == 503:  # 인증 설정 누락·인증서 조회 실패 — 설정 이름·예외 내용은 응답에 넣지 않는다
+            return unavailable("AUTH_UNAVAILABLE", "지금은 로그인을 확인할 수 없습니다. 잠시 후 다시 시도하세요", e.detail)
         headers = {"WWW-Authenticate": "Bearer"} if e.status == 401 else None
         return JSONResponse(status_code=e.status, content={"detail": e.detail}, headers=headers)
 
@@ -196,9 +205,7 @@ def create_app(settings: Settings | None = None, repository: DataRepository | No
 
     @app.exception_handler(RepositoryUnavailable)
     async def _repo_unavailable(_: Request, e: RepositoryUnavailable):
-        log.error("저장소 사용 불가: %s", redact(e, secrets))
-        return JSONResponse(status_code=503, content={"detail": "데이터 저장소에 연결할 수 없습니다",
-                                                      "reason": redact(e, secrets)})
+        return unavailable("STORAGE_UNAVAILABLE", "데이터 저장소에 연결할 수 없습니다. 잠시 후 다시 시도하세요", e)
 
     @app.get("/health", tags=["meta"])
     def health():
