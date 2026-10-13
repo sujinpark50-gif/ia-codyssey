@@ -1,0 +1,62 @@
+{
+  "run_id": "B1x_slope_low_20261010_184532",
+  "provenance": {
+    "project": "ADAIR 산불재난대응 시뮬레이션",
+    "environment": "Gazebo + PX4 (UGV 주행 시험 기록기 출력)",
+    "origin_paths": [
+      "ADAIR/logs/ugv/B1x_slope_low_20261010_184532.csv",
+      "ADAIR/logs/ugv/B1x_slope_low_20261010_184532.json"
+    ],
+    "local_copies": [
+      "data/raw/B1x_slope_low_20261010_184532.csv",
+      "data/raw/B1x_slope_low_20261010_184532.json"
+    ],
+    "note": "원본은 ADAIR 저장소에서 .gitignore(logs/) 대상이며, 로컬 사본은 해시가 동일함을 확인했다."
+  },
+  "files": [
+    {
+      "role": "position_log_csv",
+      "name": "B1x_slope_low_20261010_184532.csv",
+      "sha256": "4d18f3d45101cbd68ff85d39632e6355c7f6603caf9b2963d7bd5efb7583d4c8",
+      "bytes": 744285,
+      "data_rows": 8079,
+      "columns": [
+        "sim_t",
+        "x",
+        "y",
+        "z",
+        "yaw",
+        "roll",
+        "pitch",
+        "steer_rad",
+        "wheel_rad_s",
+        "wall_t"
+      ]
+    },
+    {
+      "role": "run_summary_json",
+      "name": "B1x_slope_low_20261010_184532.json",
+      "sha256": "4fa14bd41bfb4b74bd25a293c0cd1ccf219b88f559674cb0d8ea978f2a4e22bf",
+      "bytes": 141226
+    }
+  ],
+  "run_metadata": {
+    "tag": "B1x_slope_low",
+    "stamp": "20261010_184532",
+    "world": "kangwon_terrain_b1",
+    "model": "adair_ugv_1",
+    "resource_id": "A-ugv1",
+    "start_local": "2026-10-10 18:45:35",
+    "start_wall_epoch_s": 1791625535.449911,
+    "task_ids": [
+      "RT1-20261010_184532",
+      "HOME-20261010_184532"
+    ],
+    "profile_max_speed_kmh": 20.0,
+    "rules_max_speed_mps": 5.56
+  },
+  "time_bases": {
+    "sim_t": "Gazebo 시뮬레이션 시각 (초). 속도·집계 기준",
+    "wall_t": "기록기 벽시계, Unix epoch 초 (UTC). date 표기에만 사용"
+  }
+}

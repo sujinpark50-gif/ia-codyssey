@@ -1,0 +1,240 @@
+{
+  "run_id": "B1x_slope_low_20261010_184532",
+  "transform_version": "1.0.0",
+  "source_sha256": {
+    "csv": "4d18f3d45101cbd68ff85d39632e6355c7f6603caf9b2963d7bd5efb7583d4c8",
+    "json": "4fa14bd41bfb4b74bd25a293c0cd1ccf219b88f559674cb0d8ea978f2a4e22bf"
+  },
+  "source_unchanged_after_run": true,
+  "column_profile": {
+    "sim_t": {
+      "type": "float",
+      "empty": 0,
+      "unparsable": 0,
+      "nonfinite": 0,
+      "nonfinite_rows": []
+    },
+    "x": {
+      "type": "float",
+      "empty": 0,
+      "unparsable": 0,
+      "nonfinite": 0,
+      "nonfinite_rows": []
+    },
+    "y": {
+      "type": "float",
+      "empty": 0,
+      "unparsable": 0,
+      "nonfinite": 0,
+      "nonfinite_rows": []
+    },
+    "z": {
+      "type": "float",
+      "empty": 0,
+      "unparsable": 0,
+      "nonfinite": 0,
+      "nonfinite_rows": []
+    },
+    "yaw": {
+      "type": "float",
+      "empty": 0,
+      "unparsable": 0,
+      "nonfinite": 0,
+      "nonfinite_rows": []
+    },
+    "roll": {
+      "type": "float",
+      "empty": 0,
+      "unparsable": 0,
+      "nonfinite": 0,
+      "nonfinite_rows": []
+    },
+    "pitch": {
+      "type": "float",
+      "empty": 0,
+      "unparsable": 0,
+      "nonfinite": 0,
+      "nonfinite_rows": []
+    },
+    "steer_rad": {
+      "type": "float",
+      "empty": 0,
+      "unparsable": 0,
+      "nonfinite": 1,
+      "nonfinite_rows": [
+        1
+      ]
+    },
+    "wheel_rad_s": {
+      "type": "float",
+      "empty": 0,
+      "unparsable": 0,
+      "nonfinite": 1,
+      "nonfinite_rows": [
+        1
+      ]
+    },
+    "wall_t": {
+      "type": "float",
+      "empty": 0,
+      "unparsable": 0,
+      "nonfinite": 0,
+      "nonfinite_rows": []
+    }
+  },
+  "invalid_required_rows": [],
+  "time_checks": {
+    "sim_duplicates": 0,
+    "sim_reversals": 0,
+    "sim_zero_steps": 0,
+    "sim_step_ms_histogram": {
+      "54": 8078
+    },
+    "wall_duplicates": 0,
+    "wall_reversals": 0,
+    "wall_step_ms_min": 4,
+    "wall_step_ms_max": 927,
+    "wall_steps_over_200ms": 13,
+    "sim_first_s": 14.69,
+    "sim_last_s": 450.902,
+    "sim_duration_s": 436.212,
+    "wall_duration_s": 444.079,
+    "rtf_sim_over_wall": 0.982285
+  },
+  "speed_formula": "hypot(x[i+1]-x[i], y[i+1]-y[i]) / (sim_t[i+1]-sim_t[i])",
+  "excluded_pairs": [],
+  "raw_speed": {
+    "count": 8078,
+    "mean": 4.882585,
+    "min": 0.0,
+    "max": 5.86489,
+    "time_weighted_mean": 4.882585,
+    "covered_ms": 436212,
+    "zero_speed_count": 382,
+    "over_rules_max_count": 2234,
+    "rules_max_speed_mps": 5.56
+  },
+  "recent_raw": {
+    "definition": "마지막 관측 sim_t를 끝으로 하는 [end-60s, end) 와 직전 [end-120s, end-60s)",
+    "end_sim_s": 450.902,
+    "last60_time_weighted_mps": 4.467573,
+    "prev60_time_weighted_mps": 5.281466,
+    "covered_ms": [
+      60000,
+      60000
+    ],
+    "last60_sample_mean_mps": 4.467466,
+    "prev60_sample_mean_mps": 5.28146,
+    "sample_counts": [
+      1111,
+      1111
+    ],
+    "delta_time_weighted_mps": -0.813893,
+    "delta_pct": -15.41
+  },
+  "aggregation": {
+    "method": "시간가중 평균, 구간 [k, k+1) sim 초, 경계 가로지르는 속도 구간은 분할",
+    "kept_bins": 435,
+    "first_bin_s": 15,
+    "last_bin_s": 449,
+    "dropped_bins": [
+      {
+        "bin_start_s": 14,
+        "covered_ms": 310,
+        "rows": [
+          1,
+          7
+        ],
+        "reason": "불완전 구간 (관측 310 ms / 1000 ms)"
+      },
+      {
+        "bin_start_s": 450,
+        "covered_ms": 902,
+        "rows": [
+          8062,
+          8079
+        ],
+        "reason": "불완전 구간 (관측 902 ms / 1000 ms)"
+      }
+    ],
+    "time_weighted": {
+      "count": 435,
+      "mean": 4.896189,
+      "min": 0.0,
+      "max": 5.808594
+    },
+    "simple_mean": {
+      "count": 435,
+      "mean": 4.896249,
+      "min": 0.0,
+      "max": 5.808074
+    },
+    "max_abs_diff_tw_vs_simple": 0.029723,
+    "n_intervals_histogram": {
+      "19": 225,
+      "20": 210
+    },
+    "n_midpoint_samples_histogram": {
+      "18": 210,
+      "19": 225
+    },
+    "date_first": "2026-10-10T18:45:32.747+09:00",
+    "date_last": "2026-10-10T18:52:54.614+09:00"
+  },
+  "recent_1s": {
+    "definition": "대표 시계열의 마지막 60개 1초 구간 평균 vs 직전 60개 (구간 값의 단순 평균 = 시간가중)",
+    "last60_bins_s": [
+      390,
+      449
+    ],
+    "prev60_bins_s": [
+      330,
+      389
+    ],
+    "last60_mean_mps": 4.551057,
+    "prev60_mean_mps": 5.279502,
+    "delta_mps": -0.728445
+  },
+  "reported_comparison": {
+    "position_observations": {
+      "reported": 8079,
+      "recomputed": 8079,
+      "match": true
+    },
+    "derived_speeds": {
+      "reported": 8078,
+      "recomputed": 8078,
+      "match": true
+    },
+    "sim_duration_s": {
+      "reported": 436.212,
+      "recomputed": 436.212,
+      "match": true
+    },
+    "speed_mean_mps": {
+      "reported": 4.8826,
+      "recomputed": 4.882585,
+      "match": true
+    },
+    "speed_min_mps": {
+      "reported": 0.0,
+      "recomputed": 0.0,
+      "match": true
+    },
+    "speed_max_mps": {
+      "reported": 5.8649,
+      "recomputed": 5.86489,
+      "match": true
+    },
+    "nonempty_1s_bins": {
+      "reported": 437,
+      "recomputed": 437,
+      "match": true
+    },
+    "complete_1s_bins": {
+      "reported": 435,
+      "recomputed": 435,
+      "match": true
+    }
+  }
+}

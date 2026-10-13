@@ -1,0 +1,3 @@
+# 재현성 테스트가 바이트 단위로 비교하므로 산출물 줄바꿈을 LF로 고정
+data/*.csv text eol=lf
+data/*.json text eol=lf
