@@ -115,7 +115,11 @@
 | Firebase Auth 사용자 관리 거부 | PASS — `InsufficientPermissionError` (관리자 권한 없음 확인) |
 | 부여된 IAM 역할 이름 | 미확인 (키 권한으로는 IAM 정책을 읽을 수 없음). 위 동작이 모두 되므로 `roles/datastore.user` 이상, Auth 관리는 없음 |
 
-관리자 키는 아직 폐기하지 않았다 (사용자 지시).
+관리자 키 처리 (2026-10-13): 키만 지우는 대신 `firebase-adminsdk-fbsvc@…` **서비스 계정 자체가 삭제됐다**(사용자 콘솔 작업). 로컬 키 파일도 삭제됨.
+- 앱 영향 없음: 삭제 후 새 키로 연결 확인 12/12, data 435건·평균 4.896189 재확인.
+- 이 계정은 Firebase 콘솔의 "새 비공개 키 생성"에 쓰이는 관리용 계정이다. Firestore·Authentication 동작에는 쓰이지 않는다. 앞으로 그 버튼은 쓰지 않고 `adair-mi-backend` 같은 별도 계정으로 키를 관리한다.
+- 되살려야 할 경우: 삭제 후 30일 안에는 `gcloud iam service-accounts undelete <계정 고유 ID>`로 복구할 수 있다(고유 ID는 Cloud 로그의 DeleteServiceAccount 기록에서 확인). 지금은 필요 없다.
+- IAM 화면에 `deleted:serviceAccount:firebase-adminsdk-fbsvc@…` 항목이 남아 있을 수 있다. 동작에는 영향이 없고 정리해도 된다.
 
 IAM 역할 반영에는 몇 분이 걸릴 수 있다. 3단계에서 `PermissionDenied`가 나오면 잠시 뒤 다시 확인한다.
 
