@@ -2,13 +2,14 @@
 // 비밀값 없음: Firebase 웹 설정(공개 식별자)은 /api/config 에서 받고, API 는 로그인 ID 토큰으로만 부른다.
 // API 주소는 config.js 한 곳에서 정한다 (Render 화면·로컬: 같은 출처 / Vercel: Render API 직접 호출).
 
-import { apiUrl } from "./config.js";
+import { API_MODE, apiUrl } from "./config.js";
 
 const FIREBASE_VERSION = "10.12.2";
 const PAGE = 50;
 const WAKE_HINT_MS = 4000;      // 이보다 오래 걸리면 "서버를 깨우는 중" 안내 (Render 무료 인스턴스 콜드 스타트)
 const REQUEST_TIMEOUT_MS = 90000;
 const CHAT_TIMEOUT_MS = 120000;
+const NO_API_MESSAGE = "이 배포에는 API 서버 주소가 설정되지 않아 로그인과 데이터 기능을 쓸 수 없습니다 (Vercel Preview 등)";
 
 const $ = (sel) => document.querySelector(sel);
 const state = {
@@ -35,6 +36,7 @@ function wakeNotice(on) {
 
 // fetch + 시간 제한 + 콜드 스타트 안내. 네트워크 실패·시간 초과는 status 0 의 ApiError (인증 오류와 구분)
 async function request(path, opts = {}, { timeoutMs = REQUEST_TIMEOUT_MS, wakeHint = true } = {}) {
+  if (API_MODE === "disabled") throw new ApiError(0, { detail: NO_API_MESSAGE });
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), timeoutMs);
   let hinted = false;

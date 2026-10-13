@@ -150,8 +150,26 @@ class TrendTest(unittest.TestCase):
         self.assertIn("(-13.8%)", llm.calls[0][0]["content"])
 
     def test_trend_rules(self):
-        from app.service import TREND_FLAT_PCT
+        from app.service import TREND_FLAT_PCT, classify_trend
         self.assertEqual(TREND_FLAT_PCT, 1.0)
+        self.assertEqual(classify_trend(4.551057, 5.279502), (-13.8, "감소"))   # 실제 데이터
+        self.assertEqual(classify_trend(6.0, 5.0), (20.0, "증가"))
+        self.assertEqual(classify_trend(5.0, 5.0), (0.0, "유지"))
+        self.assertEqual(classify_trend(5.04, 5.0), (0.8, "유지"))               # |0.8%| < 1%
+        self.assertEqual(classify_trend(5.05, 5.0), (1.0, "증가"))               # 1% 는 변화로 본다
+        self.assertEqual(classify_trend(4.95, 5.0), (-1.0, "감소"))
+        self.assertEqual(classify_trend(0.0, 0.0), (None, "유지"))               # 분모 0
+        self.assertEqual(classify_trend(1.0, 0.0), (None, "증가"))
+        self.assertEqual(classify_trend(None, 5.0), (None, None))
+        self.assertEqual(classify_trend(5.0, None), (None, None))
+
+    def test_m5_baseline_unchanged(self):
+        s = TestClient(create_app(Settings(), llm=FakeLLM())).get("/api/data/summary").json()
+        self.assertEqual((s["count"], s["mean"], s["min"], s["max"]), (435, 4.896189, 0.0, 5.808594))
+        rc = s["recent_comparison"]
+        self.assertEqual((rc["recent"]["from_sim_s"], rc["recent"]["to_sim_s"], rc["recent"]["mean"]), (390, 450, 4.551057))
+        self.assertEqual((rc["previous"]["from_sim_s"], rc["previous"]["to_sim_s"], rc["previous"]["mean"]), (330, 390, 5.279502))
+        self.assertEqual((rc["difference"], rc["basis"]), (-0.728445, "sim_time_s"))
 
 
 @unittest.skipUnless(NODE, "node 없음 — web JS 실행 검증은 UNVERIFIED")
@@ -172,8 +190,8 @@ class WebBuildTest(unittest.TestCase):
         return tmp, r
 
     def test_same_origin_default(self):
-        out = self.run_node("import {apiUrl, API_BASE} from './config.js'; console.log(JSON.stringify([API_BASE, apiUrl('/api/me')]))", WEB)
-        self.assertEqual(json.loads(out), ["", "/api/me"])
+        out = self.run_node("import {apiUrl, API_BASE, API_MODE} from './config.js'; console.log(JSON.stringify([API_MODE, API_BASE, apiUrl('/api/me')]))", WEB)
+        self.assertEqual(json.loads(out), ["same-origin", "", "/api/me"])
 
     def test_vercel_build_uses_env(self):
         tmp, r = self.build({"API_BASE_URL": RENDER + "/", "VERCEL_ENV": "production"})
@@ -181,8 +199,8 @@ class WebBuildTest(unittest.TestCase):
         dist = tmp / "dist"
         self.assertEqual(sorted(p.name for p in dist.iterdir()),
                          ["app.js", "config.js", "env-config.js", "index.html", "styles.css"])
-        out = self.run_node("import {apiUrl} from './config.js'; console.log(apiUrl('/api/data/summary'))", dist)
-        self.assertEqual(out, RENDER + "/api/data/summary")
+        out = self.run_node("import {apiUrl, API_MODE} from './config.js'; console.log(API_MODE + ' ' + apiUrl('/api/data/summary'))", dist)
+        self.assertEqual(out, "remote " + RENDER + "/api/data/summary")
         for f in dist.iterdir():  # 빌드 결과에 비밀값 없음
             t = f.read_text(encoding="utf-8")
             self.assertIsNone(SK.search(t), f.name)
@@ -194,14 +212,16 @@ class WebBuildTest(unittest.TestCase):
                     {"API_BASE_URL": "", "VERCEL_ENV": "production"}):
             _, r = self.build(env)
             self.assertNotEqual(r.returncode, 0, env)
-        _, r = self.build({"API_BASE_URL": "", "VERCEL_ENV": "preview"})  # Preview 는 같은 출처(정적 확인용)
+        tmp, r = self.build({"API_BASE_URL": "", "VERCEL_ENV": "preview"})  # Preview: 빌드는 되지만 API 를 부르지 않는다
         self.assertEqual(r.returncode, 0, r.stderr)
+        out = self.run_node("import {API_MODE, apiUrl} from './config.js'; let e='none'; try { apiUrl('/api/config') } catch (x) { e = x.message } console.log(API_MODE + ' ' + e)", tmp / "dist")
+        self.assertEqual(out, "disabled API_DISABLED")  # Vercel 자신의 /api 로 요청하지 않음
 
 
 class StaticFrontendTest(unittest.TestCase):
     def test_single_api_entry_and_ux(self):
         js = (WEB / "app.js").read_text(encoding="utf-8")
-        self.assertIn('import { apiUrl } from "./config.js"', js)
+        self.assertIn('import { API_MODE, apiUrl } from "./config.js"', js)
         self.assertEqual(js.count("fetch("), 1)                 # 모든 요청이 request() 한 곳을 거친다
         self.assertIn("fetch(apiUrl(path)", js)
         self.assertIn("Authorization: `Bearer ${token}`", js)  # 토큰 전달 유지
@@ -210,6 +230,7 @@ class StaticFrontendTest(unittest.TestCase):
         self.assertIn("e.status === 0", js)                     # 네트워크 오류와
         self.assertIn("e.status === 401", js)                   # 인증 오류 구분
         self.assertNotIn("FIREBASE_WEB_API_KEY", js)          # 사용자 화면에 서버 설정 이름 노출 안 함
+        self.assertIn('if (API_MODE === "disabled") throw new ApiError(0', js)  # Preview 는 API 호출 없이 안내
         html = (WEB / "index.html").read_text(encoding="utf-8")
         self.assertIn('id="wake"', html)
         self.assertIn("서버를 깨우는 중", html)

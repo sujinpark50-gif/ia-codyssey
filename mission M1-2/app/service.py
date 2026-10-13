@@ -21,6 +21,24 @@ GENERIC_CAUTIONS = (
 )
 
 
+def classify_trend(recent: float | None, previous: float | None) -> tuple[float | None, str | None]:
+    """최근 추세 (sim_time_s 기준 최근 60초 vs 이전 60초 평균).
+
+    change_pct = (recent - previous) / previous × 100, 소수 둘째 자리 반올림.
+    trend: |change_pct| < 1% → "유지", 양수 → "증가", 음수 → "감소".
+    이전 평균이 0 이면 비율을 정의할 수 없으므로 change_pct = None, trend 는 recent 가 0 이면 "유지", 양수면 "증가".
+    어느 한쪽이 없으면 (None, None). 속도는 0 이상이므로 이전 0·최근 음수 경우는 없다.
+    """
+    if recent is None or previous is None:
+        return None, None
+    if previous == 0:
+        return None, ("유지" if recent == 0 else "증가")
+    pct = round((recent - previous) / previous * 100, 2)
+    if abs(pct) < TREND_FLAT_PCT:
+        return pct, "유지"
+    return pct, ("증가" if pct > 0 else "감소")
+
+
 class ServiceError(Exception):
     status = 400
 
@@ -227,8 +245,7 @@ class DataService:
             cautions.append(f"최근 구간에 값이 0인(정지) 1초 구간 {zeros}개가 포함되어 있다. "
                             "구간 차이에 주행 단계 변화(감속·정지)가 섞일 수 있다.")
         diff = round(rec.mean - prev.mean, 6) if rec.mean is not None and prev.mean is not None else None
-        pct = round(diff / prev.mean * 100, 2) if diff is not None and prev.mean else None
-        trend = None if pct is None else ("유지" if abs(pct) < TREND_FLAT_PCT else ("증가" if pct > 0 else "감소"))
+        pct, trend = classify_trend(rec.mean, prev.mean)
         return RecentComparison(
             basis="sim_time_s",
             definition="마지막 1초 구간의 끝(max sim_time_s + 1)에서 거슬러 [end-60, end) 와 [end-120, end-60) 의 1초 값 평균",

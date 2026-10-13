@@ -22,6 +22,8 @@ if (!apiBase && process.env.VERCEL_ENV === "production") {
 rmSync(out, { recursive: true, force: true });
 mkdirSync(out);
 for (const f of FILES) copyFileSync(join(here, f), join(out, f));
+// API_BASE_URL 이 없는 Vercel 빌드(Preview)는 같은 출처로 두지 않는다 — Vercel 자신의 /api 를 부르지 않도록 "disabled"
+const mode = apiBase ? "remote" : "disabled";
 writeFileSync(join(out, "env-config.js"),
-  `// build.mjs 가 빌드 시 생성 (공개 값만)\nexport const API_BASE_URL = ${JSON.stringify(apiBase)};\n`);
-console.log(`dist/ 생성: ${FILES.length + 1}개 파일, API_BASE_URL=${apiBase || "(같은 출처)"}`);
+  `// build.mjs 가 빌드 시 생성 (공개 값만)\nexport const API_BASE_URL = ${JSON.stringify(apiBase)};\nexport const API_MODE = ${JSON.stringify(mode)};\n`);
+console.log(`dist/ 생성: ${FILES.length + 1}개 파일, API_MODE=${mode}, API_BASE_URL=${apiBase || "(없음)"}`);
