@@ -447,6 +447,7 @@ async function ask(ev) {
       t.insertAdjacentHTML("beforeend", assistantHtml({ content: e.body.answer }, { unsaved: true }));
     } else if (t.lastElementChild?.classList.contains("user")) {
       t.lastElementChild.remove();  // 기록되지 않은 질문 말풍선은 지우고, 질문은 입력창에 남김
+      if (!t.children.length) t.innerHTML = `<p class="state">질문을 입력하면 대화가 시작됩니다.</p>`;
     }
     const el = $("#ask-error");
     el.textContent = errorText(e);

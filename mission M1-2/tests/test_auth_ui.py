@@ -172,6 +172,18 @@ def _today():
     return kst_day()
 
 
+class UnconfiguredLLMTest(unittest.TestCase):
+    def test_not_counted_when_gpt_unavailable(self):
+        from app.main import create_app as real_create_app
+        from support import FakeVerifier
+        app = real_create_app(Settings(allowed_emails=("a@test.dev",), chat_daily_limit=1), verifier=FakeVerifier())
+        c = TestClient(app)
+        for _ in range(3):
+            self.assertEqual(c.post("/api/chat", json={"message": "q"}).status_code, 503)  # 429 아님
+        me = c.get("/api/me").json()["chat_limits"]
+        self.assertEqual((me["used_today"], me["used_last_hour"]), (0, 0))
+
+
 class RequestLimitTest(unittest.TestCase):
     def test_body_size(self):
         llm = FakeLLM()

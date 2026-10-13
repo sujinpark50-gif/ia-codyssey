@@ -19,6 +19,7 @@ sys.path.insert(0, str(ROOT))
 
 from fastapi.testclient import TestClient  # noqa: E402
 
+from app.auth import TokenVerifier  # noqa: E402
 from app.config import Settings  # noqa: E402
 from app.llm import LLMClient, OpenAIChatClient, redact  # noqa: E402
 from app.main import build_repository, create_app  # noqa: E402
@@ -26,6 +27,16 @@ from app.service import DataService, load_quality  # noqa: E402
 
 QUESTION = ("이 UGV 주행 기록의 평균·최소·최대 속도와 최근 60초 변화를 알려주세요. "
             "최근 속도가 낮아진 것이 차량 고장 때문인지, 규칙 최고속도 초과는 어떻게 봐야 하는지도 설명해 주세요.")
+
+
+class LocalUser(TokenVerifier):
+    """이 스크립트 프로세스 안에서만 쓰는 고정 사용자 (네트워크로 노출되지 않음).
+    실제 Firebase 로그인 검증은 브라우저 확인과 자동 테스트에서 따로 한다."""
+
+    def verify(self, token):
+        if token != "e2e-local":
+            raise ValueError("unknown")
+        return {"sub": "e2e-local", "user_id": "e2e-local", "email": "e2e@local.test", "email_verified": True}
 
 
 class OneShot(LLMClient):
@@ -71,7 +82,10 @@ def main() -> int:
     llm = OneShot(OpenAIChatClient(api_key=s.openai_api_key, model=s.openai_model, timeout_s=s.openai_timeout_s,
                                    max_output_tokens=s.openai_max_output_tokens, base_url=s.openai_base_url,
                                    max_retries=0))
-    c = TestClient(create_app(s, repository=repo, llm=llm))
+    from dataclasses import replace
+    s = replace(s, allowed_emails=("e2e@local.test",))
+    c = TestClient(create_app(s, repository=repo, llm=llm, verifier=LocalUser()),
+                   headers={"Authorization": "Bearer e2e-local"})
     conv_col = client.collection(s.conversations_collection)
     conv_id = None
     record = {"question": QUESTION}

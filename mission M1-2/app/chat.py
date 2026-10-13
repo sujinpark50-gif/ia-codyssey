@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 
 from .auth import User
 from .conversations import ConversationRepository
-from .llm import LLMClient, LLMError, redact
+from .llm import LLMClient, LLMError, UnavailableLLM, redact
 from .models import (ChatRequest, ChatResponse, ChatTarget, ConversationCreate, ConversationDetail,
                      ConversationOut, Grounding, MessageOut, StatsBasis, Summary)
 from .ratelimit import ChatRateLimiter
@@ -200,6 +200,8 @@ class ChatService:
         system = build_system_prompt(summary, computed_at)
         messages = [{"role": "system", "content": system}, *history, {"role": "user", "content": req.message}]
 
+        if isinstance(self.llm, UnavailableLLM):  # 부를 수 없으면 사용량을 세지 않고 바로 503
+            self.llm.complete(messages)
         try:
             with self.limiter.slot(user.uid):  # 한도를 넘으면 GPT 를 부르지 않고 429
                 result = self.llm.complete(messages)
