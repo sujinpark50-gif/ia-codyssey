@@ -6,6 +6,7 @@
 import json
 import logging
 import sys
+import time
 import unittest
 from dataclasses import replace
 from pathlib import Path
@@ -114,7 +115,10 @@ class ChatTest(unittest.TestCase):
         self.assertEqual(detail["title"], "테스트 대화")
 
     def test_list_detail_delete(self):
-        ids = [self.chat().json()["conversation_id"] for _ in range(2)]
+        ids = []
+        for _ in range(2):  # Windows 시각 해상도에서 두 대화의 updated_at 이 같아지지 않도록 잠깐 띄운다 (기존 간헐 실패)
+            ids.append(self.chat().json()["conversation_id"])
+            time.sleep(0.05)
         items = self.c.get("/api/conversations").json()["items"]
         self.assertEqual([i["id"] for i in items], ids[::-1])  # 최근 수정 순
         self.assertTrue(all(i["created_at"].endswith("+09:00") for i in items))
