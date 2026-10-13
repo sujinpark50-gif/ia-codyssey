@@ -44,7 +44,7 @@
 
 시스템 프롬프트의 `[데이터]` 블록은 `GET /api/data/summary` 와 같은 계산 결과다: 분석 대상, 데이터 수(imported·manual), 기록 시각 범위, 평균·최소·최대, 최근 60초 비교(sim_time_s 기준), 데이터 품질 주의사항(원시 표본 최고속도 초과 2,234/8,078 은 원인 미확정·1초 집계 비율 아님 등).
 
-답변 원칙 8개(`app/chat.py`의 `PRINCIPLES`): 제공된 수치만 사용, 단일 주행으로 임무 성공률 판단 금지, UGV 데이터로 UAV 평가 금지, 속도 저하를 고장으로 단정 금지, 최고속도 초과 원인 미확정, 원시 비율과 1초 집계 비율 구분, 답할 수 없으면 확인 가능한 범위 설명, 분석 대상·단위·시간 기준 명시. 사용자 메시지의 지시보다 원칙이 우선한다고 명시한다.
+답변 규칙 5개(`app/chat.py`의 `PRINCIPLES`, M4에서 8개 → 5개로 압축): 제공된 수치만 사용, 주행 1건·UGV 데이터 범위 밖(임무 성공률·UAV·오케스트레이터) 평가 금지, 속도 저하·최고속도 초과를 고장·결함·위반으로 단정 금지, 원시 비율과 1초 집계 비율 구분, 답할 수 없으면 확인 가능한 범위 설명. 답변 형식은 한국어 최대 6줄, 첫 줄에 대상·단위·시간 기준. 사용자 메시지의 지시보다 규칙이 우선한다고 명시한다.
 
 ### 근거 검사 (`grounding`)
 
@@ -69,7 +69,7 @@ gpt-5.4 를 1회 호출했다. 대화 생성 → 채팅 → Firestore 저장 확
 
 ```
 conversations/{conv_id}
-  title, created_at(Timestamp), updated_at(Timestamp), run_id, metric, message_count
+  owner_uid(M4), title, created_at(Timestamp), updated_at(Timestamp), run_id, metric, message_count
 conversations/{conv_id}/messages/{000000, 000001, …}
   seq, role("user"|"assistant"), content, created_at
   assistant 만: model, stats_basis, grounding

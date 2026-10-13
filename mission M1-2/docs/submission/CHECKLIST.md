@@ -1,7 +1,7 @@
 # 과제 제출 체크리스트 — AI Agent 개발: 나만의 AI 비서 구축
 
 기준: 과제 원문(사용자 제공, 2026-10-13). 상태: PASS / FAIL / UNVERIFIED / NOT APPLICABLE.
-마지막 갱신: 2026-10-13, M6 운영 배포·검증 후 (Render `6688209`, Vercel 운영 `API_MODE=remote`).
+마지막 갱신: 2026-10-14 README 보완. 운영 검증은 2026-10-13 M6 운영 배포 후 (Render `6688209`, Vercel 운영 `API_MODE=remote`).
 
 ## 필수 요건
 
@@ -32,7 +32,8 @@
 | README | 서비스 소개, 기술 스택, 로컬 실행 | PASS | `README.md` |
 | README | 배포 URL(프론트·백엔드·Swagger) | PASS | `README.md` "배포 주소" |
 | README | 환경 변수 목록(최소 세트) | PASS | `README.md` "환경 변수" |
-| README | 스크린샷 3종 (채팅·데이터 관리·대화 기록) | PASS | `docs/submission/01-chat.png`, `02-crud.png`, `03-history.png` (이메일 미노출) |
+| README | 스크린샷 3종 (채팅·데이터 관리·대화 기록) | PASS | `docs/submission/01-chat.png`, `02-crud.png`, `03-history.png` (이메일 미노출). GitHub raw 200·image/png, README 상대경로 확인 |
+| README (M6 지시서 추가 항목) | 시스템 아키텍처, GitHub 저장소, Firestore 데이터 구조, GPT 분석 방식, 테스트 결과, 운영상 제한사항 | PASS | `README.md` 각 절 (2026-10-14 보완) |
 | 제약 | 키는 환경 변수, 코드 노출 없음 | PASS | 정적 파일·OpenAPI·Render 로그(최근 1시간) 비밀값 검사 0건 |
 | 제약 | 입력 검증·예외 처리 | PASS | Pydantic, 오류 처리 테스트 |
 | 제약 | 백엔드 Render / 프론트 Vercel | PASS | |
