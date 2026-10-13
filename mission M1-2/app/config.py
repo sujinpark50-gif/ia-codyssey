@@ -77,7 +77,7 @@ class Settings:
     max_request_bytes: int = 16_384
     max_conversations_per_user: int = 100
     max_messages_per_conversation: int = 200
-    docs_enabled: bool = True  # 운영에서는 false
+    docs_enabled: bool = True  # Swagger /docs 공개 (운영도 true, 보호 API 는 토큰 검증 유지)
 
     def __post_init__(self):
         if self.data_backend not in BACKENDS:

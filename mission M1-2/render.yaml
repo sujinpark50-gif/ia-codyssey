@@ -1,4 +1,4 @@
-# Render 배포 설정 초안 — 아직 배포하지 않음 (docs/DEPLOYMENT.md 참고)
+# Render 배포 설정 (Blueprint, main 브랜치 동기화 — 운영 중. 배포 기록은 docs/DEPLOYMENT.md)
 # 비밀값은 여기에 쓰지 않는다: sync: false 항목은 Render 대시보드에서 직접 입력하고,
 # 서비스 계정 키 JSON 은 Secret File(adair-mi-sa.json)로 올린다 → /etc/secrets/adair-mi-sa.json
 services:
