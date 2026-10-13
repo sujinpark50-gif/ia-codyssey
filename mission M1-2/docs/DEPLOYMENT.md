@@ -257,7 +257,7 @@ IAM 역할 반영에는 몇 분이 걸릴 수 있다. 3단계에서 `PermissionD
   - 근거 검사 수정의 운영 실호출 재현(`[390,450)` 공백 없는 형식) — 테스트로는 확인됨.
   - 분·시간·동시 호출 제한의 다중 인스턴스 공유 (현재 단일 프로세스 기준).
 
-## M6 — Vercel 프론트엔드 분리 (구현 완료, 운영 배포 전)
+## M6 — Vercel 프론트엔드 분리 (운영 배포·검증 완료, 2026-10-13)
 
 ### 구조
 
@@ -388,3 +388,34 @@ Blueprint 브랜치 변경 시 환경변수 동기화와 배포의 순서는 Ren
 2. Blueprint 브랜치 → `main`. 동기화·배포가 어떤 순서로 일어나도 M5·M6 코드 모두 정상 기동 (M5 는 CORS_ORIGINS, M6 은 두 값이 같으므로 허용).
 3. M6 기동 확인 뒤 `CORS_ORIGINS` 삭제 (M6 은 ALLOWED_ORIGINS 사용).
 "배포 실패 시 기존 버전 유지"는 보장된 사실로 보지 않고 실제 배포 때 확인할 항목으로 둔다.
+
+### 운영 반영 결과 (2026-10-13)
+
+| 단계 | 내용 | 결과 |
+|---|---|---|
+| 6 | `main` 병합(`6688209`), Vercel 운영 빌드 `API_MODE=remote` | PASS |
+| 7a | `CORS_ORIGINS` = 운영 도메인 하나로 축소 (사용자 콘솔 작업) | PASS — 재배포 후 정상 |
+| 7b | 서비스 브랜치 → `main` (M6 `6688209` 배포, 23:16 Live), Blueprint 브랜치 → `main` | PASS — 브랜치 변경만으로는 Blueprint 동기화가 일어나지 않았다. Manual sync 미리보기에 `DOCS_ENABLED` 수정·`ALLOWED_ORIGINS` 추가 2건만 표시되어 Approve → 재배포 23:25 Live |
+| 7b 보안 | Swagger 공개 전 점검 | PASS — `/openapi.json` 비밀값 패턴(API 키, 개인 키, 이메일, Codyssey 주소, 비밀 변수 이름, Secret File 경로) 0건. 보호 API 12개 토큰 없음·위조 토큰 401. 공개 경로는 `/health`, `/api/config` 뿐 |
+| 7c | `CORS_ORIGINS` 삭제 → 재배포 23:29 Live | PASS — 환경변수 19개(`ALLOWED_ORIGINS`·`DOCS_ENABLED` 포함, `CORS_ORIGINS` 없음), Secret File 유지 |
+
+매 재배포 뒤 확인: `/health` 200, Vercel 화면 로그인·데이터 조회, Secret File 존재(내용은 보지 않음), CORS(운영 도메인 preflight 200, 다른 출처 400).
+
+### 8단계 운영 검증 (2026-10-13)
+
+| 항목 | 결과 |
+|---|---|
+| 최근 추세 | PASS — Vercel·Render 화면 모두 "감소 −0.728 m/s (−13.8%)" (최근 60초 4.551057, 이전 60초 5.279502) |
+| 기존 통계 | PASS — 435건(imported 435, manual 0), 평균 4.896189, 최소 0, 최대 5.808594 |
+| CRUD | PASS — 생성 201 → 조회 200 → 수정 200 → 삭제 204 → 조회 404, 점검 중 436건 → 다시 435건, 통계 원래 값 |
+| 삭제 503 | 재발 없음 — 운영 삭제 첫 시도 204, 로그 5xx 없음. Preview 첫 삭제의 503 기록은 원인 미확정으로 유지 |
+| GPT | PASS — 2회 호출(`gpt-5.4`), 답변 수치가 통계와 일치 |
+| 대화 기록 | PASS — 새로고침 후 목록 2개, 대화 다시 불러오기 |
+| 인증 | PASS — 보호 API 401(토큰 없음·위조), 로그인 시 `/api/me` 200 |
+| 기존 Render 화면 | PASS — 같은 출처(`same-origin`)로 정상 동작 |
+| 레피 사이트 | PASS — `ia-codyssey-two.vercel.app` 200, 자동 배포 설정 변경 없음 |
+| Vercel 헤더 | PASS — nosniff, X-Frame-Options DENY, Referrer-Policy. Vercel `/api/*` 404 |
+| 로그 비밀값 | PASS — 최근 1시간 Render 로그에서 API 키·JWT·Bearer·개인 키·이메일·Traceback 0건 |
+| 콜드 스타트 | UNVERIFIED — 15분 이상 무요청 후 확인 필요 |
+
+롤백 기준(변경 없음): Render `dep-db724f3bc2fs73f1o9e0`(`798b453`) — 롤백 시 그 배포의 환경변수(`CORS_ORIGINS`)도 함께 복원된다. Vercel `f1a8949`.

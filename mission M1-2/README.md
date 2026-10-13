@@ -8,12 +8,38 @@ ADAIR 산불재난대응 프로젝트에서 생성된 실제 시뮬레이션 및
 
 코디세이 「AI Agent 개발: 나만의 AI 비서 구축」 과제로 개발하며, 향후 다중 무인체계의 임무 수행 결과와 운영 상태를 통합 분석하는 서비스로 확장하는 것을 목표로 합니다.
 
+## 배포 주소
+
+| 구분 | 주소 |
+|---|---|
+| 프론트엔드 (Vercel) | https://adair-mission-intelligenceweb.vercel.app |
+| 백엔드 API (Render) | https://adair-mission-intelligence.onrender.com |
+| Swagger 문서 | https://adair-mission-intelligence.onrender.com/docs |
+
+- 로그인(Google)과 허용된 계정(`ALLOWED_EMAILS`)이 있어야 데이터와 AI 비서를 쓸 수 있습니다. Swagger 문서는 공개이지만, 보호 API는 Firebase ID 토큰이 없으면 401을 반환합니다.
+- 백엔드는 Render 무료 인스턴스라 15분 동안 요청이 없으면 잠듭니다. 첫 요청은 50초 이상 걸릴 수 있고, 요청이 4초 넘게 걸리면 화면에 "서버를 깨우는 중" 안내가 나옵니다.
+- 프론트엔드는 Render API를 직접 호출합니다(CORS는 Vercel 운영 도메인만 허용). 배포 구조와 절차는 `docs/DEPLOYMENT.md`에 있습니다.
+
+## 스크린샷
+
+**AI 비서 — Firestore 통계를 근거로 한 답변**
+
+![AI 비서 답변](docs/submission/01-chat.png)
+
+**데이터 관리 — 수동 데이터 추가와 목록 (원본 435건은 읽기 전용)**
+
+![데이터 관리](docs/submission/02-crud.png)
+
+**대화 기록 — 새로고침 후 목록과 대화 다시 불러오기**
+
+![대화 기록](docs/submission/03-history.png)
+
 ## 주요 기능
 
 **1차 개발 — 코디세이 과제**
 
 - UGV 주행 속도 시계열 분석
-- 평균·최대·최소 및 구간별 변화 분석
+- 평균·최대·최소 및 구간별 변화 분석 (최근 60초 vs 이전 60초, 최근 추세 증가·감소·유지)
 - GPT 기반 데이터 질의응답
 - Firestore 데이터 관리 및 대화 기록 저장
 - 웹 기반 AI 비서 인터페이스
@@ -63,8 +89,9 @@ ADAIR 프로젝트의 Gazebo·PX4 시뮬레이션 및 테스트 로그를 활용
 | M1-2 | 원본 검증, 속도 재계산, 1초 시계열 435개 생성 | 완료 — `docs/DATA_VALIDATION.md` |
 | M2 | FastAPI 데이터 API, 저장소 계층(메모리·Firestore), 적재기, 통계 요약 | 완료 — 실제 Firestore `data` 컬렉션에 435건 적재·검증 (2026-10-13) |
 | M3 | GPT 분석 비서 `POST /api/chat`, 대화 기록 API, 통계 캐시 | 구현·모의 테스트 완료, 실제 API 연결 1회 확인 — `docs/CHAT.md` |
-| M4 | 웹 화면(대시보드·AI 비서·대화 기록), Firebase 로그인, 소유권, 호출 제한 | 구현·자동 테스트 완료, 실제 로그인 확인 대기 — `docs/SECURITY_M4.md` |
-| M5 | Render 배포, 최소 권한 계정, 보안 점검, 읽기 최적화 | **완료** — https://adair-mission-intelligence.onrender.com (`docs/DEPLOYMENT.md`) |
+| M4 | 웹 화면(대시보드·AI 비서·대화 기록), Firebase 로그인, 소유권, 호출 제한 | 완료 — 운영에서 로그인 확인 (`docs/SECURITY_M4.md`) |
+| M5 | Render 배포, 최소 권한 계정, 보안 점검, 읽기 최적화 | 완료 — https://adair-mission-intelligence.onrender.com (`docs/DEPLOYMENT.md`) |
+| M6 | 프론트엔드 Vercel 분리(Render API 직접 호출·CORS), Swagger 공개, 최근 추세, 잠든 서버 안내 | **완료** — 운영 검증 2026-10-13 (`docs/DEPLOYMENT.md`, `docs/submission/CHECKLIST.md`) |
 
 ## 폴더 구조
 
@@ -79,11 +106,13 @@ mission M1-2/
 ├─ data/
 │  ├─ raw/              원본 CSV·JSON (커밋하지 않음, 직접 준비)
 │  ├─ ugv_speed_1s.csv / .json, source_manifest.json, validation_summary.json
-├─ web/                 웹 화면 (index.html, styles.css, app.js — 비밀값 없음)
+├─ web/                 웹 화면 (index.html, styles.css, app.js, config.js — 비밀값 없음)
+│                       build.mjs·vercel.json: Vercel 빌드 (API_BASE_URL → dist/env-config.js)
 ├─ docs/                DATA_VALIDATION.md, DATA_SCHEMA.md, API.md, CHAT.md, SECURITY_M4.md, DEPLOYMENT.md
-├─ render.yaml          Render 배포 설정 초안 (비밀값 없음)
+│  └─ submission/       제출 체크리스트, 스크린샷
+├─ render.yaml          Render 배포 설정 (Blueprint, 비밀값 없음)
 ├─ firestore.rules      Firestore 보안 규칙 (클라이언트 접근 모두 거부)
-└─ tests/               test_prepare_data.py (M1-2), test_api.py (M2), test_chat.py (M3), test_auth_ui.py (M4), test_deploy.py (M5)
+└─ tests/               test_prepare_data.py (M1-2), test_api.py (M2), test_chat.py (M3), test_auth_ui.py (M4), test_deploy.py (M5), test_m6.py (M6)
 ```
 
 명령은 모두 `mission M1-2` 폴더에서 실행합니다.
@@ -131,6 +160,7 @@ python scripts/prepare_data.py
 - `test_prepare_data.py` 12개: 원본 품질, 속도 계산, 집계, 재현성, 원본 해시. **`data/raw/`에 원본이 있어야 합니다.**
 - `test_api.py` 23개: API 동작, 수정 정책, 통계 검산, 중복 적재 방지, Firestore 장애 처리, CORS, Swagger. Firestore 연결이나 원본 없이 돌아갑니다.
 - `test_chat.py` 19개: 채팅, 대화 기록, GPT 오류·저장 실패 처리, 통계 프롬프트, 근거 검사, 키 노출 방지, Codyssey 호환 요청 형식. 가짜 GPT·가짜 전송 계층을 쓰며 실제 API를 부르지 않습니다.
+- `test_auth_ui.py`(M4), `test_deploy.py`(M5), `test_m6.py`(M6: CORS, Swagger 공개 범위, 최근 추세 경계값, Vercel 빌드, 정적 파일 비밀값 검사). `test_m6.py`의 빌드 테스트는 Node.js가 필요합니다.
 
 ## 5. API 실행
 
@@ -180,3 +210,43 @@ python scripts/load_data.py --backend firestore --verify-only     # 쓰기 없�
 - `/api/config`와 정적 파일 외의 모든 API는 Firebase Google 로그인과 `ALLOWED_EMAILS`가 필요합니다. 로그인하지 않으면 401, 허용되지 않은 계정이면 403입니다.
 - `.env` 필요 값: `FIREBASE_PROJECT_ID`, `FIREBASE_WEB_API_KEY`, `FIREBASE_AUTH_DOMAIN`, `FIREBASE_WEB_APP_ID`, `ALLOWED_EMAILS`. Firebase 콘솔 → 프로젝트 설정 → 내 앱(웹)에서 확인하고, Authentication에서 Google 로그인을 켭니다.
 - 질문 제한은 기본 분당 5회, 시간당 30회, 동시 1개, 하루 200회이며 환경변수로 바꿀 수 있습니다(`.env.example`).
+- 로컬에서는 백엔드가 `web/`을 같은 출처로 함께 제공합니다(`web/env-config.js`의 기본값 `same-origin`).
+
+## 9. 프론트엔드 Vercel 빌드 (M6)
+
+Vercel 프로젝트 설정: Root Directory `mission M1-2/web`, Build Command `node build.mjs`, Output Directory `dist`, 환경변수 `API_BASE_URL`.
+
+```bash
+cd web
+API_BASE_URL=https://adair-mission-intelligence.onrender.com node build.mjs   # dist/ 생성, API_MODE=remote
+```
+
+- `API_BASE_URL`은 `https://호스트` 형태여야 하며(경로 없이), Production 빌드에서 비어 있으면 빌드가 실패합니다.
+- `API_BASE_URL` 없이 만든 빌드(Preview)는 API를 부르지 않습니다(`API_MODE=disabled`).
+- 백엔드의 `ALLOWED_ORIGINS`에 프론트엔드 도메인이 있어야 브라우저 호출이 허용됩니다.
+
+## 환경 변수
+
+값은 `.env`(로컬, 커밋 금지) 또는 Render·Vercel 대시보드에만 넣습니다. 전체 목록과 기본값은 `.env.example`, 운영 설정은 `render.yaml`에 있습니다.
+
+**백엔드 (Render) — 최소 세트**
+
+| 이름 | 용도 | 비밀 여부 |
+|---|---|---|
+| `DATA_BACKEND` | `firestore`(운영) / `memory`(로컬 기본) | 아니오 |
+| `GOOGLE_APPLICATION_CREDENTIALS` | 서비스 계정 키 파일 경로 (Render는 Secret File) | 키 파일 자체가 비밀 |
+| `FIREBASE_PROJECT_ID`, `FIRESTORE_DATABASE_ID` | Firestore 프로젝트·데이터베이스 | 아니오 |
+| `FIREBASE_WEB_API_KEY`, `FIREBASE_AUTH_DOMAIN`, `FIREBASE_WEB_APP_ID` | 화면 로그인용 Firebase 웹 설정 (`/api/config`로 공개) | 아니오 (공개 식별자) |
+| `ALLOWED_EMAILS` | 사용을 허용할 Google 계정 (쉼표 구분) | 공개하지 않음 |
+| `OPENAI_API_KEY` | GPT 호출 키 (Codyssey virtual key) | **예** |
+| `OPENAI_MODEL`, `OPENAI_BASE_URL` | `gpt-5.4`, `https://copa.codyssey.kr/v1` | 아니오 |
+| `ALLOWED_ORIGINS` | CORS 허용 출처 (Vercel 운영 도메인, `*` 불가) | 아니오 |
+| `DOCS_ENABLED` | Swagger `/docs` 공개 여부 (운영 `true`) | 아니오 |
+
+선택: `OPENAI_MAX_OUTPUT_TOKENS`(기본 800), `OPENAI_MAX_RETRIES`, 질문 제한(`CHAT_RATE_PER_MINUTE`, `CHAT_RATE_PER_HOUR`, `CHAT_DAILY_LIMIT`), `SUMMARY_CACHE_TTL_S`.
+
+**프론트엔드 (Vercel)**
+
+| 이름 | 용도 | 비밀 여부 |
+|---|---|---|
+| `API_BASE_URL` | 백엔드 API 주소 (`https://adair-mission-intelligence.onrender.com`) | 아니오 (화면에 공개됨) |
