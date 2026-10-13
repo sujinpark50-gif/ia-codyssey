@@ -64,7 +64,7 @@
 
 1. Authentication → 설정 → **승인된 도메인**에 Render 주소(`<서비스명>.onrender.com`)를 추가한다. 없으면 로그인 팝업이 `auth/unauthorized-domain`으로 실패한다.
 2. Authentication → 로그인 방법: Google 사용 (완료, 2026-10-13 브라우저 확인).
-3. Firestore → 규칙: `firestore.rules`(모두 거부)와 같은지 확인한다. 브라우저는 Firestore에 직접 접근하지 않고 API만 쓴다. Admin SDK(서버)는 규칙과 상관없이 동작한다. **현재 콘솔 규칙은 확인하지 않았다.**
+3. Firestore → 규칙: `firestore.rules`(모두 거부)와 같다 (2026-10-13 콘솔에서 확인, 변경 불필요). 브라우저는 Firestore에 직접 접근하지 않고 API만 쓴다. Admin SDK(서버)는 규칙과 상관없이 동작한다.
 4. (선택) Google Cloud → API 키 제한: `FIREBASE_WEB_API_KEY`를 HTTP 리퍼러(`localhost`, Render 도메인)로 제한한다.
 
 ## 4. 최소 권한 서비스 계정 전환
@@ -140,7 +140,7 @@ IAM 역할 반영에는 몇 분이 걸릴 수 있다. 3단계에서 `PermissionD
 | 호출 제한 — 복수 인스턴스 | 부분 | 아래 "호출 제한의 범위" |
 | data 스냅샷 캐시 — 복수 인스턴스 | 부분 | 다른 인스턴스의 쓰기는 TTL(60초) 뒤 반영 |
 | Firestore 규칙 vs IAM | 문서화 | 규칙은 클라이언트 SDK만 막고, 서버 권한은 IAM이 정함 |
-| Firestore 규칙 = 모두 거부 | **UNVERIFIED — 콘솔 확인 필요** | 저장소의 `firestore.rules`는 모두 거부. 실제 콘솔에 적용된 규칙은 확인하지 않았다 |
+| Firestore 규칙 = 모두 거부 | PASS (2026-10-13 콘솔 확인) | 콘솔 (default) DB 규칙 = `allow read, write: if false;` (모든 문서). 저장소 `firestore.rules`와 같음 → 변경 불필요 |
 
 ### 호출 제한의 범위
 
@@ -195,5 +195,5 @@ IAM 역할 반영에는 몇 분이 걸릴 수 있다. 3단계에서 `PermissionD
 3. Render 계정·서비스 생성, 저장소 연결 (공개 저장소 `sujinpark50-gif/ia-codyssey`)
 4. Render 대시보드에 비밀값 입력 (`OPENAI_API_KEY`, Secret File, `ALLOWED_EMAILS`, 웹 설정값)
 5. Firebase 승인된 도메인에 Render 주소 추가
-6. Firestore 규칙 확인·적용
+6. ~~Firestore 규칙 확인·적용~~ — 확인 완료, 이미 모두 거부라 적용할 것 없음
 7. 실제 배포와 배포 후 확인 (GPT 1회 호출 포함 여부)
