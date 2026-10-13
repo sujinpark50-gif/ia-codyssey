@@ -18,6 +18,15 @@ def _bool(text: str | None, default: bool) -> bool:
     return text.strip().lower() in ("1", "true", "yes", "on")
 
 
+def credentials_path(firebase: str | None, google: str | None) -> str | None:
+    """서비스 계정 키 경로. GOOGLE_APPLICATION_CREDENTIALS(표준) 또는 FIREBASE_CREDENTIALS(기존) 중 하나.
+    둘 다 있고 서로 다른 파일을 가리키면 어느 키를 쓸지 모호하므로 거부한다."""
+    firebase, google = (firebase or "").strip() or None, (google or "").strip() or None
+    if firebase and google and Path(firebase).resolve() != Path(google).resolve():
+        raise ValueError("FIREBASE_CREDENTIALS 와 GOOGLE_APPLICATION_CREDENTIALS 가 서로 다른 파일을 가리킵니다 — 하나만 설정하세요")
+    return firebase or google
+
+
 @dataclass(frozen=True)
 class Settings:
     data_backend: str = "memory"
@@ -47,7 +56,7 @@ class Settings:
             seed_path=Path(get("SEED_DATA_PATH") or cls.seed_path),
             seed_on_startup=_bool(get("SEED_ON_STARTUP"), True),
             quality_path=Path(get("QUALITY_SUMMARY_PATH") or cls.quality_path),
-            firebase_credentials=get("FIREBASE_CREDENTIALS") or None,
+            firebase_credentials=credentials_path(get("FIREBASE_CREDENTIALS"), get("GOOGLE_APPLICATION_CREDENTIALS")),
             firebase_project_id=get("FIREBASE_PROJECT_ID") or None,
             firestore_database_id=get("FIRESTORE_DATABASE_ID") or "(default)",
             firestore_timeout_s=float(get("FIRESTORE_TIMEOUT_S") or 10.0),

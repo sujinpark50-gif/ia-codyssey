@@ -402,6 +402,17 @@ class FirestoreSafetyTest(unittest.TestCase):
                 os.environ.pop(k, None) if v is None else os.environ.__setitem__(k, v)
 
 
+class CredentialsEnvTest(unittest.TestCase):
+    def test_google_application_credentials(self):
+        from app.config import credentials_path
+        self.assertEqual(credentials_path(None, "C:/k/a.json"), "C:/k/a.json")
+        self.assertEqual(credentials_path("C:/k/a.json", None), "C:/k/a.json")
+        self.assertEqual(credentials_path("C:/k/a.json", "C:/k/a.json"), "C:/k/a.json")
+        self.assertIsNone(credentials_path("", "  "))
+        with self.assertRaises(ValueError):
+            credentials_path("C:/k/a.json", "C:/k/b.json")
+
+
 class RepositoryContractTest(unittest.TestCase):
     def test_memory_is_repository(self):
         self.assertTrue(issubclass(InMemoryRepository, DataRepository))

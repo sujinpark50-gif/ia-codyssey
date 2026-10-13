@@ -136,7 +136,7 @@ python scripts/prepare_data.py
 
 ## 6. Firestore 연결과 적재
 
-`.env`에 `DATA_BACKEND=firestore`, `FIREBASE_CREDENTIALS`(저장소 밖 키 경로), `FIREBASE_PROJECT_ID`, `FIRESTORE_DATABASE_ID`를 넣은 뒤 순서대로 실행합니다.
+`.env`에 `DATA_BACKEND=firestore`, `GOOGLE_APPLICATION_CREDENTIALS` 또는 `FIREBASE_CREDENTIALS`(저장소 밖 키 경로, 둘 중 하나), `FIREBASE_PROJECT_ID`, `FIRESTORE_DATABASE_ID`를 넣은 뒤 순서대로 실행합니다.
 
 ```bash
 python scripts/load_data.py                                       # 1. 모의 적재 (메모리, 쓰기 없음)
