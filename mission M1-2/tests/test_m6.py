@@ -231,6 +231,7 @@ class StaticFrontendTest(unittest.TestCase):
         self.assertIn("e.status === 401", js)                   # 인증 오류 구분
         self.assertNotIn("FIREBASE_WEB_API_KEY", js)          # 사용자 화면에 서버 설정 이름 노출 안 함
         self.assertIn('if (API_MODE === "disabled") throw new ApiError(0', js)  # Preview 는 API 호출 없이 안내
+        self.assertIn("e.status === 0 || e.status >= 500", js)  # 잠든 서버 안내는 네트워크·5xx 에만
         html = (WEB / "index.html").read_text(encoding="utf-8")
         self.assertIn('id="wake"', html)
         self.assertIn("서버를 깨우는 중", html)

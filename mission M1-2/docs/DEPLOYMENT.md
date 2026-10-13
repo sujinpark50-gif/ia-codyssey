@@ -291,7 +291,7 @@ IAM 역할 반영에는 몇 분이 걸릴 수 있다. 3단계에서 `PermissionD
 | 같은 저장소의 다른 Vercel 프로젝트 | `ia-codyssey` (레피 랜딩, https://ia-codyssey-two.vercel.app) — main 푸시마다 재배포, 모든 브랜치 Preview. f1a8949 이후에도 200 정상 |
 | Render | `adair-mission-intelligence`, 브랜치 `feat/m5-deployment`, Auto-Deploy Off, 운영 코드 `798b453` |
 
-### 배포 계획 (승인 필요)
+### 배포 계획 (초안 — 아래 "재검증 후 확정안"으로 대체됨)
 
 | 항목 | 값 |
 |---|---|
@@ -318,3 +318,49 @@ IAM 역할 반영에는 몇 분이 걸릴 수 있다. 3단계에서 `PermissionD
 7. (선택) Render 브랜치를 `main`으로 되돌려 정리.
 
 롤백: Vercel → 이전 Production 배포로 Instant Rollback (f1a8949 프록시 상태). Render → 이벤트 화면 Rollback으로 `798b453`. Firebase 승인 도메인 추가는 기능에 해가 없어 되돌릴 필요 없음.
+
+### 재검증 결과 (2026-10-13, 브랜치 푸시 후)
+
+| 확인 | 결과 |
+|---|---|
+| ADAIR Vercel Production Branch | `main` (설정 화면 확인) |
+| ADAIR Vercel Ignored Build Step | Automatic — `main` 외 브랜치 푸시는 Preview 만 |
+| ADAIR 운영 도메인 | `adair-mission-intelligenceweb.vercel.app` 하나 (Production, Valid) — render.yaml 철자와 같음 |
+| M6 브랜치 푸시 결과 | ADAIR Preview `e902196` 1개 (Ready), Production `f1a8949` 그대로. 운영 3곳(Vercel·Render·레피) 200, 운영에 `env-config.js` 없음(=M6 미반영) |
+| Preview 접근 | Vercel Authentication 보호 (로그인 안 하면 302) |
+| Preview 브랜치 고정 주소 | `adair-mission-intelligenceweb-git-feat-m6-vercel-frontend-lepi.vercel.app` |
+| 현재 Preview 동작 | 빌드 설정 변경 전에 만들어져 저장소 기본값(같은 출처)으로 빌드 → 자기 `/api` 404. 빌드 설정(`node build.mjs`) 적용 후 Preview 는 API 를 부르지 않는 `disabled` 모드 |
+| Render Blueprint | Auto Sync **Yes**, 브랜치 `feat/m5-deployment`, 경로 `mission M1-2/render.yaml` → M6 브랜치 푸시는 Render 에 영향 없음. `feat/m5-deployment` 에 푸시하면 render.yaml 자동 동기화 가능 → 그 브랜치에는 푸시하지 않는다 |
+| Swagger (로컬, 실제 .env, DOCS_ENABLED=true) | `/docs`·`/openapi.json` 200, 비밀값·키 경로·이메일·프로젝트 ID 없음, 보호 API 12개 모두 Bearer 표시, 실제 Firebase 검증기로 토큰 없음·위조 토큰 401 |
+| M5 기준 통계 | 435, 4.896189, 최근 4.551057 / 이전 5.279502, 차이 −0.728445 불변 (회귀 테스트) |
+
+### Render 반영 방식 비교
+
+| | R1. 브랜치 유지 + 대시보드 환경변수만 | R2. 서비스·Blueprint 브랜치를 M6로 (권장) | R3. 검증용 Render 서비스 별도 |
+|---|---|---|---|
+| 반영 내용 | `CORS_ORIGINS`·`DOCS_ENABLED` 만 (798b453 코드) — 추세·Swagger Bearer 표시·`ALLOWED_ORIGINS`·413 CORS 미반영 | M6 백엔드 전체 | M6 백엔드 (별도 주소) |
+| 과제 요건 | 최근 추세 미충족 | 충족 | 검증만, 운영 반영은 다시 필요 |
+| 자동 배포 | 없음 | 서비스 Auto-Deploy Off 유지. Blueprint Auto Sync 가 M6 브랜치 render.yaml 변경을 동기화 | 새로 설정 |
+| 비용 | 0 | 0 | 0 (무료 인스턴스 시간 공유) |
+| 비밀값 | 변경 없음 | 변경 없음 (Secret File·키 그대로) | OpenAI 키·서비스 계정 JSON 을 새 서비스에 다시 입력 |
+| 롤백 | 환경변수 되돌리기 | 이벤트 화면 Rollback → 798b453, 브랜치 되돌리기 | 서비스 삭제 |
+| 기존 화면 영향 | 없음 | 없음 (M6 백엔드는 기존 같은 출처 화면·Vercel 프록시와 호환, 테스트·로컬 확인) | 없음 |
+
+권장: **R2**. 비밀값을 다시 다루지 않고 과제 요건을 모두 반영하며, 한 번에 되돌릴 수 있다.
+
+### 재검증 후 확정안 (승인 필요)
+
+브랜치 역할: `main` = Vercel Production · 최종 기준 / `feat/m6-vercel-frontend` = 검증 대상, Render 임시 배포 브랜치 / `feat/m5-deployment` = 이전 운영 기준(보존, 푸시 금지).
+
+| 단계 | 작업 | 운영 영향 |
+|---|---|---|
+| 1 | M6 브랜치에서 render.yaml 수정: `DOCS_ENABLED="true"`, `ALLOWED_ORIGINS`=운영 도메인 **+ Preview 브랜치 주소(임시)** → 푸시 | 없음 (Preview 만) |
+| 2 | Render: 서비스 브랜치·Blueprint 브랜치 → `feat/m6-vercel-frontend`, Blueprint 동기화, Manual Deploy | Render 재배포 1회 (수십 초), 기존 화면·Vercel 프록시 계속 동작 |
+| 3 | Firebase 승인 도메인: `adair-mission-intelligenceweb.vercel.app` 추가 + Preview 브랜치 주소(임시) 추가 | 없음 |
+| 4 | Vercel: Build `node build.mjs`, Output `dist`, Install 비움(Override). 환경변수 `API_BASE_URL`(공개 값) = Production + Preview(브랜치 `feat/m6-vercel-frontend`) | 다음 배포부터 |
+| 5 | M6 Preview 재배포 → 브랜치 주소에서 통합 검증 (로그인, 435, CRUD, 대화, CORS, 401, 콜드 스타트, GPT 1회) | 없음 |
+| 6 | 통과 시 `feat/m6-vercel-frontend` → `main` 병합 → Vercel Production 자동 배포 | Vercel 운영이 직접 호출 방식으로 전환 |
+| 7 | 운영 검증 → 스크린샷 3종 → README → 정리: render.yaml·Firebase 에서 Preview 주소 제거, Render 브랜치 → `main` | Render 재배포 1회 |
+
+롤백: Vercel Instant Rollback → `f1a8949`(프록시) / Render Rollback → `798b453` + 브랜치 `feat/m5-deployment` / Firebase 도메인 추가는 해 없음(정리 단계에서 제거).
+비용: Vercel Hobby·Render Free·Firebase Spark 0원. 무료 제약: Render 15분 미사용 시 잠듦(첫 요청 지연), Firestore 일 50,000 읽기.

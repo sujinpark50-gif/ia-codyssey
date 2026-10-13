@@ -123,7 +123,9 @@ async function boot() {
   } catch (e) {
     show($("#login-view"));
     $("#login-btn").disabled = true;
-    return loginError(`${errorText(e)} (서버가 잠들어 있었다면 1분쯤 뒤 새로고침하세요)`);
+    // 잠든 서버 안내는 네트워크 실패·시간 초과(0)·5xx 일 때만 (404 등 설정 오류에는 붙이지 않는다)
+    const sleepy = e instanceof ApiError && (e.status === 0 || e.status >= 500) && API_MODE !== "disabled";
+    return loginError(errorText(e) + (sleepy ? " (서버가 잠들어 있었다면 1분쯤 뒤 새로고침하세요)" : ""));
   }
   state.metric = state.cfg.default_metric;
   $("#question").maxLength = state.cfg.max_message_chars;
