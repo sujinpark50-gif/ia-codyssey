@@ -212,6 +212,7 @@ class StatsBasis(BaseModel):
 
 
 class Grounding(BaseModel):
+    """정규식 기반 보조 검사. ok=true 는 명백한 신호가 없다는 뜻이며 사실 정확성을 보장하지 않는다."""
     ok: bool
     unverified_numbers: list[str] = Field(description="답변에 있으나 제공한 통계·대화에서 찾지 못한 수치")
     assertive_cause_phrases: list[str] = Field(description="고장·결함·위반 등을 단정하는 표현")
