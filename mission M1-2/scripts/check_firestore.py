@@ -3,9 +3,10 @@
 `.env`의 Firestore 설정으로 접속해 다음을 확인한다. 데이터는 적재하지 않는다.
   1. 설정·키 파일 확인 (키 내용은 출력하지 않는다)
   2. 인증 및 `data` 컬렉션 접근 (현재 문서 수 집계)
-  3. 임시 문서 1개 생성 → 조회 (Timestamp·KST 변환 확인) → 삭제 → 삭제 확인
+  3. `connection_tests` 컬렉션에 임시 문서 1개 생성 → 조회 (Timestamp·KST 변환 확인) → 삭제 → 삭제 확인
 
-임시 문서 ID는 `_conncheck-<uuid>`, metric은 `_connection_check`이다. 중간에 실패해도 삭제를 시도한다.
+임시 문서는 `data`가 아닌 별도 컬렉션에 만들어 기존 데이터에 닿지 않는다.
+문서 ID는 `_conncheck-<uuid>`. 중간에 실패해도 삭제를 시도한다.
 
   python scripts/check_firestore.py
 """
@@ -27,6 +28,7 @@ from app.repository import FirestoreRepository, RepositoryError, safe_error  # n
 from app.service import KST, iso_kst  # noqa: E402
 
 SAMPLE_ISO = "2026-10-10T18:45:32.747+09:00"
+TEST_COLLECTION = "connection_tests"
 
 
 class Checker:
@@ -69,10 +71,14 @@ def main() -> int:
     try:
         col = repo._col()
         n = repo._call(lambda: col.count().get(timeout=s.firestore_timeout_s))[0][0].value
-        c.record("인증 및 data 컬렉션 접근", True, f"현재 문서 {n}건")
+        c.record("인증 및 data 컬렉션 접근", True, f"현재 문서 {int(n)}건")
     except RepositoryError as e:
         c.record("인증 및 data 컬렉션 접근", False, safe_error(e))
         return 1
+
+    # 임시 문서는 별도 컬렉션에서 (같은 Firebase 앱·클라이언트 재사용)
+    repo = FirestoreRepository(replace(s, data_collection=TEST_COLLECTION), client=repo._client)
+    print(f"  임시 문서 컬렉션={TEST_COLLECTION}")
 
     doc_id = f"_conncheck-{uuid.uuid4().hex}"
     sample = datetime.fromisoformat(SAMPLE_ISO)
