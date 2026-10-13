@@ -1,0 +1,51 @@
+# Render 배포 설정 초안 — 아직 배포하지 않음 (docs/DEPLOYMENT.md 참고)
+# 비밀값은 여기에 쓰지 않는다: sync: false 항목은 Render 대시보드에서 직접 입력하고,
+# 서비스 계정 키 JSON 은 Secret File(adair-mi-sa.json)로 올린다 → /etc/secrets/adair-mi-sa.json
+services:
+  - type: web
+    name: adair-mission-intelligence
+    runtime: python
+    plan: free
+    region: singapore
+    rootDir: "mission M1-2"
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -X utf8 -m uvicorn app.main:create_app --factory --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    autoDeploy: false
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.14"
+      - key: DATA_BACKEND
+        value: firestore
+      - key: GOOGLE_APPLICATION_CREDENTIALS
+        value: /etc/secrets/adair-mi-sa.json
+      - key: FIREBASE_PROJECT_ID
+        value: adair-mission-intelligence
+      - key: FIRESTORE_DATABASE_ID
+        value: "(default)"
+      - key: FIREBASE_AUTH_DOMAIN
+        value: adair-mission-intelligence.firebaseapp.com
+      - key: FIREBASE_WEB_API_KEY      # 공개 식별자지만 저장소에는 두지 않는다
+        sync: false
+      - key: FIREBASE_WEB_APP_ID
+        sync: false
+      - key: ALLOWED_EMAILS
+        sync: false
+      - key: OPENAI_API_KEY            # Codyssey virtual key — 대시보드에서만 입력
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-5.4
+      - key: OPENAI_BASE_URL
+        value: https://copa.codyssey.kr/v1
+      - key: OPENAI_MAX_RETRIES
+        value: "1"
+      - key: DOCS_ENABLED
+        value: "false"
+      - key: CHAT_RATE_PER_MINUTE
+        value: "5"
+      - key: CHAT_RATE_PER_HOUR
+        value: "30"
+      - key: CHAT_DAILY_LIMIT
+        value: "200"
+      - key: SUMMARY_CACHE_TTL_S
+        value: "60"

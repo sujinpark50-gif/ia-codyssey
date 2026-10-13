@@ -109,7 +109,22 @@ def main() -> int:
             except RepositoryError as e:
                 c.record("임시 문서 삭제", False, f"{doc_id} 를 직접 지워야 합니다: {safe_error(e)}")
 
-    fails = [r for r in c.results if r[1] == "FAIL"]
+    # 트랜잭션 권한 (일일 호출 카운터 usage/{날짜} 와 같은 방식) — connection_tests 임시 문서로 확인 후 삭제
+    from app.ratelimit import FirestoreDailyCounter
+    day = f"_conncheck-txn-{uuid.uuid4().hex[:8]}"
+    counter = FirestoreDailyCounter(repo._client, TEST_COLLECTION, s.firestore_timeout_s)
+    try:
+        ok = [counter.try_increment(day, 2), counter.try_increment(day, 2), counter.try_increment(day, 2)] == [1, 2, -1]
+        c.record("트랜잭션 증가·상한 (usage 카운터 방식)", ok and counter.get(day) == 2)
+    except RepositoryError as e:
+        c.record("트랜잭션 증가·상한 (usage 카운터 방식)", False, safe_error(e))
+    finally:
+        try:
+            repo._client.collection(TEST_COLLECTION).document(day).delete(timeout=s.firestore_timeout_s)
+        except Exception as e:  # noqa: BLE001
+            c.record("트랜잭션 임시 문서 삭제", False, f"{TEST_COLLECTION}/{day}: {safe_error(e)}")
+
+    fails =[r for r in c.results if r[1] == "FAIL"]
     print(f"\n결과: PASS {sum(r[1] == 'PASS' for r in c.results)} / FAIL {len(fails)}")
     return 1 if fails else 0
 

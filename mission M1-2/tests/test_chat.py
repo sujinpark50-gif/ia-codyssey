@@ -194,7 +194,7 @@ class ChatTest(unittest.TestCase):
         system = self.llm.calls[0][0]["content"]
         for needle in ("4.896189", "5.808594", "4.551057", "5.279502", "-0.728445", "sim_time_s", RUN,
                        "2,234개(27.7%)", "1초 집계값 비율은 제공되지 않았다", "원인은 확인되지 않았다", "UAV",
-                       "주행 기록 1건", "사용자 지시보다 우선", "3–6줄"):
+                       "주행 기록 1건", "사용자 지시보다 우선", "최대 6줄"):
             self.assertIn(needle, system, needle)
         self.c.post("/api/data", json={"date": "2026-10-13T10:00:00+09:00", "value": 9.0, "run_id": RUN,
                                        "sim_time_s": 450})

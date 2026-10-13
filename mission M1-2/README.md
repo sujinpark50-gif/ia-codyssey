@@ -64,7 +64,7 @@ ADAIR 프로젝트의 Gazebo·PX4 시뮬레이션 및 테스트 로그를 활용
 | M2 | FastAPI 데이터 API, 저장소 계층(메모리·Firestore), 적재기, 통계 요약 | 완료 — 실제 Firestore `data` 컬렉션에 435건 적재·검증 (2026-10-13) |
 | M3 | GPT 분석 비서 `POST /api/chat`, 대화 기록 API, 통계 캐시 | 구현·모의 테스트 완료, 실제 API 연결 1회 확인 — `docs/CHAT.md` |
 | M4 | 웹 화면(대시보드·AI 비서·대화 기록), Firebase 로그인, 소유권, 호출 제한 | 구현·자동 테스트 완료, 실제 로그인 확인 대기 — `docs/SECURITY_M4.md` |
-| M5 | 배포 | 미착수 |
+| M5 | 배포 준비 (Render 설정 초안, 최소 권한 절차, 보안 점검, 읽기 최적화) | 준비 완료·미배포 — `docs/DEPLOYMENT.md` |
 
 ## 폴더 구조
 
@@ -80,8 +80,10 @@ mission M1-2/
 │  ├─ raw/              원본 CSV·JSON (커밋하지 않음, 직접 준비)
 │  ├─ ugv_speed_1s.csv / .json, source_manifest.json, validation_summary.json
 ├─ web/                 웹 화면 (index.html, styles.css, app.js — 비밀값 없음)
-├─ docs/                DATA_VALIDATION.md, DATA_SCHEMA.md, API.md, CHAT.md, SECURITY_M4.md
-└─ tests/               test_prepare_data.py (M1-2), test_api.py (M2), test_chat.py (M3), test_auth_ui.py (M4)
+├─ docs/                DATA_VALIDATION.md, DATA_SCHEMA.md, API.md, CHAT.md, SECURITY_M4.md, DEPLOYMENT.md
+├─ render.yaml          Render 배포 설정 초안 (비밀값 없음)
+├─ firestore.rules      Firestore 보안 규칙 (클라이언트 접근 모두 거부)
+└─ tests/               test_prepare_data.py (M1-2), test_api.py (M2), test_chat.py (M3), test_auth_ui.py (M4), test_deploy.py (M5)
 ```
 
 명령은 모두 `mission M1-2` 폴더에서 실행합니다.

@@ -199,3 +199,66 @@ def _make_client(settings):
         options = {"projectId": settings.firebase_project_id} if settings.firebase_project_id else None
         app = firebase_admin.initialize_app(credentials.Certificate(str(key)), options, name=name)
     return firestore.client(app, database_id=settings.firestore_database_id)
+
+
+class CachedRepository(DataRepository):
+    """data 컬렉션 스냅샷 캐시. summary·목록·단건 조회가 같은 스냅샷을 쓰고, 이 객체를 거친 쓰기는 즉시 무효화한다.
+
+    - ttl_s 동안 inner.list() 를 다시 부르지 않는다 (Firestore 읽기 = 문서 수 × TTL 창 수).
+    - 이 객체를 거치지 않은 변경(적재 스크립트, 콘솔, 다른 서버 인스턴스)은 TTL 이 지나면 반영된다.
+    - ttl_s <= 0 이면 캐시 없이 inner 를 그대로 부른다.
+    """
+
+    def __init__(self, inner: DataRepository, ttl_s: float, clock=None):
+        import time
+        self.inner = inner
+        self.ttl_s = ttl_s
+        self._clock = clock or time.monotonic
+        self._snapshot: dict[str, dict] | None = None
+        self._expires = 0.0
+
+    def invalidate(self) -> None:
+        self._snapshot = None
+
+    def _fresh(self) -> dict[str, dict] | None:
+        if self.ttl_s <= 0:
+            return None
+        if self._snapshot is None or self._clock() >= self._expires:
+            self._snapshot = dict(self.inner.list())
+            self._expires = self._clock() + self.ttl_s
+        return self._snapshot
+
+    def get(self, doc_id):
+        snap = self._fresh()
+        if snap is None:
+            return self.inner.get(doc_id)
+        doc = snap.get(doc_id)
+        return copy.deepcopy(doc) if doc is not None else None
+
+    def list(self, *, run_id=None, metric=None, record_type=None):
+        snap = self._fresh()
+        if snap is None:
+            return self.inner.list(run_id=run_id, metric=metric, record_type=record_type)
+        out = [(i, copy.deepcopy(d)) for i, d in snap.items()
+               if (run_id is None or d.get("run_id") == run_id)
+               and (metric is None or d.get("metric") == metric)
+               and (record_type is None or d.get("record_type") == record_type)]
+        return sorted(out, key=_sort_key)
+
+    def create(self, doc_id, doc):
+        try:
+            self.inner.create(doc_id, doc)
+        finally:
+            self.invalidate()
+
+    def update(self, doc_id, fields):
+        try:
+            self.inner.update(doc_id, fields)
+        finally:
+            self.invalidate()
+
+    def delete(self, doc_id):
+        try:
+            self.inner.delete(doc_id)
+        finally:
+            self.invalidate()

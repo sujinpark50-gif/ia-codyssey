@@ -320,7 +320,19 @@ class ChatAnswerFormatTest(unittest.TestCase):
         TestClient(app_with(llm)).post("/api/chat", json={"message": "q"})
         system = llm.calls[0][0]["content"]
         self.assertLess(len(system), 1300)
-        self.assertIn("3–6줄", system)
+        self.assertIn("최대 6줄", system)
+        # 시간 기준·집계 방식·기록 시각을 서로 다른 줄로 구분
+        lines = system.splitlines()
+        basis = [ln for ln in lines if ln.startswith("시간 기준:")]
+        agg = [ln for ln in lines if ln.startswith("집계 방식:")]
+        rec = [ln for ln in lines if ln.startswith("기록 시각(date")]
+        self.assertEqual((len(basis), len(agg), len(rec)), (1, 1, 1))
+        self.assertIn("sim_time_s", basis[0])
+        self.assertIn("시간가중 평균", agg[0])
+        self.assertIn("KST", rec[0])
+        self.assertIn("+09:00", rec[0])
+        self.assertIn("시간 기준(sim_time_s)", system)  # 형식 지시도 시간 기준을 sim_time_s 로 명시
+        self.assertNotIn("시간 기준: 시뮬레이션 1초 구간", system)
         self.assertNotIn("\n {", system)  # 들여쓴 JSON 없음
 
 

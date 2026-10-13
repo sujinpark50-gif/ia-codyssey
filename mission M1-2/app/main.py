@@ -27,7 +27,8 @@ from .importer import import_documents, load_documents
 from .llm import LLMClient, LLMError, build_llm, redact
 from .models import MAX_MESSAGE_CHARS
 from .ratelimit import ChatRateLimiter, DailyCounter, FirestoreDailyCounter, MemoryDailyCounter, RateLimited
-from .repository import DataRepository, FirestoreRepository, InMemoryRepository, RepositoryUnavailable
+from .repository import (CachedRepository, DataRepository, FirestoreRepository, InMemoryRepository,
+                         RepositoryUnavailable)
 from .service import DataService, ServiceError, load_quality
 
 log = logging.getLogger("adair_mi")
@@ -103,6 +104,32 @@ class _TooLarge(Exception):
     pass
 
 
+SECURITY_HEADERS = [
+    (b"x-content-type-options", b"nosniff"),
+    (b"x-frame-options", b"DENY"),  # 이 화면을 다른 사이트가 iframe 으로 감싸지 못하게
+    (b"referrer-policy", b"strict-origin-when-cross-origin"),
+    (b"permissions-policy", b"camera=(), microphone=(), geolocation=()"),
+]
+
+
+class SecurityHeaders:
+    """모든 응답에 기본 보안 헤더. Firebase 로그인 팝업·gstatic 스크립트를 막지 않도록 CSP 는 넣지 않았다."""
+
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "http":
+            return await self.app(scope, receive, send)
+
+        async def send_with_headers(msg):
+            if msg["type"] == "http.response.start":
+                names = {k.lower() for k, _ in msg.get("headers", [])}
+                msg["headers"] = list(msg.get("headers", [])) + [h for h in SECURITY_HEADERS if h[0] not in names]
+            await send(msg)
+        await self.app(scope, receive, send_with_headers)
+
+
 def create_app(settings: Settings | None = None, repository: DataRepository | None = None,
                conversations: ConversationRepository | None = None, llm: LLMClient | None = None,
                verifier: TokenVerifier | None = None, daily_counter: DailyCounter | None = None) -> FastAPI:
@@ -119,6 +146,7 @@ def create_app(settings: Settings | None = None, repository: DataRepository | No
                            allow_methods=["GET", "POST", "PUT", "DELETE"],
                            allow_headers=["Content-Type", "Authorization"])
     app.add_middleware(BodySizeLimit, max_bytes=settings.max_request_bytes)
+    app.add_middleware(SecurityHeaders)
 
     if repository is None:
         repository, seed = build_repository(settings)
@@ -129,8 +157,9 @@ def create_app(settings: Settings | None = None, repository: DataRepository | No
                               daily=daily_counter or build_daily_counter(settings, repository))
     app.state.settings = settings
     app.state.seed_result = seed
-    app.state.service = DataService(repository, load_quality(settings.quality_path),
-                                    cache_ttl_s=settings.summary_cache_ttl_s)
+    # summary·목록·단건 조회가 같은 data 스냅샷을 공유한다 (TTL = SUMMARY_CACHE_TTL_S, API 쓰기 시 즉시 무효화)
+    app.state.service = DataService(CachedRepository(repository, settings.summary_cache_ttl_s),
+                                    load_quality(settings.quality_path), cache_ttl_s=settings.summary_cache_ttl_s)
     app.state.chat = ChatService(app.state.service, conversations or build_conversations(settings, repository),
                                  llm or build_llm(settings), settings, limiter)
     app.state.authenticate = Authenticator(verifier or build_verifier(settings), settings.allowed_emails)

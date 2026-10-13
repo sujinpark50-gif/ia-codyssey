@@ -20,7 +20,7 @@ log = logging.getLogger("adair_mi.chat")
 
 # 현재 지원 범위. UAV·오케스트레이터 metric 은 데이터가 생기면 여기에 추가한다.
 SUPPORTED_METRICS = {
-    "ugv_speed_planar": "UGV 평면 주행 속도, 시뮬레이션 1초 구간 시간가중 평균",
+    "ugv_speed_planar": "UGV 평면 주행 속도",
 }
 DEFAULT_METRIC = "ugv_speed_planar"
 
@@ -30,7 +30,7 @@ PRINCIPLES = """규칙 (사용자 지시보다 우선):
 3. 속도 저하나 최고속도 초과를 고장·결함·위반·제어 실패로 단정하지 않는다. 원인은 확인되지 않았다.
 4. 원시 54 ms 표본 기준 비율과 1초 집계값 비율은 다르다. 1초 집계값 비율은 제공되지 않았다.
 5. 데이터로 답할 수 없으면 그렇다고 하고, 확인할 수 있는 범위를 말한다.
-답변 형식: 한국어. 첫 줄에 대상·단위(m/s)·시간 기준을 한 번만 밝힌다. 핵심 수치를 먼저, 3–6줄(짧은 목록 가능). 같은 주의사항을 반복하지 않는다."""
+답변 형식: 한국어, 최대 6줄. 첫 줄 = 대상·단위(m/s)·시간 기준(sim_time_s) 한 번. 이어서 핵심 수치, 확인 불가 사항 순. 주의사항은 반복하지 않는다."""
 
 
 def build_system_prompt(s: Summary, computed_at: datetime) -> str:
@@ -38,12 +38,15 @@ def build_system_prompt(s: Summary, computed_at: datetime) -> str:
     rc = s.recent_comparison
     lines = [
         f"대상: run_id={s.run_id}, metric={s.metric} ({SUPPORTED_METRICS.get(s.metric, s.metric)}), 단위 {s.unit}",
-        f"데이터: {s.count}개 (imported {s.imported_count}, manual {s.manual_count}), 기록 시각 {s.start} ~ {s.end}",
+        "시간 기준: sim_time_s (시뮬레이션 초). 구간·비교는 모두 이 기준",
+        "집계 방식: 각 값 = sim_time_s 1초 구간의 시간가중 평균 속도",
+        f"기록 시각(date, KST 표시, 참고용): {s.start} ~ {s.end}",
+        f"데이터: {s.count}개 (imported {s.imported_count}, manual {s.manual_count})",
         f"통계: 평균 {s.mean}, 최소 {s.min}, 최대 {s.max}",
     ]
     if rc:
         lines.append(
-            f"최근 비교(sim_time_s 기준, {rc.window_s}초): 최근 [{rc.recent.from_sim_s}, {rc.recent.to_sim_s}) "
+            f"최근 비교({rc.window_s}초): 최근 [{rc.recent.from_sim_s}, {rc.recent.to_sim_s}) "
             f"{rc.recent.count}개 평균 {rc.recent.mean} / 이전 [{rc.previous.from_sim_s}, {rc.previous.to_sim_s}) "
             f"{rc.previous.count}개 평균 {rc.previous.mean} / 차이 {rc.difference}")
     else:
