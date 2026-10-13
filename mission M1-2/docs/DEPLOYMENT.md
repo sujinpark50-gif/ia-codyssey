@@ -256,3 +256,65 @@ IAM 역할 반영에는 몇 분이 걸릴 수 있다. 3단계에서 `PermissionD
   - Render 서비스 배포 브랜치를 `feat/m5-deployment` → `main`으로 바꿀지 결정 (지금은 기능 브랜치에서 배포).
   - 근거 검사 수정의 운영 실호출 재현(`[390,450)` 공백 없는 형식) — 테스트로는 확인됨.
   - 분·시간·동시 호출 제한의 다중 인스턴스 공유 (현재 단일 프로세스 기준).
+
+## M6 — Vercel 프론트엔드 분리 (구현 완료, 운영 배포 전)
+
+### 구조
+
+```
+변경 전: 브라우저 → Render (화면 + FastAPI) → Firestore / GPT
+변경 후: 브라우저 → Vercel (HTML·CSS·JS) ─직접 호출(CORS)→ Render (FastAPI) → Firestore / GPT
+         브라우저 → Render (화면 + FastAPI)  ← 기존 주소도 그대로 동작 (같은 출처)
+```
+
+- API 주소: `web/config.js` 한 곳. 값은 `web/env-config.js`에서 온다. 저장소 기본값은 `""`(같은 출처), Vercel 빌드(`web/build.mjs`)는 환경변수 `API_BASE_URL`로 `dist/env-config.js`를 새로 만든다 (과제 원문: "환경 변수로 API 서버 URL을 설정").
+- 로그인: Firebase 웹 설정은 계속 Render `/api/config`에서 받는다. 그래서 로그인 버튼은 Render가 응답한 뒤에 켜진다. 콜드 스타트면 4초 뒤 "서버를 깨우는 중(최대 1분)" 안내, 90초 시간 제한, 네트워크 실패·인증 오류(401·403)를 구분해 표시.
+- CORS: `ALLOWED_ORIGINS`(과제 원문 이름) 또는 `CORS_ORIGINS`(기존). Vercel 운영 도메인만, `*` 거부, 쿠키 없음. CORS 미들웨어를 가장 바깥에 두어 401·413 응답도 브라우저가 읽을 수 있다. CORS는 접근 통제가 아니며 인증은 그대로 Firebase ID 토큰 + 허용 이메일.
+- Preview: Vercel Preview 주소는 CORS·Firebase 승인 도메인에 넣지 않는다 → 정적 화면 확인용. `API_BASE_URL`은 Production 환경에만 둔다.
+- Swagger: `HTTPBearer(auto_error=False)`로 OpenAPI에 "FirebaseIdToken" Bearer 표시만 추가. 실제 검증은 기존 Authenticator. `/openapi.json`에 비밀값 없음(테스트). 공개 여부는 `DOCS_ENABLED`로, 운영 공개는 배포 승인 때 `render.yaml` 값을 `"true"`로 바꿔 적용.
+- 최근 추세: summary `recent_comparison`에 `change_pct`, `trend`(증가·감소·유지, |변화율| < 1% 이면 유지) 추가. 과제 원문 "최근 추세(증가/감소/유지)" 대응. 화면 비교 상자와 GPT 프롬프트에 한 줄 표시.
+
+### f1a8949 처리
+
+`main`에 먼저 푸시된 `f1a8949`는 Vercel `/api/*`를 Render로 넘기는 rewrite(프록시, A안)였다. 설계 결정(B안: 직접 호출 + CORS)에 따라 `feat/m6-vercel-frontend`에서 rewrite만 제거하고 보안 헤더는 유지했다. 이력은 다시 쓰지 않았다(강제 푸시 없음). rewrite 테스트 2개는 B안 테스트(`tests/test_m6.py`)로 대체.
+현재 Vercel 운영은 `f1a8949`가 반영되어 프록시 방식으로 동작 중이다 (`/api/config` 200, 2026-10-13 확인).
+
+### 확인한 Vercel·Render 현재 설정 (읽기만 함, 2026-10-13)
+
+| 항목 | 값 |
+|---|---|
+| Vercel 프로젝트 | `adair-mission-intelligence_web` (팀 lepi), 저장소 `sujinpark50-gif/ia-codyssey` |
+| Production Branch | `main` — main에 푸시하면 Production 배포 |
+| Root Directory | `mission M1-2/web` (공백 경로 정상), "변경 없으면 배포 건너뛰기" 켜짐 |
+| Framework / Build / Output / Install | Other / 기본값 / 기본값(`public` 없으면 `.`) / 기본값 |
+| 환경변수 | 없음 |
+| 같은 저장소의 다른 Vercel 프로젝트 | `ia-codyssey` (레피 랜딩, https://ia-codyssey-two.vercel.app) — main 푸시마다 재배포, 모든 브랜치 Preview. f1a8949 이후에도 200 정상 |
+| Render | `adair-mission-intelligence`, 브랜치 `feat/m5-deployment`, Auto-Deploy Off, 운영 코드 `798b453` |
+
+### 배포 계획 (승인 필요)
+
+| 항목 | 값 |
+|---|---|
+| Vercel 프로젝트 | 기존 `adair-mission-intelligence_web` 재사용 (새로 만들지 않음) |
+| 저장소·배포 브랜치 | `sujinpark50-gif/ia-codyssey`, Production = `main` (M6 병합 후) |
+| Root Directory | `mission M1-2/web` (그대로) |
+| Framework Preset | Other (그대로) |
+| Build Command | `node build.mjs` (Override) |
+| Output Directory | `dist` (Override) |
+| Install Command | 비움 (Override, 패키지 없음) |
+| Vercel 환경변수 | `API_BASE_URL=https://adair-mission-intelligence.onrender.com` — **공개 값**, Production 환경만 |
+| Render CORS | `ALLOWED_ORIGINS=https://adair-mission-intelligenceweb.vercel.app` (render.yaml) |
+| Swagger | render.yaml `DOCS_ENABLED` → `"true"` (승인 시) → https://adair-mission-intelligence.onrender.com/docs |
+| Firebase 승인 도메인 | `adair-mission-intelligenceweb.vercel.app` 추가 |
+| 비용 | Vercel Hobby·Render Free·Firebase Spark — 0원 (GPT 호출만 Codyssey 키 사용량) |
+
+순서 (각 단계 뒤에도 서비스가 동작하도록):
+1. `feat/m6-vercel-frontend` 푸시 (Vercel Preview만 생성, 운영 영향 없음).
+2. Render: 서비스·Blueprint 브랜치를 `feat/m6-vercel-frontend`로 바꾸고 배포 → 새 백엔드(CORS 허용, Bearer 표시, 추세, Swagger). 이 시점에도 Vercel 운영(프록시)과 Render 화면은 그대로 동작.
+3. Firebase 승인 도메인에 Vercel 도메인 추가.
+4. Vercel: `API_BASE_URL`(Production), Build `node build.mjs`, Output `dist`, Install 비움으로 설정 저장 (다음 배포부터 적용, 현재 운영 영향 없음).
+5. `feat/m6-vercel-frontend` → `main` 병합 → Vercel Production 자동 배포 (직접 호출 방식으로 전환). `ia-codyssey` 프로젝트도 재배포되지만 그 폴더는 바뀌지 않음.
+6. 운영 통합 검증 (로그인, 435건, CRUD, GPT 1회, 대화, CORS, 401, Swagger) → 스크린샷 3종 → README.
+7. (선택) Render 브랜치를 `main`으로 되돌려 정리.
+
+롤백: Vercel → 이전 Production 배포로 Instant Rollback (f1a8949 프록시 상태). Render → 이벤트 화면 Rollback으로 `798b453`. Firebase 승인 도메인 추가는 기능에 해가 없어 되돌릴 필요 없음.
