@@ -89,10 +89,11 @@
 
 `source_ref`의 파일명·해시 앞자리·행 범위 → `data/source_manifest.json`의 전체 해시·원본 경로 → `ADAIR/logs/ugv/` 원본. 행 범위로 원본 CSV에서 해당 관측을 그대로 찾을 수 있다.
 
-## 6. 정하지 않은 것
+## 6. Firestore 적재 시 결정 (M2)
 
-- Firestore 컬렉션 이름
-- `date`를 문자열로 둘지 Timestamp로 바꿀지
-- 일괄 쓰기 방식(배치 크기 등)
+- 컬렉션: `data` (대화 기록은 M3에서 `conversations`)
+- `date`: 이 JSON의 KST 문자열을 같은 시점의 Firestore Timestamp로 저장
+- 추가 필드 `record_type`: 이 파일에서 적재한 문서는 `imported`
+- 쓰기 방식: 문서별 `create`. 재적재 시 같은 문서는 건너뛰고, 다른 내용은 conflict로 기록
 
-이 셋은 Firestore 연동 단계에서 정한다.
+자세한 내용은 `docs/API.md`.

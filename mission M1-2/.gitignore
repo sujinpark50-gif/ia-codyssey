@@ -1,3 +1,12 @@
-# 원본 로그는 ADAIR 저장소 소유 — 공개 범위 결정 전까지 커밋하지 않는다
+# 원본 로그는 ADAIR 저장소 소유 — 커밋하지 않는다
 data/raw/
 __pycache__/
+
+# 비밀·환경
+.env
+*service-account*.json
+*firebase-adminsdk*.json
+.venv/
+
+# 적재 오류 기록
+logs/

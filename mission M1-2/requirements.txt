@@ -1,3 +1,9 @@
-# 1단계(데이터 검증·변환)는 Python 표준 라이브러리만 사용한다. 외부 패키지 없음.
-# 확인한 실행 환경: Python 3.12.14 (Windows 11)
-# 사용 모듈: argparse, csv, decimal, fractions, hashlib, json, math, datetime, unittest
+# M1-2 데이터 검증·변환(scripts/prepare_data.py)은 표준 라이브러리만 쓴다.
+# 아래는 M2 API용. 확인한 환경: Python 3.12.14 (Windows 11)
+fastapi==0.143.0
+pydantic==2.14.1
+uvicorn==0.54.0
+firebase-admin==7.7.0
+python-dotenv==1.2.4
+# 테스트(fastapi.testclient)용
+httpx==0.28.1

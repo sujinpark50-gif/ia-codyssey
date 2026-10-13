@@ -30,7 +30,7 @@ ADAIR 산불재난대응 프로젝트에서 생성된 실제 시뮬레이션 및
 
 ADAIR 프로젝트의 Gazebo·PX4 시뮬레이션 및 테스트 로그를 활용합니다.
 
-1차 데이터는 실제 UGV 주행 기록에서 계산한 속도 시계열이며, 원본 검증과 정규화를 진행할 예정입니다.
+1차 데이터는 실제 UGV 주행 기록에서 계산한 속도 시계열이며, 원본 검증과 정규화를 마쳤습니다(M1-2).
 
 향후 UAV, UGV, 오케스트레이터 로그를 검증하여 통합 데이터셋으로 확장할 계획입니다.
 
@@ -55,3 +55,98 @@ ADAIR 프로젝트의 Gazebo·PX4 시뮬레이션 및 테스트 로그를 활용
 단일 차량의 성능 분석을 넘어, 다중 무인체계의 임무 수행 과정에서 발생하는 데이터를 통합하고 AI를 통해 운영 결과를 이해할 수 있는 분석 기반을 구축합니다.
 
 현재는 코디세이 과제의 필수 기능을 우선 구현하는 단계입니다.
+
+## 현재 구현 상태
+
+| 단계 | 내용 | 상태 |
+|---|---|---|
+| M1-2 | 원본 검증, 속도 재계산, 1초 시계열 435개 생성 | 완료 — `docs/DATA_VALIDATION.md` |
+| M2 | FastAPI 데이터 API, 저장소 계층(메모리·Firestore), 적재기, 통계 요약 | 구현·테스트 완료, **실제 Firestore 미연결** |
+| M3 이후 | 대화 기록, GPT 분석, 웹 화면, 배포 | 미착수 |
+
+## 폴더 구조
+
+```
+mission M1-2/
+├─ app/                 FastAPI 앱 (config, models, repository, service, importer, api/)
+├─ scripts/
+│  ├─ prepare_data.py   원본 → 1초 시계열 (표준 라이브러리만)
+│  └─ load_data.py      1초 시계열 → 저장소 적재 (기본: 메모리 모의 적재)
+├─ data/
+│  ├─ raw/              원본 CSV·JSON (커밋하지 않음, 직접 준비)
+│  ├─ ugv_speed_1s.csv / .json, source_manifest.json, validation_summary.json
+├─ docs/                DATA_VALIDATION.md, DATA_SCHEMA.md, API.md
+└─ tests/               test_prepare_data.py (M1-2), test_api.py (M2)
+```
+
+명령은 모두 `mission M1-2` 폴더에서 실행합니다.
+
+## 1. 원본 파일 준비
+
+원본은 ADAIR 저장소의 `logs/ugv/`에 있습니다. 두 파일을 `data/raw/`에 복사하고 해시를 확인합니다.
+
+```bash
+mkdir -p data/raw
+cp <ADAIR 경로>/logs/ugv/B1x_slope_low_20261010_184532.csv  data/raw/
+cp <ADAIR 경로>/logs/ugv/B1x_slope_low_20261010_184532.json data/raw/
+sha256sum data/raw/*      # PowerShell: Get-FileHash data/raw/*
+```
+
+| 파일 | SHA-256 |
+|---|---|
+| `B1x_slope_low_20261010_184532.csv` | `4d18f3d45101cbd68ff85d39632e6355c7f6603caf9b2963d7bd5efb7583d4c8` |
+| `B1x_slope_low_20261010_184532.json` | `4fa14bd41bfb4b74bd25a293c0cd1ccf219b88f559674cb0d8ea978f2a4e22bf` |
+
+해시가 다르면 다른 파일입니다. 데이터 생성과 M1-2 테스트가 실패합니다.
+
+## 2. 환경 준비
+
+```bash
+python -m venv .venv
+.venv/Scripts/python -m pip install -r requirements.txt     # macOS/Linux: .venv/bin/python
+cp .env.example .env                                         # 필요할 때만
+```
+
+## 3. 데이터 생성 (M1-2)
+
+```bash
+python scripts/prepare_data.py
+```
+
+`data/ugv_speed_1s.csv`, `ugv_speed_1s.json`, `source_manifest.json`, `validation_summary.json`을 다시 만듭니다. 같은 원본이면 바이트까지 같은 결과가 나옵니다. 원본 파일은 읽기만 합니다.
+
+## 4. 테스트
+
+```bash
+.venv/Scripts/python -m unittest discover -s tests -v
+```
+
+- `test_prepare_data.py` 12개: 원본 품질, 속도 계산, 집계, 재현성, 원본 해시. **`data/raw/`에 원본이 있어야 합니다.**
+- `test_api.py` 17개: API 동작, 수정 정책, 통계 검산, 중복 적재 방지, Firestore 장애 처리, CORS, Swagger. Firestore 연결이나 원본 없이 돌아갑니다.
+
+## 5. API 실행
+
+```bash
+.venv/Scripts/python -m uvicorn app.main:create_app --factory --reload
+```
+
+- Swagger: http://127.0.0.1:8000/docs
+- 기본(`DATA_BACKEND=memory`)은 시작할 때 435개를 메모리에 적재하고, 종료하면 변경 내용이 사라집니다.
+- 엔드포인트와 응답 형식은 `docs/API.md`에 있습니다.
+
+## 6. Firestore 적재
+
+```bash
+python scripts/load_data.py                                     # 모의 적재: 검증 + 2회 적재 중복 확인
+python scripts/load_data.py --backend firestore --confirm-upload  # 실제 적재 — 승인 후에만
+```
+
+실제 적재에는 `.env`의 `FIREBASE_CREDENTIALS`(서비스 계정 키 경로)가 필요합니다. **아직 실행하지 않았습니다.**
+
+## 원본 데이터 정책
+
+- 원본 CSV·JSON은 **읽기 전용**입니다. 스크립트는 원본을 읽기만 하고, 실행 전후 해시가 같은지 확인합니다.
+- 원본은 이 저장소에 **커밋하지 않습니다** (`.gitignore`의 `data/raw/`).
+- Firestore의 `imported` 데이터(원본에서 계산한 435개)는 API로 수정·삭제할 수 없습니다. 서버가 403으로 거부합니다. 추가·수정·삭제는 `manual` 데이터만 가능합니다.
+- 이 저장소는 공개 저장소입니다. 원본에서 계산한 파생 산출물(1초 속도값, 원본 행 번호, 파일 해시, 시험 식별자·월드·차량 이름)은 저장소에 포함되어 있습니다. 소유자가 공개해도 된다고 판단했습니다(2026-10-13).
+- API 키, 서비스 계정 키, `.env`는 커밋하지 않습니다.
