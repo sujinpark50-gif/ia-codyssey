@@ -45,6 +45,7 @@ class Settings:
     openai_model: str | None = None  # 기본값 없음: 미설정이면 /api/chat 이 503
     openai_base_url: str | None = None  # OpenAI 호환 API (예: Codyssey). 없으면 OpenAI 기본 주소
     openai_timeout_s: float = 30.0
+    openai_max_retries: int = 1  # SDK 자동 재시도 횟수 (0 이면 요청 1회 = HTTP 1회)
     openai_max_output_tokens: int = 800
     chat_history_max_messages: int = 10
     chat_history_max_chars: int = 8000
@@ -90,6 +91,7 @@ class Settings:
             openai_model=(get("OPENAI_MODEL") or "").strip() or None,
             openai_base_url=(get("OPENAI_BASE_URL") or "").strip() or None,
             openai_timeout_s=float(get("OPENAI_TIMEOUT_S") or 30.0),
+            openai_max_retries=int(get("OPENAI_MAX_RETRIES") or 1),
             openai_max_output_tokens=int(get("OPENAI_MAX_OUTPUT_TOKENS") or 800),
             chat_history_max_messages=int(get("CHAT_HISTORY_MAX_MESSAGES") or 10),
             chat_history_max_chars=int(get("CHAT_HISTORY_MAX_CHARS") or 8000),

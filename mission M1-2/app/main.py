@@ -31,6 +31,11 @@ from .repository import DataRepository, FirestoreRepository, InMemoryRepository,
 from .service import DataService, ServiceError, load_quality
 
 log = logging.getLogger("adair_mi")
+if not log.handlers:  # uvicorn 기본 설정은 앱 로거를 출력하지 않는다 — 운영 로그(수치만, 본문·키 없음)를 남긴다
+    _h = logging.StreamHandler()
+    _h.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s"))
+    log.addHandler(_h)
+    log.setLevel(logging.INFO)
 WEB_DIR = ROOT / "web"
 
 

@@ -171,7 +171,7 @@ python scripts/load_data.py --backend firestore --verify-only     # 쓰기 없�
 ## 8. 웹 화면과 로그인 (M4)
 
 ```bash
-.venv/Scripts/python -m uvicorn app.main:create_app --factory --port 8000
+.venv/Scripts/python -X utf8 -m uvicorn app.main:create_app --factory --port 8000   # -X utf8: Windows 에서 로그 한글 깨짐 방지
 # 브라우저에서 http://localhost:8000
 ```
 

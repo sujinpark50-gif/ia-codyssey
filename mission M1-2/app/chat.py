@@ -204,7 +204,10 @@ class ChatService:
             self.llm.complete(messages)
         try:
             with self.limiter.slot(user.uid):  # 한도를 넘으면 GPT 를 부르지 않고 429
+                log.info("GPT 요청: system_chars=%d history=%d question_chars=%d",
+                         len(system), len(history), len(req.message))
                 result = self.llm.complete(messages)
+            log.info("GPT 응답: model=%s answer_chars=%d usage=%s", result.model, len(result.text), result.usage)
         except LLMError as e:
             # 실패한 요청은 대화 기록에 남기지 않는다 (새 대화도 만들지 않음)
             log.warning("GPT 호출 실패 (저장 안 함): %s", redact(e, self._secrets))

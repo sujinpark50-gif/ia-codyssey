@@ -110,6 +110,6 @@ def build_llm(settings) -> LLMClient:
         return OpenAIChatClient(api_key=settings.openai_api_key, model=settings.openai_model,
                                 timeout_s=settings.openai_timeout_s,
                                 max_output_tokens=settings.openai_max_output_tokens,
-                                base_url=settings.openai_base_url)
+                                base_url=settings.openai_base_url, max_retries=settings.openai_max_retries)
     except LLMNotConfigured as e:
         return UnavailableLLM(str(e))
