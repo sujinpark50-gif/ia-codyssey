@@ -422,7 +422,7 @@
                                         "scoped": "true",
                                         "connection": "google"
                                     },
-                                    "label": "My Google connection (sujinpark50@gmail.com)"
+                                    "label": "My Google connection (<email>)"
                                 }
                             }
                         },
@@ -795,7 +795,7 @@
                                 "scoped": "true",
                                 "connection": "google"
                             },
-                            "label": "My Google connection (sujinpark50@gmail.com)"
+                            "label": "My Google connection (<email>)"
                         }
                     }
                 },
@@ -2398,7 +2398,7 @@
                                                         "scoped": "true",
                                                         "connection": "google"
                                                     },
-                                                    "label": "My Google connection (sujinpark50@gmail.com)"
+                                                    "label": "My Google connection (<email>)"
                                                 }
                                             }
                                         },
@@ -3188,7 +3188,7 @@
                                                         "scoped": "true",
                                                         "connection": "google"
                                                     },
-                                                    "label": "My Google connection (sujinpark50@gmail.com)"
+                                                    "label": "My Google connection (<email>)"
                                                 }
                                             }
                                         },
@@ -3663,7 +3663,7 @@
                                         "restore": {
                                             "parameters": {
                                                 "__IMTCONN__": {
-                                                    "label": "My Google connection (sujinpark50@gmail.com)",
+                                                    "label": "My Google connection (<email>)",
                                                     "data": {
                                                         "scoped": "true",
                                                         "connection": "google"
@@ -5500,7 +5500,7 @@
                                                         "scoped": "true",
                                                         "connection": "google"
                                                     },
-                                                    "label": "My Google connection (sujinpark50@gmail.com)"
+                                                    "label": "My Google connection (<email>)"
                                                 }
                                             }
                                         },
@@ -6006,7 +6006,7 @@
                                                 "scoped": "true",
                                                 "connection": "google"
                                             },
-                                            "label": "My Google connection (sujinpark50@gmail.com)"
+                                            "label": "My Google connection (<email>)"
                                         }
                                     }
                                 },
@@ -6478,7 +6478,7 @@
                                                 "scoped": "true",
                                                 "connection": "google"
                                             },
-                                            "label": "My Google connection (sujinpark50@gmail.com)"
+                                            "label": "My Google connection (<email>)"
                                         }
                                     }
                                 },
