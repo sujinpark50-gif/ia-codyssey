@@ -246,3 +246,9 @@ select { width: auto; }
   .data-form .span2 { grid-column: auto; }
   .chart { height: 220px; }
 }
+
+/* 콜드 스타트 안내 */
+.wake {
+  position: sticky; top: 0; z-index: 30; background: var(--warn-bg); color: var(--warn-ink);
+  font-size: .85rem; text-align: center; padding: 8px 16px; border-bottom: 1px solid var(--line);
+}

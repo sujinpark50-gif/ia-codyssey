@@ -1,8 +1,14 @@
 // ADAIR Mission Intelligence 웹 화면 (Vanilla JS).
 // 비밀값 없음: Firebase 웹 설정(공개 식별자)은 /api/config 에서 받고, API 는 로그인 ID 토큰으로만 부른다.
+// API 주소는 config.js 한 곳에서 정한다 (Render 화면·로컬: 같은 출처 / Vercel: Render API 직접 호출).
+
+import { apiUrl } from "./config.js";
 
 const FIREBASE_VERSION = "10.12.2";
 const PAGE = 50;
+const WAKE_HINT_MS = 4000;      // 이보다 오래 걸리면 "서버를 깨우는 중" 안내 (Render 무료 인스턴스 콜드 스타트)
+const REQUEST_TIMEOUT_MS = 90000;
+const CHAT_TIMEOUT_MS = 120000;
 
 const $ = (sel) => document.querySelector(sel);
 const state = {
@@ -21,13 +27,39 @@ class ApiError extends Error {
 }
 
 // ---------------------------------------------------------------- 공통
+let waking = 0;
+function wakeNotice(on) {
+  waking = Math.max(0, waking + (on ? 1 : -1));
+  show($("#wake"), waking > 0);
+}
+
+// fetch + 시간 제한 + 콜드 스타트 안내. 네트워크 실패·시간 초과는 status 0 의 ApiError (인증 오류와 구분)
+async function request(path, opts = {}, { timeoutMs = REQUEST_TIMEOUT_MS, wakeHint = true } = {}) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+  let hinted = false;
+  const hint = wakeHint ? setTimeout(() => { hinted = true; wakeNotice(true); }, WAKE_HINT_MS) : null;
+  try {
+    return await fetch(apiUrl(path), { ...opts, signal: ctrl.signal });
+  } catch (e) {
+    throw new ApiError(0, { detail: e.name === "AbortError"
+      ? "서버 응답이 너무 늦습니다. 잠시 후 다시 시도하세요"
+      : "서버에 연결할 수 없습니다. 네트워크를 확인하거나 잠시 후 다시 시도하세요" });
+  } finally {
+    clearTimeout(timer);
+    clearTimeout(hint);
+    if (hinted) wakeNotice(false);
+  }
+}
+
 async function api(path, { method = "GET", body } = {}) {
   const token = await state.user.getIdToken();
-  const res = await fetch(path, {
+  const long = path === "/api/chat";  // GPT 답변은 원래 수 초 걸리므로 깨우는 중 안내 대신 분석 중 표시를 쓴다
+  const res = await request(path, {
     method,
     headers: { Authorization: `Bearer ${token}`, ...(body ? { "Content-Type": "application/json" } : {}) },
     body: body ? JSON.stringify(body) : undefined,
-  });
+  }, long ? { timeoutMs: CHAT_TIMEOUT_MS, wakeHint: false } : {});
   if (res.status === 204) return null;
   let data = null;
   try { data = await res.json(); } catch { /* 본문 없음 */ }
@@ -40,6 +72,9 @@ async function api(path, { method = "GET", body } = {}) {
 
 function errorText(e) {
   if (!(e instanceof ApiError)) return "서버에 연결할 수 없습니다. 잠시 후 다시 시도하세요";
+  if (e.status === 0) return e.message;                                   // 네트워크·시간 초과
+  if (e.status === 401) return "로그인이 필요합니다. 다시 로그인하세요";       // 인증 오류
+  if (e.status === 403) return `접근 권한이 없습니다: ${e.message}`;
   if (e.status === 422) return "입력값을 확인하세요: " + (e.body.detail || []).map((d) => d.msg).join(", ");
   if (e.status === 429) return `${e.message} (${e.body.retry_after_s}초 뒤 다시 시도)`;
   if (e.status === 504) return "AI 응답 시간이 초과되었습니다. 다시 시도하세요";
@@ -80,16 +115,20 @@ function renderMarkdown(text) {
 // ---------------------------------------------------------------- 인증
 async function boot() {
   try {
-    state.cfg = await (await fetch("/api/config")).json();
-  } catch {
-    return loginError("서버에 연결할 수 없습니다");
+    const res = await request("/api/config");  // 로그인 초기화 전에 서버 연결이 필요하다 → 콜드 스타트면 여기서 기다린다
+    if (!res.ok) throw new ApiError(res.status, null);
+    state.cfg = await res.json();
+  } catch (e) {
+    show($("#login-view"));
+    $("#login-btn").disabled = true;
+    return loginError(`${errorText(e)} (서버가 잠들어 있었다면 1분쯤 뒤 새로고침하세요)`);
   }
   state.metric = state.cfg.default_metric;
   $("#question").maxLength = state.cfg.max_message_chars;
   if (!state.cfg.firebase) {
     show($("#login-view"));
     $("#login-btn").disabled = true;
-    return loginError("로그인 설정이 없습니다. 서버의 FIREBASE_WEB_API_KEY·FIREBASE_AUTH_DOMAIN·FIREBASE_WEB_APP_ID 를 확인하세요");
+    return loginError("로그인 설정을 불러오지 못했습니다. 잠시 후 다시 시도하거나 관리자에게 문의하세요");  // 서버 설정 이름은 화면에 보이지 않는다
   }
   const base = `https://www.gstatic.com/firebasejs/${FIREBASE_VERSION}`;
   const [{ initializeApp }, fbAuth] = await Promise.all([import(`${base}/firebase-app.js`), import(`${base}/firebase-auth.js`)]);
@@ -176,8 +215,8 @@ function renderSummary(s) {
         <span class="val">${num(rc.previous.mean)} ${esc(s.unit)}</span></div>
       <div><span class="label">최근 60초 · sim ${rc.recent.from_sim_s}–${rc.recent.to_sim_s}s</span>
         <span class="val">${num(rc.recent.mean)} ${esc(s.unit)}</span></div>
-      <div class="delta-box"><span class="label">차이</span>
-        <span class="val delta ${d < 0 ? "down" : "up"}">${d > 0 ? "+" : ""}${num(d)} ${esc(s.unit)}</span></div>
+      <div class="delta-box"><span class="label">최근 추세${rc.trend ? ` · ${esc(rc.trend)}` : ""}</span>
+        <span class="val delta ${d < 0 ? "down" : "up"}">${d > 0 ? "+" : ""}${num(d)} ${esc(s.unit)}${rc.change_pct !== null && rc.change_pct !== undefined ? ` (${rc.change_pct > 0 ? "+" : ""}${rc.change_pct}%)` : ""}</span></div>
       <span class="basis">시뮬레이션 시간(sim_time_s) 기준 1초 구간 평균. 기록 시각(date) 기준이 아닙니다.</span>`;
   }
   $("#cautions").innerHTML = s.cautions.slice(2).map((c) => `<li>${esc(c)}</li>`).join("");

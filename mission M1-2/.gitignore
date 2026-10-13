@@ -10,3 +10,6 @@ __pycache__/
 
 # 적재 오류 기록
 logs/
+
+# Vercel 빌드 산출물
+web/dist/
