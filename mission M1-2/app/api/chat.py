@@ -1,6 +1,7 @@
 """/api/chat, /api/conversations 라우터."""
 
 from fastapi import APIRouter, Depends, Path, Query, Request, Response
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from ..auth import User
 from ..chat import ChatService
@@ -15,7 +16,13 @@ def get_chat(request: Request) -> ChatService:
     return request.app.state.chat
 
 
-def current_user(request: Request) -> User:
+# OpenAPI(Swagger)에 "Authorize: Bearer <Firebase ID 토큰>" 을 표시하기 위한 선언일 뿐이다.
+# auto_error=False 라 여기서는 아무것도 거부하지 않고, 실제 검증은 Authenticator 가 Authorization 헤더로 한다.
+bearer_scheme = HTTPBearer(auto_error=False, scheme_name="FirebaseIdToken",
+                           description="Firebase Authentication 으로 로그인해 받은 ID 토큰 (허용된 계정만)")
+
+
+def current_user(request: Request, _: HTTPAuthorizationCredentials | None = Depends(bearer_scheme)) -> User:
     return request.app.state.authenticate(request)
 
 

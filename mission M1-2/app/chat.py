@@ -48,7 +48,7 @@ def build_system_prompt(s: Summary, computed_at: datetime) -> str:
         lines.append(
             f"최근 비교({rc.window_s}초): 최근 [{rc.recent.from_sim_s}, {rc.recent.to_sim_s}) "
             f"{rc.recent.count}개 평균 {rc.recent.mean} / 이전 [{rc.previous.from_sim_s}, {rc.previous.to_sim_s}) "
-            f"{rc.previous.count}개 평균 {rc.previous.mean} / 차이 {rc.difference}")
+            f"{rc.previous.count}개 평균 {rc.previous.mean} / 차이 {rc.difference} ({rc.change_pct}%), 추세 {rc.trend}")
     else:
         lines.append("최근 비교: 없음")
     specific = [c for c in s.cautions if c not in GENERIC_CAUTIONS]

@@ -148,6 +148,9 @@ class RecentComparison(BaseModel):
     recent: WindowStat
     previous: WindowStat
     difference: float | None = Field(description="recent.mean - previous.mean")
+    change_pct: float | None = Field(None, description="difference / previous.mean × 100")
+    trend: Literal["증가", "감소", "유지"] | None = Field(
+        None, description="최근 추세: 변화율 절댓값이 1% 미만이면 유지 (sim_time_s 기준 두 구간 비교)")
 
 
 class Summary(BaseModel):

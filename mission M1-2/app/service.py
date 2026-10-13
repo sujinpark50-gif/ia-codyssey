@@ -13,6 +13,7 @@ from .repository import DataRepository, DocumentNotFound
 
 KST = timezone(timedelta(hours=9))
 WINDOW_S = 60
+TREND_FLAT_PCT = 1.0  # 최근 추세: |변화율| < 1% 이면 "유지"
 # 모든 summary 에 붙는 일반 주의사항. GPT 프롬프트에서는 규칙·지표 설명과 겹쳐 생략한다.
 GENERIC_CAUTIONS = (
     "구간 비교는 시뮬레이션 시간(sim_time_s) 기준이다. date(기록 벽시계)로 나눈 60초와 다르다.",
@@ -226,7 +227,9 @@ class DataService:
             cautions.append(f"최근 구간에 값이 0인(정지) 1초 구간 {zeros}개가 포함되어 있다. "
                             "구간 차이에 주행 단계 변화(감속·정지)가 섞일 수 있다.")
         diff = round(rec.mean - prev.mean, 6) if rec.mean is not None and prev.mean is not None else None
+        pct = round(diff / prev.mean * 100, 2) if diff is not None and prev.mean else None
+        trend = None if pct is None else ("유지" if abs(pct) < TREND_FLAT_PCT else ("증가" if pct > 0 else "감소"))
         return RecentComparison(
             basis="sim_time_s",
             definition="마지막 1초 구간의 끝(max sim_time_s + 1)에서 거슬러 [end-60, end) 와 [end-120, end-60) 의 1초 값 평균",
-            window_s=WINDOW_S, recent=rec, previous=prev, difference=diff)
+            window_s=WINDOW_S, recent=rec, previous=prev, difference=diff, change_pct=pct, trend=trend)

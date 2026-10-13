@@ -27,6 +27,20 @@ def credentials_path(firebase: str | None, google: str | None) -> str | None:
     return firebase or google
 
 
+def cors_origins(allowed: str | None, legacy: str | None) -> tuple[str, ...]:
+    """CORS 허용 Origin. ALLOWED_ORIGINS(과제 원문 이름) 또는 CORS_ORIGINS(기존 이름), 쉼표 구분.
+    둘 다 있고 내용이 다르면 어느 쪽인지 모호하므로 거부한다. '*' 는 받지 않는다."""
+    def parse(v):
+        return tuple(o.strip().rstrip("/") for o in (v or "").split(",") if o.strip())
+    a, b = parse(allowed), parse(legacy)
+    if a and b and set(a) != set(b):
+        raise ValueError("ALLOWED_ORIGINS 와 CORS_ORIGINS 가 서로 다릅니다 — 하나만 설정하세요")
+    out = a or b
+    if "*" in out:
+        raise ValueError("CORS 허용 Origin 에 '*' 는 쓸 수 없습니다 — 운영 도메인을 명시하세요")
+    return out
+
+
 @dataclass(frozen=True)
 class Settings:
     data_backend: str = "memory"
@@ -74,7 +88,7 @@ class Settings:
         if env_file is not None and env_file.is_file():
             load_dotenv(env_file, override=False)
         get = os.getenv
-        origins = tuple(o.strip() for o in (get("CORS_ORIGINS") or "").split(",") if o.strip())
+        origins = cors_origins(get("ALLOWED_ORIGINS"), get("CORS_ORIGINS"))
         return cls(
             data_backend=(get("DATA_BACKEND") or "memory").strip().lower(),
             seed_path=Path(get("SEED_DATA_PATH") or cls.seed_path),

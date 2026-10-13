@@ -142,12 +142,12 @@ def create_app(settings: Settings | None = None, repository: DataRepository | No
         description="UGV 주행 속도 데이터와 GPT 분석 비서. /api/config 외 모든 /api 는 Firebase 로그인이 필요하다.",
         docs_url="/docs" if docs else None, redoc_url=None, openapi_url="/openapi.json" if docs else None,
     )
-    if settings.cors_origins:
-        app.add_middleware(CORSMiddleware, allow_origins=list(settings.cors_origins),
-                           allow_methods=["GET", "POST", "PUT", "DELETE"],
-                           allow_headers=["Content-Type", "Authorization"])
     app.add_middleware(BodySizeLimit, max_bytes=settings.max_request_bytes)
     app.add_middleware(SecurityHeaders)
+    if settings.cors_origins:  # 마지막에 추가 = 가장 바깥 → 413 등 미들웨어 응답에도 CORS 헤더가 붙는다
+        app.add_middleware(CORSMiddleware, allow_origins=list(settings.cors_origins),
+                           allow_methods=["GET", "POST", "PUT", "DELETE"],
+                           allow_headers=["Content-Type", "Authorization"], allow_credentials=False)
 
     if repository is None:
         repository, seed = build_repository(settings)
