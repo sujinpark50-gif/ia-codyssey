@@ -100,6 +100,23 @@
 4. 모두 통과하면 **[승인 필요]** 관리자 키 폐기: 콘솔 → 서비스 계정 → firebase-adminsdk → 키 → 해당 키 삭제. 로컬 파일 삭제만으로는 키가 계속 유효하다.
 5. Render Secret File에는 새 키만 올린다.
 
+### 전환 확인 결과 (2026-10-13)
+
+사용자가 서비스 계정 `adair-mi-backend@adair-mission-intelligence.iam.gserviceaccount.com`을 만들고 키를 발급했다. 로컬 `.env`의 `GOOGLE_APPLICATION_CREDENTIALS`를 새 키로 바꿨고, 이전 관리자 키 경로는 주석으로 남겼다. 키 파일 내용은 확인 항목(계정·프로젝트 일치)만 비교하고 출력하지 않았다.
+
+| 확인 | 결과 |
+|---|---|
+| 키 = 새 계정, project_id 일치, 저장소 밖 | PASS |
+| `check_firestore.py` (인증, data count 435, 임시 문서 생성·조회·삭제, Timestamp·KST, 트랜잭션) | 12/12 PASS (관리자 키와 같은 결과) |
+| `load_data.py --verify-only` (435건, ID, 값·날짜, 평균·최소·최대) | 9/9 PASS |
+| conversations batch 생성·갱신, 소유자 조건 목록, 메시지 정렬 조회, 대화·메시지 삭제 | PASS (임시 대화, 삭제 완료) |
+| usage 일일 카운터 조회 | PASS |
+| 웹 서버 첫 화면 API (`/api/me`, summary, 그래프·표 데이터, 대화 목록) | 서버 로그 200 (브라우저 화면 캡처는 탭 무응답으로 미확인) |
+| Firebase Auth 사용자 관리 거부 | PASS — `InsufficientPermissionError` (관리자 권한 없음 확인) |
+| 부여된 IAM 역할 이름 | 미확인 (키 권한으로는 IAM 정책을 읽을 수 없음). 위 동작이 모두 되므로 `roles/datastore.user` 이상, Auth 관리는 없음 |
+
+관리자 키는 아직 폐기하지 않았다 (사용자 지시).
+
 IAM 역할 반영에는 몇 분이 걸릴 수 있다. 3단계에서 `PermissionDenied`가 나오면 잠시 뒤 다시 확인한다.
 
 ## 5. 보안 점검 결과
