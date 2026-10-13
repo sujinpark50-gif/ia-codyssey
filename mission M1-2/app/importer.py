@@ -13,7 +13,7 @@ import math
 from pathlib import Path
 
 from .models import parse_aware_datetime
-from .repository import DataRepository, DocumentExists, RepositoryUnavailable
+from .repository import DataRepository, DocumentExists, RepositoryUnavailable, safe_error
 
 FIELDS = ("date", "value", "memo", "run_id", "metric", "unit", "sim_time_s", "source_ref", "transform_version")
 
@@ -86,5 +86,5 @@ def import_documents(repo: DataRepository, docs: list[tuple[str, dict]]) -> dict
         except RepositoryUnavailable as e:
             result["errors"].append({"id": doc_id, "error": str(e)})
         except Exception as e:  # 문서 하나의 실패가 전체를 멈추지 않게
-            result["errors"].append({"id": doc_id, "error": f"{type(e).__name__}: {e}"})
+            result["errors"].append({"id": doc_id, "error": f"{type(e).__name__}: {safe_error(e)}"})
     return result

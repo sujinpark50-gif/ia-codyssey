@@ -26,6 +26,8 @@ class Settings:
     quality_path: Path = ROOT / "data/validation_summary.json"
     firebase_credentials: str | None = None  # 서비스 계정 키 파일 경로 (저장소 밖에 둔다)
     firebase_project_id: str | None = None
+    firestore_database_id: str = "(default)"
+    firestore_timeout_s: float = 10.0
     data_collection: str = "data"
     conversations_collection: str = "conversations"  # M3에서 사용 예정
     cors_origins: tuple[str, ...] = ()
@@ -47,6 +49,8 @@ class Settings:
             quality_path=Path(get("QUALITY_SUMMARY_PATH") or cls.quality_path),
             firebase_credentials=get("FIREBASE_CREDENTIALS") or None,
             firebase_project_id=get("FIREBASE_PROJECT_ID") or None,
+            firestore_database_id=get("FIRESTORE_DATABASE_ID") or "(default)",
+            firestore_timeout_s=float(get("FIRESTORE_TIMEOUT_S") or 10.0),
             data_collection=get("FIRESTORE_DATA_COLLECTION") or "data",
             conversations_collection=get("FIRESTORE_CONVERSATIONS_COLLECTION") or "conversations",
             cors_origins=origins,

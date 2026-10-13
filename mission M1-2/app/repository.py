@@ -10,6 +10,8 @@
 from __future__ import annotations
 
 import copy
+import json
+import re
 from abc import ABC, abstractmethod
 from datetime import timezone
 from pathlib import Path
@@ -99,34 +101,39 @@ class FirestoreRepository(DataRepository):
 
     def __init__(self, settings, client=None):
         self._collection = settings.data_collection
+        self._timeout = settings.firestore_timeout_s
         self._client = client
         self._init_error: str | None = None
         if client is None:
             try:
                 self._client = _make_client(settings)
             except Exception as e:  # 설정·키·초기화 오류 모두 서비스 불가로 취급
-                self._init_error = f"Firestore 초기화 실패: {e}"
+                self._init_error = f"Firestore 초기화 실패: {safe_error(e)}"
 
     def _col(self):
         if self._client is None:
             raise RepositoryUnavailable(self._init_error or "Firestore 미연결")
         return self._call(lambda: self._client.collection(self._collection))
 
-    def _call(self, fn):
+    def _call(self, fn, *, doc_level: bool = False):
+        """Google 예외 → 저장소 예외. NotFound 는 문서 단위 호출(doc_level)에서만 '문서 없음'으로 본다.
+        컬렉션·데이터베이스 단위 NotFound(예: 데이터베이스 없음)는 서비스 불가다."""
         from google.api_core import exceptions as gexc
         from google.auth import exceptions as aexc
         try:
             return fn()
         except gexc.AlreadyExists as e:
-            raise DocumentExists(str(e))
+            raise DocumentExists(safe_error(e))
         except gexc.NotFound as e:
-            raise DocumentNotFound(str(e))
+            if doc_level:
+                raise DocumentNotFound(safe_error(e))
+            raise RepositoryUnavailable(f"Firestore 요청 실패: NotFound: {safe_error(e)}")
         except (gexc.GoogleAPIError, aexc.GoogleAuthError, OSError) as e:
-            raise RepositoryUnavailable(f"Firestore 요청 실패: {type(e).__name__}: {e}")
+            raise RepositoryUnavailable(f"Firestore 요청 실패: {type(e).__name__}: {safe_error(e)}")
 
     def get(self, doc_id):
         col = self._col()
-        snap = self._call(lambda: col.document(doc_id).get())
+        snap = self._call(lambda: col.document(doc_id).get(timeout=self._timeout))
         return snap.to_dict() if snap.exists else None
 
     def list(self, *, run_id=None, metric=None, record_type=None):
@@ -135,23 +142,34 @@ class FirestoreRepository(DataRepository):
         for field, value in (("run_id", run_id), ("metric", metric), ("record_type", record_type)):
             if value is not None:
                 q = q.where(filter=FieldFilter(field, "==", value))
-        docs = self._call(lambda: [(s.id, s.to_dict()) for s in q.stream()])
+        docs = self._call(lambda: [(s.id, s.to_dict()) for s in q.stream(timeout=self._timeout)])
         return sorted(docs, key=_sort_key)
 
     def create(self, doc_id, doc):
         col = self._col()
-        self._call(lambda: col.document(doc_id).create(doc))
+        self._call(lambda: col.document(doc_id).create(doc, timeout=self._timeout))
 
     def update(self, doc_id, fields):
         col = self._col()
-        self._call(lambda: col.document(doc_id).update(fields))
+        self._call(lambda: col.document(doc_id).update(fields, timeout=self._timeout), doc_level=True)
 
     def delete(self, doc_id):
         col = self._col()
         ref = col.document(doc_id)
-        if not self._call(lambda: ref.get()).exists:
+        if not self._call(lambda: ref.get(timeout=self._timeout)).exists:
             raise DocumentNotFound(doc_id)
-        self._call(lambda: ref.delete())
+        self._call(lambda: ref.delete(timeout=self._timeout), doc_level=True)
+
+
+_PEM = re.compile(r"-----BEGIN [A-Z ]+-----.*?(-----END [A-Z ]+-----|$)", re.S)
+_KEY_FIELD = re.compile(r'("?(private_key|private_key_id|client_secret|refresh_token)"?\s*[:=]\s*)("[^"]*"|\S+)', re.I)
+
+
+def safe_error(e: BaseException | str, limit: int = 300) -> str:
+    """오류 메시지에서 키 내용(PEM 블록, private_key 값)을 지우고 길이를 줄인다."""
+    msg = _PEM.sub("[REDACTED KEY]", str(e))
+    msg = _KEY_FIELD.sub(lambda m: m.group(1) + "[REDACTED]", msg)
+    return msg if len(msg) <= limit else msg[:limit] + "…"
 
 
 def _make_client(settings):
@@ -160,6 +178,13 @@ def _make_client(settings):
     key = Path(settings.firebase_credentials)
     if not key.is_file():
         raise RepositoryUnavailable(f"서비스 계정 키 파일이 없습니다: {key.name}")
+    try:
+        key_project = json.loads(key.read_text(encoding="utf-8")).get("project_id")
+    except (ValueError, OSError):
+        raise RepositoryUnavailable(f"서비스 계정 키 파일을 JSON으로 읽을 수 없습니다: {key.name}")
+    if settings.firebase_project_id and key_project != settings.firebase_project_id:
+        raise RepositoryUnavailable(
+            f"키의 project_id({key_project})와 FIREBASE_PROJECT_ID({settings.firebase_project_id})가 다릅니다")
     import firebase_admin
     from firebase_admin import credentials, firestore
 
@@ -169,4 +194,4 @@ def _make_client(settings):
     except ValueError:
         options = {"projectId": settings.firebase_project_id} if settings.firebase_project_id else None
         app = firebase_admin.initialize_app(credentials.Certificate(str(key)), options, name=name)
-    return firestore.client(app)
+    return firestore.client(app, database_id=settings.firestore_database_id)

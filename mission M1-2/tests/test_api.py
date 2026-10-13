@@ -5,6 +5,7 @@
 
 import json
 import sys
+import tempfile
 import unittest
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -276,22 +277,22 @@ class _Ref:
     def __init__(self, store, id_):
         self.s, self.id = store, id_
 
-    def get(self):
+    def get(self, **kw):
         return _Snap(self.id, self.s.get(self.id))
 
-    def create(self, data):
+    def create(self, data, **kw):
         from google.api_core import exceptions as gexc
         if self.id in self.s:
             raise gexc.AlreadyExists(self.id)
         self.s[self.id] = dict(data)
 
-    def update(self, data):
+    def update(self, data, **kw):
         from google.api_core import exceptions as gexc
         if self.id not in self.s:
             raise gexc.NotFound(self.id)
         self.s[self.id].update(data)
 
-    def delete(self):
+    def delete(self, **kw):
         self.s.pop(self.id, None)
 
 
@@ -305,7 +306,7 @@ class _Col:
     def where(self, filter):
         return _Col(self.s, (*self.f, (filter.field_path, filter.value)))
 
-    def stream(self):
+    def stream(self, **kw):
         return [_Snap(i, d) for i, d in self.s.items() if all(d.get(k) == v for k, v in self.f)]
 
 
@@ -329,6 +330,76 @@ class FirestoreMappingTest(unittest.TestCase):
         s = TestClient(app).get("/api/data/summary").json()
         self.assertAlmostEqual(s["mean"], BASE["mean"], delta=1e-6)
         self.assertEqual(len(repo.list(run_id=RUN, record_type="imported")), 435)
+
+
+class FirestoreSafetyTest(unittest.TestCase):
+    """실제 연결 전 준비: 필터, 오류 마스킹, 데이터베이스 단위 오류, 설정."""
+
+    def test_summary_filters(self):
+        c = client()
+        self.assertEqual(c.get("/api/data/summary", params={"run_id": RUN}).json()["count"], 435)
+        self.assertEqual(c.get("/api/data/summary", params={"metric": "ugv_speed_planar"}).json()["count"], 435)
+        c.post("/api/data", json={**MANUAL, "metric": "battery_pct", "unit": "%", "value": 80})
+        self.assertEqual(c.get("/api/data/summary").status_code, 400)  # metric 섞임 → 지정 요구
+        s = c.get("/api/data/summary", params={"metric": "battery_pct"}).json()
+        self.assertEqual((s["count"], s["unit"], s["recent_comparison"]), (1, "%", None))
+        self.assertEqual(c.get("/api/data/summary", params={"run_id": RUN}).json()["count"], 435)
+        # 다른 run 이 섞이면 구간 비교 생략
+        c.post("/api/data", json={**MANUAL, "run_id": "other_run", "sim_time_s": 5})
+        s = c.get("/api/data/summary", params={"metric": "ugv_speed_planar"}).json()
+        self.assertIsNone(s["recent_comparison"])
+        self.assertEqual(len(s["run_ids"]), 2)
+
+    def test_error_redaction(self):
+        from app.repository import safe_error
+        pem = "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASC\n-----END PRIVATE KEY-----"
+        for msg in (f"bad: {pem} tail", '{"private_key_id": "abc123def456", "x": 1}', f'"private_key": "{pem}"'):
+            out = safe_error(msg)
+            self.assertNotIn("MIIEvQ", out)
+            self.assertNotIn("abc123def456", out)
+        self.assertLessEqual(len(safe_error("x" * 1000)), 301)
+
+    def test_database_not_found_is_unavailable(self):
+        from google.api_core import exceptions as gexc
+
+        class NoDb:
+            def collection(self, name):
+                return self
+
+            def where(self, filter):
+                return self
+
+            def stream(self, timeout=None):
+                raise gexc.NotFound("The database (default) does not exist for project x")
+        repo = FirestoreRepository(Settings(data_backend="firestore"), client=NoDb())
+        r = TestClient(create_app(Settings(data_backend="firestore"), repository=repo)).get("/api/data")
+        self.assertEqual(r.status_code, 503)
+
+    def test_key_project_mismatch_and_settings(self):
+        import os
+        with tempfile.TemporaryDirectory() as d:
+            key = Path(d) / "k.json"
+            key.write_text(json.dumps({"type": "service_account", "project_id": "proj-a",
+                                       "private_key": "-----BEGIN PRIVATE KEY-----\nSECRET\n-----END PRIVATE KEY-----"}),
+                           encoding="utf-8")
+            repo = FirestoreRepository(Settings(data_backend="firestore", firebase_credentials=str(key),
+                                                firebase_project_id="proj-b"))
+            self.assertIn("proj-a", repo._init_error)
+            self.assertNotIn("SECRET", repo._init_error)
+            r = TestClient(create_app(Settings(data_backend="firestore"), repository=repo)).get("/api/data")
+            self.assertEqual(r.status_code, 503)
+            self.assertNotIn("SECRET", r.text)
+        keys = ("FIRESTORE_DATABASE_ID", "FIRESTORE_TIMEOUT_S", "CORS_ORIGINS")
+        saved = {k: os.environ.get(k) for k in keys}
+        try:
+            os.environ.update({"FIRESTORE_DATABASE_ID": "adair-mi", "FIRESTORE_TIMEOUT_S": "5",
+                               "CORS_ORIGINS": "http://a.test, http://b.test"})
+            st = Settings.from_env(env_file=None)
+            self.assertEqual((st.firestore_database_id, st.firestore_timeout_s), ("adair-mi", 5.0))
+            self.assertEqual(st.cors_origins, ("http://a.test", "http://b.test"))
+        finally:
+            for k, v in saved.items():
+                os.environ.pop(k, None) if v is None else os.environ.__setitem__(k, v)
 
 
 class RepositoryContractTest(unittest.TestCase):

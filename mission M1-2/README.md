@@ -134,14 +134,21 @@ python scripts/prepare_data.py
 - 기본(`DATA_BACKEND=memory`)은 시작할 때 435개를 메모리에 적재하고, 종료하면 변경 내용이 사라집니다.
 - 엔드포인트와 응답 형식은 `docs/API.md`에 있습니다.
 
-## 6. Firestore 적재
+## 6. Firestore 연결과 적재
+
+`.env`에 `DATA_BACKEND=firestore`, `FIREBASE_CREDENTIALS`(저장소 밖 키 경로), `FIREBASE_PROJECT_ID`, `FIRESTORE_DATABASE_ID`를 넣은 뒤 순서대로 실행합니다.
 
 ```bash
-python scripts/load_data.py                                     # 모의 적재: 검증 + 2회 적재 중복 확인
-python scripts/load_data.py --backend firestore --confirm-upload  # 실제 적재 — 승인 후에만
+python scripts/load_data.py                                       # 1. 모의 적재 (메모리, 쓰기 없음)
+python scripts/check_firestore.py                                 # 2. 연결 확인: 인증, data 접근, 임시 문서 생성·조회·삭제
+python scripts/load_data.py --backend firestore --confirm-upload  # 3. 실제 적재 + 검증 (승인 후에만)
+python scripts/load_data.py --backend firestore --confirm-upload  # 4. 재적재: created=0, unchanged=435 이어야 함
+python scripts/load_data.py --backend firestore --verify-only     # 쓰기 없이 검증만
 ```
 
-실제 적재에는 `.env`의 `FIREBASE_CREDENTIALS`(서비스 계정 키 경로)가 필요합니다. **아직 실행하지 않았습니다.**
+적재 후 검증 항목: imported 문서 수 435, 문서 ID 집합 일치, 날짜·값·단위·원본 식별자 보존, 평균 4.896189·최소 0·최대 5.808594 (오차 1e-6).
+
+키 파일 내용과 private key는 출력·로그·API 오류 응답에 나오지 않도록 지웁니다(`app/repository.py`의 `safe_error`).
 
 ## 원본 데이터 정책
 
