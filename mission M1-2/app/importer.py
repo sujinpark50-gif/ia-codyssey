@@ -66,7 +66,7 @@ def load_documents(path: Path) -> list[tuple[str, dict]]:
     return out
 
 
-def _same(a: dict, b: dict) -> bool:
+def same_document(a: dict, b: dict) -> bool:
     return all(a.get(k) == b.get(k) for k in (*FIELDS, "record_type"))
 
 
@@ -79,7 +79,7 @@ def import_documents(repo: DataRepository, docs: list[tuple[str, dict]]) -> dict
                 result["created"] += 1
             except DocumentExists:
                 existing = repo.get(doc_id)
-                if existing is not None and _same(existing, doc):
+                if existing is not None and same_document(existing, doc):
                     result["unchanged"] += 1
                 else:
                     result["conflicts"].append(doc_id)
@@ -88,3 +88,16 @@ def import_documents(repo: DataRepository, docs: list[tuple[str, dict]]) -> dict
         except Exception as e:  # 문서 하나의 실패가 전체를 멈추지 않게
             result["errors"].append({"id": doc_id, "error": f"{type(e).__name__}: {safe_error(e)}"})
     return result
+
+
+def plan_import(existing: dict[str, dict], docs: list[tuple[str, dict]]):
+    """쓰기 전 대조. (새로 만들 문서, 이미 같은 내용으로 있는 ID, 내용이 다른 충돌 ID)."""
+    todo, unchanged, conflicts = [], [], []
+    for doc_id, doc in docs:
+        if doc_id not in existing:
+            todo.append((doc_id, doc))
+        elif same_document(existing[doc_id], doc):
+            unchanged.append(doc_id)
+        else:
+            conflicts.append(doc_id)
+    return todo, unchanged, conflicts

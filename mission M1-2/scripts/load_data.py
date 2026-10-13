@@ -21,14 +21,14 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from app.config import Settings  # noqa: E402
-from app.importer import ImportValidationError, import_documents, load_documents  # noqa: E402
+from app.importer import ImportValidationError, import_documents, load_documents, plan_import  # noqa: E402
 from app.repository import FirestoreRepository, InMemoryRepository, RepositoryError, safe_error  # noqa: E402
-from app.service import DataService  # noqa: E402
+from app.service import DataService, iso_kst  # noqa: E402
 
 TOL = 1e-6
 
 
-def verify(repo, docs: list[tuple[str, dict]], expected_path: Path) -> bool:
+def verify(repo, docs: list[tuple[str, dict]], expected_path: Path, input_path: Path) -> bool:
     """적재 결과 검증: 문서 수·ID 집합·원본 식별자, summary 통계가 M1-2 값과 일치."""
     run_id, metric = docs[0][1]["run_id"], docs[0][1]["metric"]
     ok = True
@@ -45,6 +45,14 @@ def verify(repo, docs: list[tuple[str, dict]], expected_path: Path) -> bool:
     diff = [i for i in expected if i in stored and any(
         stored[i].get(k) != expected[i][k] for k in ("date", "value", "unit", "run_id", "source_ref", "sim_time_s"))]
     check("날짜·값·단위·원본 식별자 보존", not diff, f"불일치 {len(diff)}건 {diff[:3]}")
+
+    src = {d["id"]: d["data"] for d in json.loads(input_path.read_text(encoding="utf-8"))["documents"]}
+    for label, idx in (("첫 번째", 0), ("중간", len(docs) // 2), ("마지막", len(docs) - 1)):
+        doc_id = docs[idx][0]
+        got = stored.get(doc_id)
+        same = got is not None and got["value"] == src[doc_id]["value"] and iso_kst(got["date"]) == src[doc_id]["date"]
+        note = (f"{doc_id} value={got['value']} date={iso_kst(got['date'])}" if got else f"{doc_id} 없음")
+        check(f"{label} 문서 대조 (ID·값·Timestamp)", same, note)
 
     agg = json.loads(expected_path.read_text(encoding="utf-8"))["aggregation"]["time_weighted"]
     s = DataService(repo).summary(run_id=run_id, metric=metric)
@@ -87,18 +95,28 @@ def main(argv=None) -> int:
               f"conflicts={len(second['conflicts'])} errors={len(second['errors'])}")
         print(f"저장소 문서 수: {total}")
         return 0 if (total == len(docs) and not first["errors"] and second["created"] == 0
-                     and verify(repo, docs, a.expected)) else 1
+                     and verify(repo, docs, a.expected, a.input)) else 1
 
     settings = replace(Settings.from_env(), data_backend="firestore")
     repo = FirestoreRepository(settings)
     try:
         if a.verify_only:
-            return 0 if verify(repo, docs, a.expected) else 1
+            return 0 if verify(repo, docs, a.expected, a.input) else 1
         if not a.confirm_upload:
             print("Firestore 적재는 --confirm-upload 가 있어야 실행됩니다. 아무것도 쓰지 않았습니다.", file=sys.stderr)
             return 2
-        result = import_documents(repo, docs)
-        print(f"적재 created={result['created']} unchanged={result['unchanged']} "
+        existing = dict(repo.list())  # data 컬렉션 전체 (현재 규모 전제)
+        todo, unchanged, conflicts = plan_import(existing, docs)
+        print(f"쓰기 전 대조: 기존 문서 {len(existing)}건, 새로 만들 문서 {len(todo)}건, "
+              f"이미 같은 내용 {len(unchanged)}건, 충돌 {len(conflicts)}건")
+        if conflicts:
+            a.error_log.mkdir(parents=True, exist_ok=True)
+            path = a.error_log / f"import_conflicts_{datetime.now(timezone.utc):%Y%m%dT%H%M%SZ}.json"
+            path.write_text(json.dumps({"conflicts": conflicts}, ensure_ascii=False, indent=2), encoding="utf-8")
+            print(f"내용이 다른 같은 ID가 있어 아무것도 쓰지 않고 중단합니다: {path}", file=sys.stderr)
+            return 1
+        result = import_documents(repo, todo)
+        print(f"적재 created={result['created']} unchanged={result['unchanged'] + len(unchanged)} "
               f"conflicts={len(result['conflicts'])} errors={len(result['errors'])}")
         if result["errors"] or result["conflicts"]:
             a.error_log.mkdir(parents=True, exist_ok=True)
@@ -106,7 +124,7 @@ def main(argv=None) -> int:
             path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
             print(f"실패·충돌 기록: {path}", file=sys.stderr)
             return 1
-        return 0 if verify(repo, docs, a.expected) else 1
+        return 0 if verify(repo, docs, a.expected, a.input) else 1
     except RepositoryError as e:
         print(f"Firestore 오류: {safe_error(e)}", file=sys.stderr)
         return 1

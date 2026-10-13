@@ -402,6 +402,18 @@ class FirestoreSafetyTest(unittest.TestCase):
                 os.environ.pop(k, None) if v is None else os.environ.__setitem__(k, v)
 
 
+class PlanImportTest(unittest.TestCase):
+    def test_plan_import(self):
+        from app.importer import plan_import
+        docs = load_documents(SEED)
+        todo, same, conflicts = plan_import({}, docs)
+        self.assertEqual((len(todo), same, conflicts), (435, [], []))
+        existing = dict(docs[:10])
+        existing[docs[0][0]] = {**docs[0][1], "value": 99.0}
+        todo, same, conflicts = plan_import(existing, docs)
+        self.assertEqual((len(todo), len(same), conflicts), (425, 9, [docs[0][0]]))
+
+
 class CredentialsEnvTest(unittest.TestCase):
     def test_google_application_credentials(self):
         from app.config import credentials_path
