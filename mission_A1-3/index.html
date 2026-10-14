@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>레피 | 메모 몇 줄로 쓰는 상품 스토리</title>
-  <meta name="description" content="사장님이 적은 메모에서 상품의 이야기를 찾아 상세페이지와 SNS 글로 정리해드려요. 없는 이야기는 만들지 않아요. 무료 베타 운영 중." />
+  <meta name="description" content="사장님 메모에서 이 상품만의 이야기를 찾아, 손님에게 건네는 글로 정리해드려요. 없는 이야기는 만들지 않아요. 베타 신청 받는 중." />
 
   <!-- 카톡·슬랙 링크 미리보기용. 크롤러는 상대 경로를 못 읽으므로 절대 주소로 적는다.
        배포 루트가 mission_A1-3라 og-image.png는 도메인 바로 아래에 놓인다. -->
@@ -12,21 +12,20 @@
   <meta property="og:locale" content="ko_KR" />
   <meta property="og:site_name" content="레피(Lepi)" />
   <meta property="og:url" content="https://ia-codyssey-two.vercel.app/" />
-  <meta property="og:title" content="레피 — 전하고 싶은 의미는 그대로, 표현은 더 선명하게." />
-  <meta property="og:description" content="사장님이 적은 메모에서 상품의 이야기를 찾아 상세페이지와 SNS 글로 정리해드려요. 없는 이야기는 만들지 않아요. 무료 베타 운영 중." />
-  <meta property="og:image" content="https://ia-codyssey-two.vercel.app/og-image.png" />
+  <meta property="og:title" content="레피 — 물건은 흔해도, 고른 이유는 저마다." />
+  <meta property="og:description" content="사장님 메모에서 이 상품만의 이야기를 찾아, 손님에게 건네는 글로 정리해드려요. 없는 이야기는 만들지 않아요. 베타 신청 받는 중." />
+  <meta property="og:image" content="https://ia-codyssey-two.vercel.app/og-image.png?v=2" />
   <!-- 카톡은 크기를 명시하지 않으면 큰 카드 대신 작은 섬네일로 떨어뜨릴 때가 있다. -->
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:image:alt" content="물건은 흔해도, 고른 이유는 저마다. 그 이유를 담아, 레피가 상품에 이야기를 입혀드려요." />
-  <!-- 이미지가 생겼으므로 summary(작은 정사각 섬네일)에서 큰 카드로 올린다. -->
+  <!-- 이미지가 바뀌면 ?v= 를 올려 카톡·슬랙 캐시를 비운다. -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="레피 — 전하고 싶은 의미는 그대로, 표현은 더 선명하게." />
-  <meta name="twitter:description" content="사장님이 적은 메모에서 상품의 이야기를 찾아 상세페이지와 SNS 글로 정리해드려요. 없는 이야기는 만들지 않아요. 무료 베타 운영 중." />
-  <meta name="twitter:image" content="https://ia-codyssey-two.vercel.app/og-image.png" />
-  <!-- 로고 "Lepi."의 마침표를 그대로 쓴 파비콘. 외부 파일 없이 SVG를 인라인으로
-       넣어 요청을 하나 줄인다. 딥포레스트 바탕에 샌드 점(6.0:1). -->
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23283618'/%3E%3Ccircle cx='16' cy='16' r='7' fill='%23DDA15E'/%3E%3C/svg%3E" />
+  <meta name="twitter:title" content="레피 — 물건은 흔해도, 고른 이유는 저마다." />
+  <meta name="twitter:description" content="사장님 메모에서 이 상품만의 이야기를 찾아, 손님에게 건네는 글로 정리해드려요. 없는 이야기는 만들지 않아요. 베타 신청 받는 중." />
+  <meta name="twitter:image" content="https://ia-codyssey-two.vercel.app/og-image.png?v=2" />
+  <!-- 파비콘: 로고의 씨앗(오커 점)에서 새싹이 돋는 모양. 외부 파일 없이 SVG 인라인. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%227%22%20fill%3D%22%23283618%22%2F%3E%3Cpath%20d%3D%22M16%2024%20V13%22%20stroke%3D%22%239BC53D%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%20fill%3D%22none%22%2F%3E%3Cpath%20d%3D%22M16%2014.5%20C%2010.5%2014.5%207.5%2011.5%207%207%20C%2011.5%207%2015.5%209.5%2016%2014.5%20Z%22%20fill%3D%22%239BC53D%22%2F%3E%3Cpath%20d%3D%22M16%2012.5%20C%2020.5%2012.5%2024.5%209.5%2025%205%20C%2020%205%2016.5%208%2016%2012.5%20Z%22%20fill%3D%22%23B5D45A%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2224.5%22%20r%3D%224%22%20fill%3D%22%23DDA15E%22%2F%3E%3C%2Fsvg%3E" />
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500&family=Noto+Serif+KR:wght@300;400;600&display=swap" rel="stylesheet">
