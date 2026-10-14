@@ -1,8 +1,8 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
   <title>레피 | 메모 몇 줄로 쓰는 상품 스토리</title>
   <meta name="description" content="사장님이 적은 메모에서 상품의 이야기를 찾아 상세페이지와 SNS 글로 정리해드려요. 없는 이야기는 만들지 않아요. 무료 베타 운영 중." />
 
@@ -28,1705 +28,731 @@
        넣어 요청을 하나 줄인다. 딥포레스트 바탕에 샌드 점(6.0:1). -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23283618'/%3E%3Ccircle cx='16' cy='16' r='7' fill='%23DDA15E'/%3E%3C/svg%3E" />
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;300;400&display=swap" rel="stylesheet" />
-  <style>
-    /* ── CSS Variables ──
-       Olive Garden Feast — 크림 · 딥 포레스트 · 올리브 · 샌드 · 번트 오커
-       강조는 바탕에 따라 나눠 쓴다. 밝은 면은 --accent(오커, 크림 위 3.8:1),
-       어두운 면은 --accent-dark(샌드, 포레스트 위 6.0:1).
-       샌드는 크림 위에서 2.1:1이라 밝은 면의 선·텍스트로는 쓰지 않는다. */
-    :root {
-      /* Earthy Caramel Glow(FEFAE0)와 Whimsical Cherry Farm(FFFFEA)의 중간값.
-         토큰을 반투명으로 두면 어두운 면의 글자색(color: var(--bg))까지 비쳐서
-         깨지므로 불투명한 결과값으로 고정한다. */
-      --bg: #FFFDE5;
-      --surface: #F7F0D2;
-      --fg: #283618;
-      --muted: #606C38;
-      /* 선은 세 층이다.
-         --border:  nav 하단 구분선 + 버튼/태그/입력창 테두리.  2.92:1  진하게
-         --rule:    본문 안쪽 목록선. 블러시.                   1.56:1
-         --divider: 섹션 사이 구분선.                          1.32:1  가장 옅게
-         섹션 구분은 선이 아니라 120px 여백이 맡는다. */
-      --border: #93987C;
-      --rule: #EBC3BE;
-      --divider: #E0DEC4;
-      --accent: #BC6C25;
-      --accent-dark: #DDA15E;
-      --serif: 'Noto Serif KR', 'Apple SD Gothic Neo', serif;
-      --ease: cubic-bezier(0.16, 1, 0.3, 1);
-    }
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500&family=Noto+Serif+KR:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FFFDE5}
+a{color:#283618}a:hover{color:#BC6C25}
+.wrap{max-width:1200px;margin:0 auto;padding-left:24px;padding-right:24px;box-sizing:border-box}
+.sec{padding-top:112px;padding-bottom:112px;border-top:1px solid #E0DEC4}
+.sl{display:flex;align-items:center;gap:16px;margin:0 0 28px;font-size:12px;letter-spacing:.2em;color:#283618}
+.sl-line{width:32px;height:1px;background:#283618;display:inline-block}
+.sh{font-family:'Noto Serif KR',serif;font-weight:300;font-size:clamp(28px,3.6vw,44px);line-height:1.32;letter-spacing:-.015em;margin:0}
+.lead{font-size:16px;line-height:1.85;color:#606C38;max-width:640px;margin:20px 0 0}
+.label{font-size:12px;letter-spacing:.08em;color:#606C38}
+.stack{display:grid}
+.stack > *{grid-area:1/1;position:relative;z-index:0}
+img.ov{z-index:1}
+.logo{font-family:'Noto Serif KR',serif;font-weight:600;font-size:32px;letter-spacing:-.02em;text-decoration:none;color:#283618;display:inline-flex;align-items:baseline;line-height:1.3;padding-top:14px}
+.logo:hover{color:#283618}
+.logo .lt{padding:.08em 0 .34em;background-image:linear-gradient(90deg,var(--c) 0 50%,#283618 50% 100%);background-size:200% 100%;background-position:100% 0;-webkit-background-clip:text;background-clip:text;color:transparent;transition:background-position 520ms cubic-bezier(.16,1,.3,1) var(--d)}
+.logo:hover .lt,.logo:focus-visible .lt{background-position:0 0}
+.logo .seed{position:relative;display:inline-block;width:.19em;height:.19em;border-radius:50%;background:#BC6C25;margin-left:.13em}
+.logo:hover .seed,.logo:focus-visible .seed{animation:lepiPop 480ms cubic-bezier(.34,1.56,.64,1) 420ms both}
+@keyframes lepiPop{0%{transform:none}40%{transform:translateY(-5px) scale(1.3)}100%{transform:none}}
+.logo .sprout{position:absolute;left:50%;bottom:62%;width:18px;height:20px;margin-left:-9px;overflow:visible;pointer-events:none}
+.sprout .stem,.sprout .leaf{transform-box:fill-box;transition:transform 220ms ease}
+.sprout .stem{transform-origin:50% 100%;transform:scaleY(0)}
+.sprout .leaf-l{transform-origin:100% 100%;transform:scale(0)}
+.sprout .leaf-r{transform-origin:0 100%;transform:scale(0)}
+.logo:hover .sprout .stem,.logo:focus-visible .sprout .stem{transform:scaleY(1);transition:transform 420ms cubic-bezier(.16,1,.3,1) 820ms}
+.logo:hover .sprout .leaf-l,.logo:focus-visible .sprout .leaf-l{transform:scale(1);transition:transform 520ms cubic-bezier(.34,1.56,.64,1) 1080ms}
+.logo:hover .sprout .leaf-r,.logo:focus-visible .sprout .leaf-r{transform:scale(1);transition:transform 520ms cubic-bezier(.34,1.56,.64,1) 1200ms}
+.draw{background-image:linear-gradient(#BC6C25,#BC6C25);background-repeat:no-repeat;background-position:0 92%;background-size:0% 2px;animation:lepiDraw 1100ms cubic-bezier(.16,1,.3,1) 700ms forwards}
+@keyframes lepiDraw{to{background-size:100% 2px}}
+.rise{opacity:0;transform:translateY(8px);animation:lepiRise 900ms cubic-bezier(.16,1,.3,1) forwards}
+@keyframes lepiRise{to{opacity:1;transform:none}}
+.hint-touch{display:none}
+.bw{filter:grayscale(1) contrast(0.92)}
+.ov{opacity:0}
+@media (hover:none){.hint-touch{display:inline}.hint-mouse{display:none}}
+.btn{font:inherit;font-size:16px;cursor:pointer;border-radius:999px;min-height:48px;padding:0 24px;transition:background-color 300ms ease,color 300ms ease,border-color 300ms ease;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;box-sizing:border-box}
+.btn:focus-visible,.textbtn:focus-visible,.tab:focus-visible,.faq-q:focus-visible{outline:2px solid #BC6C25;outline-offset:3px}
+.btn-solid{background:#283618;color:#FFFDE5;border:1px solid #283618}
+.btn-solid:hover{background:#1B2510;color:#FFFDE5}
+.btn-line{background:transparent;color:#283618;border:1px solid #93987C}
+.btn-line:hover{border-color:#283618;color:#283618}
+.textbtn{font:inherit;font-size:13px;background:none;border:0;padding:8px 0;min-height:44px;color:#606C38;cursor:pointer;text-decoration:underline;text-underline-offset:4px;text-decoration-color:#93987C}
+.textbtn:hover{color:#283618}
+.navlink{font-size:13px;color:#606C38;text-decoration:none;padding:12px 4px}
+.navlink:hover{color:#283618}
+.tab{font:inherit;font-size:15px;background:transparent;border:0;border-bottom:1px solid transparent;padding:10px 2px;min-height:44px;color:#606C38;cursor:pointer;transition:color 300ms ease,border-color 300ms ease}
+.tab:hover{color:#283618}
+.faq-q{font:inherit;width:100%;background:none;border:0;padding:26px 0;display:flex;align-items:center;gap:20px;text-align:left;cursor:pointer;color:#283618}
+.field{display:flex;flex-direction:column;gap:8px}
+.field label{font-size:13px;color:#283618}
+.field input,.field select,.field textarea{font:inherit;font-size:16px;color:#283618;background:#FFFFFF;border:1px solid #CFCCB0;border-radius:4px;padding:12px 14px;min-height:48px;box-sizing:border-box;transition:border-color 300ms ease}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:#283618}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}.draw{background-size:100% 2px}.rise{opacity:1;transform:none}}
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body {
-      background: var(--bg);
-      color: var(--fg);
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI',
-                   'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
-      font-size: 16px;
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-      /* 브라우저 기본값은 한글을 아무 글자에서나 끊어 단어가 중간에 갈라진다.
-         keep-all로 띄어쓰기 단위로만 끊고, 긴 영문/이메일은 break-word로 예외 처리한다. */
-      word-break: keep-all;
-      overflow-wrap: break-word;
-    }
 
-    /* 줄 길이를 고르게 나눈다. 단 <br>로 줄을 직접 잡아둔 요소
-       (.sh · .hero-promise · .prob-callout · .cta-h · .cta-sub)는 제외한다.
-       balance는 브라우저가 줄을 재분배하는 기능이라 수동 줄바꿈과 충돌한다. */
-    .prob-title, .sol-title, .feat-title, .faq-q-text, .test-desc {
-      text-wrap: balance;
-    }
-    /* 여러 줄 본문은 마지막 줄에 한 단어만 남는 것을 막는다. */
-    .prob-desc, .sol-desc, .feat-desc,
-    .faq-body-inner, .fc-label, .test-result-text, .foot-disc p {
-      text-wrap: pretty;
-    }
+/* PC 게시물 만들기 창 + 레피 확장 프로그램 시연. 모든 이름은 pd- 로 시작해 홈페이지와 섞이지 않게 함 */
+.pd-root{--bg:#FFFDE5;--surface:#F7F0D2;--card:#FFFFFF;--fg:#283618;--muted:#606C38;--rule:#E0DEC4;--line:#93987C;--accent:#BC6C25;--ochre:#DDA15E;--dim:rgba(40,54,24,.42);--on:#FFFDE5;
+  --serif:'Noto Serif KR','Apple SD Gothic Neo',serif;--sans:'Noto Sans KR','Apple SD Gothic Neo',system-ui,sans-serif;--ease:cubic-bezier(.16,1,.3,1);
+  font-family:var(--sans);color:var(--fg);word-break:keep-all}
+.pd-stage{display:flex;flex-wrap:wrap;gap:40px 48px;align-items:center}
+.pd-side{flex:0 1 300px;min-width:0;display:flex;flex-direction:column;gap:18px}
+.pd-label{font-size:12px;letter-spacing:.08em;color:var(--muted)}
+.pd-steps{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
+.pd-steps li{display:flex;gap:14px;align-items:baseline;padding:13px 0;border-bottom:1px solid var(--rule);transition:opacity 500ms var(--ease)}
+.pd-n{font-family:var(--serif);color:var(--accent);font-size:15px;width:18px;flex:0 0 auto}
+.pd-t{font-size:15px;line-height:1.55;background-image:linear-gradient(var(--muted),var(--muted));background-repeat:no-repeat;background-position:0 55%;background-size:0% 1px;transition:background-size 500ms var(--ease)}
+.pd-steps li.pd-done{opacity:.45}
+.pd-steps li.pd-done .pd-t{background-size:100% 1px}
+.pd-steps li.pd-mine .pd-t{color:var(--accent);font-weight:500}
+.pd-time{display:flex;gap:14px;align-items:baseline;padding:16px 18px;background:var(--bg);border:1px solid var(--rule);border-radius:4px}
+.pd-timer{font-family:var(--serif);font-size:22px;color:var(--accent);font-variant-numeric:tabular-nums;flex:0 0 auto}
+.pd-time span:last-child{font-size:14px;line-height:1.6}
+.pd-note{font-size:13px;line-height:1.7;color:var(--muted);margin:0}
 
-    /* ── 키보드 접근 ──
-       마우스 클릭에는 테두리가 안 뜨고 탭 이동에만 뜨도록 :focus-visible을 쓴다.
-       어두운 면(#cta·footer)에서는 오커가 3.4:1로 약해 샌드로 바꾼다. */
-    a:focus-visible, button:focus-visible, input:focus-visible,
-    select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
-      outline: 2px solid var(--accent);
-      outline-offset: 3px;
-    }
-    #cta a:focus-visible, #cta button:focus-visible, #cta input:focus-visible,
-    #cta select:focus-visible, #cta textarea:focus-visible,
-    footer a:focus-visible {
-      outline-color: var(--accent-dark);
-    }
-    .skip-link {
-      position: absolute; left: 16px; top: -60px; z-index: 200;
-      background: var(--fg); color: var(--bg);
-      padding: 10px 18px; font-size: 13px; text-decoration: none;
-      transition: top 0.2s var(--ease);
-    }
-    .skip-link:focus { top: 16px; }
+.pd-main{flex:1 1 600px;min-width:0;display:flex;flex-direction:column;gap:14px}
+.pd-browser{position:relative;background:var(--card);border:1px solid var(--rule);border-radius:8px;overflow:hidden;box-shadow:0 18px 44px rgba(40,54,24,.12)}
+.pd-chrome{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--surface);border-bottom:1px solid var(--rule)}
+.pd-dots{display:flex;gap:6px}.pd-dots i{width:10px;height:10px;border-radius:50%;background:var(--line);opacity:.5}
+.pd-addr{flex:1;min-width:0;font-size:12px;color:var(--muted);background:var(--card);border-radius:999px;padding:6px 14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pd-ext{width:26px;height:26px;border-radius:6px;display:grid;place-items:center;transition:background-color 300ms ease}
+.pd-ext.pd-on{background:var(--rule)}
+.pd-web{position:relative;background:var(--dim);padding:22px;display:flex;gap:0;min-height:430px}
+.pd-modal{flex:1;min-width:0;background:var(--card);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;transition:margin-right 500ms var(--ease)}
+.pd-mhead{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:12px 16px;border-bottom:1px solid var(--rule);font-size:15px;font-weight:500}
+.pd-mhead .pd-back{font-size:20px;color:var(--fg);line-height:1}
+.pd-share{justify-self:end;font:inherit;font-size:14px;font-weight:500;color:var(--accent);background:none;border:0;padding:6px 4px;cursor:pointer;border-radius:4px}
+.pd-share:disabled{color:var(--line);cursor:default}
+.pd-share.pd-pulse{animation:pdPulse 1.4s ease-in-out infinite}
+@keyframes pdPulse{50%{background:rgba(188,108,37,.14)}}
+.pd-mbody{display:flex;flex-wrap:wrap;flex:1;min-height:0}
+.pd-photo{flex:1 1 300px;min-width:0;display:grid;background:var(--surface)}
+.pd-photo > *{grid-area:1/1;position:relative;z-index:0}
+.pd-photo img{width:100%;height:100%;min-height:260px;object-fit:cover;display:block;max-width:100%}
+.pd-bw{filter:grayscale(1) contrast(.92)}
+.pd-ov{z-index:1!important;opacity:0;transition:opacity 1400ms var(--ease)}
+.pd-colored .pd-ov{opacity:1}
+.pd-capcol{flex:1 1 240px;min-width:0;display:flex;flex-direction:column;border-left:1px solid var(--rule)}
+.pd-acct{display:flex;align-items:center;gap:10px;padding:14px 16px 8px;font-size:14px;font-weight:500}
+.pd-avatar{width:28px;height:28px;border-radius:50%;background:var(--surface);display:grid;place-items:center;flex:0 0 auto}
+.pd-capwrap{position:relative;flex:1;padding:4px 16px 12px;display:grid}
+.pd-capwrap > *{grid-area:1/1;transition:opacity 500ms var(--ease),transform 600ms var(--ease)}
+.pd-cap{font-size:14px;line-height:1.75;margin:0;cursor:text;user-select:text}
+.pd-cap mark{background:transparent;color:inherit;transition:background-color 300ms ease}
+.pd-cap.pd-sel mark{background:rgba(188,108,37,.22)}
+.pd-cap.pd-hint{outline:1px dashed var(--line);outline-offset:6px;border-radius:2px;animation:pdHint 1.8s ease-in-out infinite}
+@keyframes pdHint{50%{outline-color:var(--accent)}}
+.pd-story h4{font-family:var(--serif);font-weight:400;font-size:15px;line-height:1.55;margin:0}
+.pd-story p{font-size:14px;line-height:1.75;margin:6px 0 0}
+.pd-count{font-size:12px;color:var(--line);text-align:right;padding:0 16px 12px;font-variant-numeric:tabular-nums}
+.pd-hide{opacity:0;transform:translateY(6px);pointer-events:none}
 
-    /* ── Layout ── */
-    .container { max-width: 1120px; margin: 0 auto; padding: 0 32px; }
-    section { padding: 120px 0; border-bottom: 1px solid var(--divider); }
+.pd-menu{position:absolute;z-index:6;min-width:210px;background:var(--card);border:1px solid var(--line);border-radius:6px;box-shadow:0 10px 26px rgba(40,54,24,.16);padding:4px 0;font-size:13px;opacity:0;transform:scale(.97);transform-origin:0 0;pointer-events:none;transition:opacity 180ms ease,transform 180ms ease}
+.pd-menu.pd-show{opacity:1;transform:none;pointer-events:auto}
+.pd-menu div{padding:8px 14px;color:var(--muted)}
+.pd-menu hr{border:0;border-top:1px solid var(--rule);margin:4px 0}
+.pd-menu button{font:inherit;font-size:13px;width:100%;text-align:left;background:var(--surface);border:0;padding:9px 14px;color:var(--fg);display:flex;align-items:center;gap:8px;cursor:pointer}
+.pd-menu button:hover,.pd-menu button:focus-visible{background:var(--rule);outline:none}
 
-    /* ── NAV ── */
-    nav {
-      position: sticky; top: 0; z-index: 100;
-      background: rgba(254,250,224,0.92);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      padding: 20px 0;
-    }
-    nav .container { display: flex; justify-content: space-between; align-items: center; }
-    .logo {
-      font-size: 14px; font-weight: 500;
-      letter-spacing: 0.12em; text-transform: uppercase;
-    }
-    .logo-dot { color: var(--accent); }
-    .nav-right { display: flex; align-items: center; gap: 32px; }
-    .nav-link {
-      font-size: 11px; font-weight: 500; color: var(--muted);
-      text-decoration: none; letter-spacing: 0.15em; text-transform: uppercase;
-      transition: color 0.3s ease;
-    }
-    .nav-link:hover { color: var(--fg); }
-    .nav-cta {
-      font-size: 11.5px; font-weight: 500; color: var(--fg);
-      text-decoration: none; letter-spacing: 0.1em; text-transform: uppercase;
-      padding: 7px 16px; border: 1px solid var(--fg);
-      transition: background 0.3s ease, color 0.3s ease;
-    }
-    .nav-cta:hover { background: var(--fg); color: var(--bg); }
+.pd-panel{position:absolute;top:0;right:0;bottom:0;width:300px;max-width:85%;background:var(--bg);border-left:1px solid var(--rule);display:flex;flex-direction:column;gap:14px;padding:18px;box-sizing:border-box;transform:translateX(105%);transition:transform 550ms var(--ease);z-index:4;box-shadow:-12px 0 30px rgba(40,54,24,.10)}
+.pd-panel.pd-show{transform:none}
+.pd-phead{display:flex;align-items:baseline;justify-content:space-between}
+.pd-logo{font-family:var(--serif);font-weight:600;font-size:20px}
+.pd-logo b{color:var(--accent)}
+.pd-tag{font-size:12px;color:var(--muted)}
+.pd-bar{height:2px;background:var(--rule);position:relative;overflow:hidden}
+.pd-bar i{position:absolute;inset:0 auto 0 0;width:0;background:var(--accent);transition:width 900ms var(--ease)}
+.pd-pbody{flex:1;min-height:0;overflow-y:auto;display:grid}
+.pd-pbody > *{grid-area:1/1;transition:opacity 450ms var(--ease),transform 600ms var(--ease)}
+.pd-stagetext{font-size:14px;color:var(--muted);display:flex;align-items:center;gap:8px;align-self:start}
+.pd-stagetext i{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.pd-result h4{font-family:var(--serif);font-weight:400;font-size:16px;line-height:1.55;margin:0}
+.pd-result p{font-size:13px;line-height:1.75;margin:6px 0 0}
+.pd-pbtns{display:flex;gap:8px}
+.pd-btn{font:inherit;font-size:14px;flex:1;min-height:42px;border-radius:999px;cursor:pointer;border:1px solid var(--fg);background:var(--fg);color:var(--on)}
+.pd-btn.pd-line{background:transparent;color:var(--fg);border-color:var(--line)}
+.pd-btn:disabled{opacity:.35;cursor:default}
+.pd-btn:focus-visible,.pd-share:focus-visible,.pd-text:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 
-    /* ── Section Label (FeaturedSpotlight 패턴) ── */
-    .sl {
-      display: flex; align-items: center; gap: 16px;
-      margin-bottom: 48px; cursor: default;
-    }
-    /* 호버 반응을 뺐다. .sl은 cursor: default인 정적 표지판인데
-       마우스가 스치면 선이 50% 길어지고 자간이 두 배가 됐다.
-       누를 수 없는 것이 움직이면 누를 수 있다는 신호가 된다. */
-    .sl-line {
-      height: 1px; background: var(--fg); width: 32px;
-    }
-    /* 한글은 획이 많아 10px에서 자획이 붙는다. 넓은 자간도 대문자 라틴용 기법이라
-       한글에서는 단어가 흩어져 더 안 읽힌다 — 크기를 올리고 자간은 줄인다. */
-    .sl-text {
-      font-size: 12.5px; font-weight: 500;
-      text-transform: uppercase; letter-spacing: 0.16em; color: var(--fg);
-    }
-    /* 섹션 번호(01~06)는 제거했다. 문제·해결·특징·FAQ·체험·베타는 순서가 없는
-       병렬 목록이라, 번호를 붙이면 없는 순서를 있는 것처럼 말하게 된다.
-       해결 섹션 안의 단계 번호(.sol-n)는 실제 순서이므로 남긴다. */
-
-    /* ── Section Heading ── */
-    .sh {
-      font-family: var(--serif);
-      font-size: clamp(29px, 4.6vw, 56px);
-      font-weight: 300; line-height: 1.28;
-      letter-spacing: -0.015em; color: var(--fg);
-      /* 슬로건 첫 줄 "전하고 싶은 의미는 그대로,"가 56px에서 약 730px 필요하다. */
-      margin-bottom: 64px; max-width: 760px;
-    }
-
-    /* ── Arrow Button (FeaturedSpotlight CTA pattern) ── */
-    .arr-btn {
-      display: inline-flex; align-items: center; gap: 14px;
-      text-decoration: none; cursor: pointer;
-      background: none; border: none; font-family: inherit; padding: 0;
-    }
-    .arr-circle {
-      width: 44px; height: 44px; border-radius: 50%;
-      border: 1px solid var(--fg);
-      display: flex; align-items: center; justify-content: center;
-      transition: background 0.5s var(--ease), box-shadow 0.5s var(--ease);
-      flex-shrink: 0;
-    }
-    .arr-circle svg {
-      stroke: var(--fg);
-      transition: stroke 0.5s var(--ease), transform 0.5s var(--ease);
-    }
-    .arr-btn:hover .arr-circle { background: var(--fg); box-shadow: 0 8px 32px rgba(40,54,24,0.18); }
-    .arr-btn:hover .arr-circle svg { stroke: var(--bg); transform: rotate(45deg); }
-    /* 기본 opacity가 0.5였다. 크림 바탕에서 실효 2.84:1 — 아래 --border 주석에
-       적어둔 본문 4.5:1 기준에 못 미치고, 호버로만 밝아지니 터치 기기에서는
-       내내 그 상태로 남는다. 페이지에서 가장 중요한 행동의 이름이라 1로 둔다.
-       살짝 미끄러지는 움직임은 "누르면 뭔가 있다"는 신호라 남기되, 라벨이
-       또렷해진 만큼 쉬는 자리가 원에 붙어 보여 8px에서 4px로 줄인다.
-       (opacity는 :disabled에서만 쓰이므로 전환 목록에는 남긴다.) */
-    .arr-label {
-      font-size: 11.5px; font-weight: 500;
-      text-transform: uppercase; letter-spacing: 0.14em; color: var(--fg);
-      transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
-      opacity: 1; transform: translateX(-4px);
-    }
-    .arr-btn:hover .arr-label { transform: translateX(0); }
-
-    /* ── HERO ── */
-    #hero {
-      min-height: 90vh;
-      display: flex; align-items: center;
-      padding: 80px 0;
-    }
-    /* 세로 가운데 정렬을 위해 #hero만 flex인데, 그 탓에 .container가 flex
-       아이템이 된다. 블록이던 다른 섹션과 달리 주축으로 늘어나지 않고 내용
-       크기만큼만 잡히고, margin: 0 auto가 남는 공간을 나눠 가운데로 민다.
-       그래서 히어로만 다른 섹션보다 좁고 안쪽에서 시작한다 — 폭에 상관없이
-       일어나며, 내용이 가용 폭에 얼마나 못 미치느냐에 따라 어긋나는 양이
-       달라진다. 데스크톱에서는 2열 격자가 1120px을 다 채우지 못해서,
-       900px 이하에서는 1열이 되면서 더 크게 벌어진다.
-       스크롤로 이어 보는 자리라 시작 선은 모든 섹션이 같아야 한다. */
-    #hero > .container { width: 100%; }
-    .hero-grid {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 80px; align-items: end; width: 100%;
-    }
-    .hero-badge {
-      display: inline-flex; align-items: center; gap: 10px;
-      font-size: 11.5px; font-weight: 500;
-      text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted);
-      margin-bottom: 40px;
-    }
-    /* 깜빡이는 점을 짧은 선으로 바꿨다. 점멸은 서버 모니터링 UI의 기호인데
-       여기서는 감시하는 대상이 없다 — 기능인 척하는 장식이었다.
-       섹션 라벨(.sl-line)이 쓰는 것과 같은 선이라 페이지 문법에 맞는다. */
-    .badge-rule {
-      width: 24px; height: 1px; flex-shrink: 0;
-      background: var(--accent);
-    }
-    /* 두 줄이 각각 한 줄로 유지되도록 크기를 제한한다.
-       왼쪽 칸은 최대 488px(컨테이너 1120 − 패딩 64 − 갭 80, ÷2)이고
-       긴 줄 "고른 이유는 저마다."가 실측 8.46em이다 → 상한 56px.
-       vw 계수도 900~1120px 구간에서 같은 제약을 받는다. 901px에서 칸이
-       378px인데 세로 스크롤바(약 15px)가 있으면 371px이라, 4.7vw(42px)로 여유를 둔다.
-       600px 이하는 아래에서 따로 잡는다. */
-    .hero-h1 {
-      font-family: var(--serif);
-      font-size: clamp(36px, 4.7vw, 56px);
-      font-weight: 300; line-height: 1.16;
-      letter-spacing: -0.02em; margin-bottom: 24px;
-    }
-    .hero-h1 em { font-style: normal; display: block; }
-    /* 둘째 줄 "레피가 상품에 이야기를 입혀드려요."가 약 15.4em이라
-       27px × 15.4 ≈ 416px. 폭 480px 안에 한 줄로 들어간다. */
-    .hero-promise {
-      font-family: var(--serif);
-      font-size: clamp(18px, 2.3vw, 27px);
-      font-weight: 400; line-height: 1.45;
-      letter-spacing: -0.01em; color: var(--fg);
-      max-width: 480px; margin-bottom: 30px;
-    }
-    .hero-promise b { font-weight: 500; }
-    .hero-sub {
-      font-size: 15px; color: var(--muted);
-      line-height: 1.8; max-width: 380px; margin-bottom: 48px;
-    }
-    .hero-btns { display: flex; gap: 20px; flex-wrap: wrap; }
-    /* hero right — 사례 미리보기. 메모·결과 모양은 사례 섹션(.case-*)을
-       그대로 쓰고, 첫 화면 한 칸에 들어가도록 사진 높이와 간격만 줄인다. */
-    .hero-right { display: flex; flex-direction: column; }
-    /* 원본 4:3을 3:2로 조금만 자른다. 두 사람 얼굴은 가운데 있어 남는다. */
-    .hero-case-photo img {
-      display: block; width: 100%; height: auto;
-      aspect-ratio: 3 / 2; object-fit: cover;
-      margin-bottom: 24px;
-    }
-    .hero-right .case-memo { font-size: 13.5px; line-height: 1.8; }
-    .hero-right .case-result { margin-top: 24px; }
-    .hero-right .case-headline {
-      font-size: clamp(19px, 2vw, 23px); margin-bottom: 0;
-    }
-    .hero-case-more {
-      align-self: flex-start; margin-top: 24px;
-      font-size: 13px; color: var(--muted);
-      text-decoration: underline; text-decoration-color: var(--rule);
-      text-underline-offset: 5px;
-    }
-    .hero-case-more:hover { color: var(--fg); }
-
-    /* ── PROBLEM ── */
-    /* 720px은 이 페이지의 기준 폭이다 — .sol-steps · .faq-list · .test-form이
-       모두 여기에 맞춰 있다. 문제 목록만 상한이 없어 가로선이 컨테이너 끝까지
-       뻗었고, 바로 다음 섹션인 해결의 선보다 300px 넘게 길었다. 두 섹션은
-       같은 헤어라인 문법을 쓰는 목록이라 선 길이가 다르면 그것부터 보인다. */
-    .prob-list { display: flex; flex-direction: column; max-width: 720px; }
-    .prob-row {
-      display: grid; grid-template-columns: 48px 1fr;
-      gap: 32px; align-items: start;
-      padding: 28px 0;
-      border-top: 1px solid var(--rule);
-      cursor: default;
-    }
-    .prob-row:last-child { border-bottom: 1px solid var(--rule); }
-    .prob-n {
-      font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
-      font-size: 11px; color: var(--muted);
-      padding-top: 3px;
-      transition: color 0.5s var(--ease);
-    }
-    /* 위치 이동은 뺐다. 색 변화만 남긴다 —
-       색이 진해지는 것은 "지금 이 줄을 읽고 있다"는 표시이고,
-       옆으로 미는 것은 "누르면 뭔가 있다"는 신호다. 앞만 남긴다.
-       한때 이 줄에 아이콘을 하나씩 붙여 호버 때 함께 밝혔는데, 시계·전구·
-       돋보기처럼 개념을 그림으로 옮긴 것들이라 아무 정보도 더하지 않았다
-       (그래서 좁은 화면에서는 통째로 숨기고 있었다). 호버 반응은 번호와
-       설명문의 색으로 충분하다 — 설명문 한 줄 전체가 5.52:1에서 12.53:1로
-       진해지는 쪽이 22px 아이콘 하나보다 넓게 움직인다. */
-    .prob-row:hover .prob-n { color: var(--fg); }
-    .prob-title {
-      font-size: 17px; font-weight: 400; margin-bottom: 6px;
-    }
-    .prob-desc {
-      font-size: 14px; color: var(--muted); line-height: 1.7;
-      transition: color 0.5s var(--ease);
-    }
-    .prob-row:hover .prob-desc { color: var(--fg); }
-    /* 문제 섹션의 결론. 테두리 대신 서체로 무게를 준다.
-       줄은 <br>로 직접 끊는다. 가장 긴 줄이 한글 열여섯 자 남짓이라 26px에서도
-       460px 안팎이고, 위 목록(720px)보다 짧게 끝난다. max-width는 문구가
-       길어질 때를 대비한 안전선일 뿐 지금 문장은 닿지 않는다. */
-    .prob-callout {
-      margin-top: 72px;
-      font-family: var(--serif);
-      font-size: clamp(19px, 2.2vw, 26px);
-      font-weight: 300; line-height: 1.5;
-      letter-spacing: -0.01em;
-      max-width: 860px;
-    }
-    .prob-callout strong { font-weight: 500; }
-
-    /* ── SOLUTION ── */
-    .sol-steps { max-width: 720px; }
-    .sol-step {
-      display: grid; grid-template-columns: 48px 1fr;
-      gap: 32px; padding: 28px 0;
-      border-top: 1px solid var(--rule);
-    }
-    .sol-step:last-of-type { border-bottom: 1px solid var(--rule); }
-    .sol-n {
-      font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
-      font-size: 11px; color: var(--muted); padding-top: 3px;
-    }
-    .sol-title { font-size: 17px; font-weight: 400; margin-bottom: 6px; }
-    .sol-desc { font-size: 14px; color: var(--muted); line-height: 1.7; }
-
-    /* ── FEATURES ──
-       박스 격자를 버리고 세로 헤어라인으로 나눈다. 문제·해결 섹션의 가로선과
-       같은 문법이라 이질적이지 않고, 칸이 비어도 아무 일도 생기지 않는다.
-       (이전 격자는 배경색을 1px 틈으로 비추는 방식이라 빈 칸이 덩어리로 드러났다.) */
-    .feat-photo {
-      margin: 0 0 56px; overflow: hidden; background: var(--surface);
-    }
-    .feat-photo img { display: block; width: 100%; height: auto; }
-
-    /* 다섯 칸이 균등하다가, 하나에 커서를 올리면 그 칸만 2.4배로 늘고
-       나머지 넷이 균일하게 줄어든다. 2.4 + 4×0.65 = 5로 총합이 유지돼
-       행 전체 폭은 그대로다. JS 없이 flex-grow 전환만 쓴다. */
-    .feat-row { display: flex; }
-    .feat-item {
-      flex: 1 1 0; min-width: 0;
-      padding: 0 18px 0 24px;
-      border-left: 1px solid var(--rule);
-      transition: flex-grow 0.55s var(--ease);
-      /* 다섯째 항목만 제목 아래 태그가 하나 더 있어 내용 높이가 다르다.
-         상자는 전체 높이를 유지해 세로선을 온전히 그리고,
-         내용만 가운데로 모아 넷이 위로 쏠려 보이지 않게 한다. */
-      display: flex; flex-direction: column; justify-content: center;
-    }
-    /* 선은 카드끼리 마주보는 자리에만 둔다. 첫 항목 왼쪽은 바깥 모서리라
-       선을 빼고, 글자를 섹션 제목과 같은 선에 맞춘다. */
-    .feat-item:first-child { border-left: none; padding-left: 0; }
-    .feat-row:hover .feat-item,
-    .feat-row:focus-within .feat-item { flex-grow: 0.65; }
-    .feat-item:hover,
-    .feat-item:focus-within { flex-grow: 2.4; }
-    .feat-item:focus-visible { outline: 2px solid var(--fg); outline-offset: 4px; }
-
-    /* 설명문은 접어둔다. 접힌 칸은 120px 남짓이라 제목만으로도 빠듯하다.
-       grid-template-rows 0fr→1fr은 높이를 매끄럽게 전환하는 방법이다. */
-    .feat-body {
-      display: grid; grid-template-rows: 0fr;
-      transition: grid-template-rows 0.55s var(--ease);
-    }
-    .feat-body > p { overflow: hidden; }
-    .feat-item:hover .feat-body,
-    .feat-item:focus-within .feat-body { grid-template-rows: 1fr; }
-
-    /* 라벨이 위, 내용이 아래. "이건 지금 됨 → 뭐가 되는지" 순서로 읽힌다. */
-    .feat-tag {
-      display: inline-block;
-      font-size: 11px; font-weight: 600;
-      text-transform: uppercase; letter-spacing: 0.1em;
-      padding: 4px 10px; border: 1px solid;
-    }
-    /* 되는 기능에는 라벨을 안 붙인다 — 되는 게 기본이므로 말할 필요가 없다.
-       아직인 것 하나에만 붙이고, 그것도 제목 아래에 둬서
-       다섯 제목의 시작 높이가 어긋나지 않게 한다.
-       (그리드 밖 각주의 태그는 혼자 있으므로 박스를 유지한다.) */
-    .feat-row .feat-tag {
-      border: none; padding: 0;
-      display: block; margin-bottom: 12px;
-      font-size: 11px; letter-spacing: 0.12em;
-      color: var(--muted);
-    }
-    .feat-title { font-size: 18px; font-weight: 500; margin: 0 0 8px; letter-spacing: -0.01em; }
-    .feat-desc { font-size: 13.5px; color: var(--muted); line-height: 1.75; }
-
-    /* 아직 시점이 없는 기능. 항목 행 밖에 한 줄 각주로 둔다. */
-    .feat-later {
-      margin-top: 44px;
-      display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
-      font-size: 13.5px; color: var(--muted); line-height: 1.7;
-    }
-    .feat-later b { color: var(--fg); font-weight: 500; }
-    .feat-later .feat-tag { flex-shrink: 0; }
-
-    /* 글자색은 4.5:1을 넘는 값만 쓴다 — --border(2.92:1)는 테두리 전용.
-       "지금 되는 기능"에는 라벨을 붙이지 않으므로 등급은 둘뿐이다. */
-
-    .tag-next { border-color: var(--muted); color: var(--muted); } /* 정식 출시 예정 */
-    .tag-soon { border-color: var(--border); color: var(--muted); }/* 고도화 예정 */
-
-    /* ── FAQ ── */
-    .faq-list { max-width: 720px; }
-    .faq-item { border-top: 1px solid var(--rule); }
-    .faq-item:last-child { border-bottom: 1px solid var(--rule); }
-    .faq-btn {
-      width: 100%; text-align: left; background: none; border: none;
-      cursor: pointer; font-family: inherit; padding: 26px 0;
-      display: grid; grid-template-columns: 48px 1fr 20px;
-      gap: 24px; align-items: center;
-    }
-    .faq-btn:hover .faq-q-text { transform: translateX(4px); }
-    .faq-n {
-      font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
-      font-size: 11px; color: var(--muted);
-    }
-    .faq-q-text {
-      font-size: 16px; font-weight: 400; color: var(--fg);
-      transition: transform 0.4s var(--ease);
-    }
-    .faq-chev {
-      width: 16px; height: 16px; color: var(--muted);
-      transition: transform 0.4s var(--ease);
-      flex-shrink: 0;
-    }
-    .faq-item.open .faq-chev { transform: rotate(180deg); }
-    .faq-body { max-height: 0; overflow: hidden; transition: max-height 0.4s var(--ease); }
-    .faq-item.open .faq-body { max-height: 360px; }
-    .faq-body-inner {
-      padding: 0 0 26px 72px;
-      font-size: 14px; color: var(--muted); line-height: 1.8;
-    }
-
-    /* ── TEST (LEPI TEST) ── */
-    .test-desc {
-      font-size: 15px; color: var(--muted); line-height: 1.8;
-      max-width: 620px; margin-bottom: 56px;
-    }
-    .test-form { max-width: 720px; }
-    .test-label {
-      display: block; font-size: 12px; font-weight: 500;
-      text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted);
-      margin-bottom: 12px;
-    }
-    .test-textarea {
-      width: 100%; background: transparent;
-      border: 1px solid var(--border); color: var(--fg);
-      font-family: inherit; font-size: 15px; line-height: 1.7;
-      padding: 20px; resize: vertical; outline: none;
-      transition: border-color 0.3s ease;
-      margin-bottom: 28px;
-    }
-    .test-textarea::placeholder { color: var(--muted); opacity: 0.7; }
-    .test-textarea:focus { border-color: var(--fg); }
-    /* 쿨다운 중에는 남은 시간이 라벨에 뜬다. 버튼 전체를 흐리게 하면
-       그 글자까지 묻히므로(0.4 × 0.5 = 0.2), 동그라미만 흐리고 글자는 살린다. */
-    button.arr-btn:disabled { cursor: default; pointer-events: none; }
-    button.arr-btn:disabled .arr-circle { opacity: 0.3; }
-    button.arr-btn:disabled .arr-label { opacity: 0.85; }
-    /* 라벨은 상자 밖, 상자는 그 아래. "원문" 라벨과 왼쪽 끝이 맞는다. */
-    .test-result-wrap { margin-top: 48px; max-width: 720px; }
-    /* 결과 라벨은 원문 라벨보다 강하게 — 사용자가 기다린 자리다.
-       오커는 크림 위 3.90:1이라 12px 텍스트 기준(4.5:1)에 미달한다.
-       색 대신 진하기로 세운다 — 딥포레스트는 12.5:1. */
-    .test-label-strong { font-size: 13px; color: var(--fg); }
-    .test-result {
-      padding: 28px 32px;
-      border: 1px solid var(--fg);
-    }
-    .test-result-text {
-      font-size: 15px; line-height: 1.8; color: var(--fg);
-      white-space: pre-wrap;
-    }
-    /* 사례 카드의 간격은 사진 옆 넓은 칸 기준이라, 테두리 상자 안에서는 줄인다. */
-    .test-result .case-card { margin-bottom: 20px; }
-    .test-result .case-headline { margin-bottom: 18px; }
-    /* Writer가 문단 안에 넣은 줄바꿈(\n)을 화면에서도 줄바꿈으로 보여준다. */
-    .test-result .case-body p { white-space: pre-line; }
-    .test-questions {
-      padding-left: 20px; margin: 0 0 16px;
-      font-size: 15px; line-height: 1.8; color: var(--fg);
-    }
-    .test-questions li + li { margin-top: 6px; }
-    .test-error {
-      margin-top: 20px; font-size: 14px; color: #9c4a3c; max-width: 720px;
-    }
-    .test-notice {
-      margin-top: 24px; font-size: 14.5px; color: var(--fg);
-      max-width: 720px; line-height: 1.7;
-    }
-    .test-notice a {
-      color: var(--fg); text-decoration: underline;
-      text-decoration-color: var(--accent); text-underline-offset: 4px;
-      text-decoration-thickness: 2px;
-    }
-    .test-notice a:hover { color: var(--accent); }
-
-    /* ── CTA ── */
-    #cta {
-      background: var(--fg); color: var(--bg);
-      border-bottom: none;
-    }
-    /* 딥포레스트 바탕에서 본문 4.5:1을 넘으려면 알파 0.55가 하한이다.
-       읽어야 하는 텍스트는 전부 그 위로, 장식용 선은 낮게 둔다. */
-    #cta .sl-line { background: rgba(254,250,224,0.3); }
-    #cta .sl-text { color: rgba(254,250,224,0.62); }
-    .cta-grid {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 80px; align-items: start;
-    }
-    /* 히어로와 같은 제약. 왼쪽 칸 488px에 "레피에게 먼저 보여주세요."가
-       약 11.6em이라 상한 38px, vw 계수 3.4가 한계다. */
-    .cta-h {
-      font-family: var(--serif);
-      font-size: clamp(26px, 3.4vw, 38px);
-      font-weight: 300; line-height: 1.24;
-      letter-spacing: -0.015em; color: var(--bg);
-      margin-bottom: 20px;
-    }
-    .cta-sub { font-size: 14px; color: rgba(254,250,224,0.66); line-height: 1.8; }
-
-    /* form — underline only */
-    .fg { margin-bottom: 20px; }
-    /* 자간 0.12em은 라틴 대문자 라벨을 위한 값이다. 대문자는 글자마다 폭이
-       비슷하고 좌우 여백이 좁아 벌려줘야 읽히지만, 한글 음절은 이미 네모틀
-       안에 여백을 품고 있어 같은 값을 주면 낱자로 흩어진다. 다섯 라벨이 전부
-       한글이므로("이름 또는 닉네임", "운영 중인 SNS 채널" …) 0.02em만 남긴다 —
-       "SNS" 같은 약어가 뭉치지 않을 만큼이다. */
-    .fl {
-      display: block; font-size: 11.5px; font-weight: 500;
-      text-transform: uppercase; letter-spacing: 0.02em;
-      color: rgba(254,250,224,0.62); margin-bottom: 8px;
-    }
-    .fl .req { color: rgba(254,250,224,0.55); }
-    .fi, .fs, .ft {
-      width: 100%; background: transparent; border: none;
-      border-bottom: 1px solid rgba(254,250,224,0.3);
-      color: var(--bg); font-family: inherit; font-size: 15px;
-      padding: 10px 0; outline: none;
-      transition: border-color 0.3s ease;
-    }
-    .fi:focus, .fs:focus, .ft:focus { border-bottom-color: rgba(254,250,224,0.6); }
-    .fi::placeholder, .ft::placeholder { color: rgba(254,250,224,0.45); }
-    .fs option { background: var(--fg); color: var(--bg); }
-    .ft { resize: none; min-height: 56px; }
-    .fi:disabled, .fs:disabled, .ft:disabled {
-      opacity: 0.55; cursor: default; border-bottom-color: rgba(254,250,224,0.08);
-    }
-    .fc-wrap {
-      display: flex; gap: 12px; align-items: flex-start;
-      padding: 16px 0;
-      border-top: 1px solid rgba(254,250,224,0.08);
-      margin-top: 4px; margin-bottom: 28px;
-    }
-    .fc { width: auto; flex-shrink: 0; margin-top: 2px; }
-    /* 개인정보 수집 동의 문구. 법적으로 읽혀야 하는 텍스트라 가장 먼저 올린다. */
-    .fc-label { font-size: 12px; color: rgba(254,250,224,0.62); line-height: 1.65; }
-    .fc:disabled ~ .fc-label { opacity: 0.55; }
-
-    /* submit button — arr-btn inverted */
-    .submit-btn {
-      display: inline-flex; align-items: center; gap: 14px;
-      background: none; border: none; font-family: inherit;
-      cursor: pointer; padding: 0;
-      transition: opacity 0.6s var(--ease);
-    }
-    .submit-btn:disabled { cursor: default; pointer-events: none; }
-    .submit-btn:disabled:not(.success) { opacity: 0.4; }
-    .submit-circle {
-      width: 44px; height: 44px; border-radius: 50%;
-      border: 1px solid rgba(254,250,224,0.45);
-      display: flex; align-items: center; justify-content: center;
-      transition: background 0.5s var(--ease), border-color 0.5s var(--ease), box-shadow 0.5s var(--ease);
-    }
-    .submit-circle svg { stroke: var(--bg); transition: transform 0.5s var(--ease), stroke 0.5s var(--ease); }
-    .submit-btn:not(:disabled):hover .submit-circle {
-      background: var(--bg); border-color: var(--bg);
-      box-shadow: 0 8px 32px rgba(254,250,224,0.1);
-    }
-    .submit-btn:not(:disabled):hover .submit-circle svg { stroke: var(--fg); transform: rotate(45deg); }
-    /* .arr-label과 같은 이유로 기본을 1로 올린다. 어두운 면이라 0.5에서도
-       4.40:1로 밝은 면(2.84:1)만큼 나쁘지는 않았지만, 여전히 4.5:1에 못 미친다.
-       폼을 다 채우고 마지막으로 누르는 버튼이라 이름이 흐릴 이유가 없다.
-       opacity는 :disabled(버튼 전체 0.4)와 .success에서 계속 쓰이므로 남긴다. */
-    .submit-label {
-      font-size: 11.5px; font-weight: 500;
-      text-transform: uppercase; letter-spacing: 0.14em; color: var(--bg);
-      opacity: 1; transform: translateX(-4px);
-      transition: opacity 0.5s var(--ease), transform 0.5s var(--ease), color 0.5s var(--ease);
-    }
-    .submit-btn:not(:disabled):hover .submit-label { transform: translateX(0); }
-
-    /* success micro-interaction */
-    @keyframes submitPop {
-      0% { transform: scale(1); }
-      45% { transform: scale(1.18); }
-      100% { transform: scale(1); }
-    }
-    .submit-btn.success .submit-circle {
-      background: var(--accent-dark); border-color: var(--accent-dark);
-      box-shadow: 0 8px 32px rgba(221,161,94,0.35);
-      animation: submitPop 0.6s var(--ease);
-    }
-    .submit-btn.success .submit-circle svg { stroke: var(--fg); }
-    .submit-btn.success .submit-label {
-      color: var(--accent-dark); opacity: 1; transform: translateX(0);
-    }
-
-    /* ── FOOTER ── */
-    footer {
-      background: var(--fg);
-      border-top: 1px solid rgba(254,250,224,0.06);
-      padding: 36px 0;
-    }
-    .foot-inner {
-      display: flex; gap: 48px;
-      justify-content: space-between; align-items: flex-start;
-    }
-    .foot-logo {
-      font-size: 13px; font-weight: 500;
-      letter-spacing: 0.12em; text-transform: uppercase;
-      color: rgba(254,250,224,0.6); white-space: nowrap;
-    }
-    /* 어두운 푸터 위이므로 샌드를 쓴다 (포레스트 위 6.0:1). 오커는 3.4:1로 약하다. */
-    .foot-logo span { color: var(--accent-dark); }
-    /* 브랜드 서명. 본문 고딕이 아니라 명조로 써서 약관 문구와 구분한다. */
-    .foot-brand { display: flex; flex-direction: column; gap: 10px; }
-    .foot-slogan {
-      font-family: var(--serif); font-weight: 300;
-      font-size: 14px; line-height: 1.5; letter-spacing: -0.01em;
-      color: rgba(254,250,224,0.55); white-space: nowrap;
-    }
-    .foot-disc { font-size: 12px; color: rgba(254,250,224,0.58); line-height: 1.75; }
-    .foot-disc p + p { margin-top: 6px; }
-
-    /* ── CASES ── */
-    /* 섹션 설명 한 줄. 히어로 보조문(.hero-sub)과 같은 결이지만
-       밑줄 표시의 뜻을 여기서 알려주므로 본문색으로 조금 더 세운다. */
-    .cases-lead {
-      font-size: 15px; line-height: 1.8; color: var(--muted);
-      max-width: 560px; margin: -32px 0 72px;
-    }
-    .cases-lead .kept { color: var(--fg); }
-
-    .case-list { list-style: none; }
-    /* 사례 사이는 문제 목록과 같은 블러시 선. 섹션 구분선(--divider)보다 진하고
-       nav 테두리(--border)보다 옅은 층이다. */
-    .case {
-      display: grid; grid-template-columns: 5fr 7fr;
-      gap: 64px; align-items: start;
-      padding: 72px 0; border-top: 1px solid var(--rule);
-    }
-    .case:first-child { padding-top: 0; border-top: none; }
-
-    /* 사진은 원래 비율 그대로 둔다. 셀카(가로)와 소품 사진(세로)을
-       같은 틀로 자르면 모자 사례의 두 사람이 잘려 나간다. */
-    .case-photo img {
-      display: block; width: 100%; height: auto;
-      max-height: 560px; object-fit: cover;
-    }
-
-    /* 상품명과 가격은 본문 밖 정보다 (엔진 v1.3: product_card). */
-    .case-card {
-      display: flex; flex-wrap: wrap; align-items: baseline;
-      gap: 4px 16px; margin-bottom: 32px;
-    }
-    .case-name { font-size: 15px; font-weight: 500; color: var(--fg); }
-    .case-price { font-size: 13.5px; color: var(--muted); }
-
-    /* Before: 사장님이 쓴 그대로. 한 번 읽고 넘어가는 자리라
-       바탕면(--surface) 위에 작게 둔다. 반말·띄어쓰기도 손대지 않는다. */
-    .case-label {
-      font-size: 12.5px; font-weight: 500; color: var(--muted);
-      margin-bottom: 10px;
-    }
-    .case-memo {
-      background: var(--surface);
-      padding: 20px 24px;
-      font-size: 14px; line-height: 1.85; color: var(--fg);
-    }
-    .case-memo + .case-memo { margin-top: 8px; }
-    .case-memo-add { font-size: 13px; color: var(--muted); margin-bottom: 4px; }
-
-    /* 밑줄 = 레피가 버리지 않고 결과에 살려 쓴 사장님의 말.
-       이 섹션에서 유일하게 색을 쓰는 곳이다. 오커 글자는 크림 위 3.9:1로
-       본문 기준에 못 미치므로 글자는 그대로 두고 밑줄에만 오커를 쓴다
-       (.test-notice a와 같은 방식). */
-    .kept {
-      text-decoration: underline;
-      text-decoration-color: var(--accent);
-      text-decoration-thickness: 2px;
-      text-underline-offset: 5px;
-      text-decoration-skip-ink: none;
-    }
-
-    /* After: 메모에서 한 칸 띄우고, 세로선 하나로 "여기부터 레피가 정리한 글"을
-       표시한다. 카드 상자를 하나 더 두르지 않는 것은 Before 상자와 무게를 겨루지
-       않게 하려는 것이다. */
-    .case-result {
-      margin-top: 36px; padding-left: 24px;
-      border-left: 1px solid var(--fg);
-    }
-    .case-result .case-label { color: var(--fg); }
-    /* 헤드라인은 섹션 제목(.sh)과 같은 명조·300. 글 전체에서 가장 큰 돌이다.
-       줄은 쉼표에서 <br>로 직접 끊는다. balance에 맡기면 "바람 / 부는"처럼
-       구가 갈라진다 — 페이지의 다른 <br> 요소와 같은 규칙이다. */
-    .case-headline {
-      font-family: var(--serif);
-      font-size: clamp(21px, 2.3vw, 27px);
-      font-weight: 300; line-height: 1.45;
-      letter-spacing: -0.01em; color: var(--fg);
-      margin-bottom: 22px;
-    }
-    .case-body p {
-      font-size: 15px; line-height: 1.85; color: var(--fg);
-      text-wrap: pretty;
-    }
-    .case-body p + p { margin-top: 14px; }
-
-    .cases-foot {
-      margin-top: 16px; padding-top: 48px;
-      border-top: 1px solid var(--rule);
-      display: flex; flex-wrap: wrap; justify-content: space-between;
-      align-items: center; gap: 32px;
-    }
-    .cases-disc {
-      font-size: 12.5px; line-height: 1.75; color: var(--muted);
-      max-width: 520px; text-wrap: pretty;
-    }
-
-    @media (max-width: 900px) {
-      .case { grid-template-columns: 1fr; gap: 36px; }
-      .case-photo img { max-height: 480px; }
-      .cases-lead { margin-bottom: 56px; }
-    }
-    @media (max-width: 600px) {
-      .case { padding: 56px 0; }
-      .cases-lead { margin-top: -24px; margin-bottom: 48px; }
-      .case-memo { padding: 16px 18px; }
-      .case-result { padding-left: 18px; }
-    }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 900px) {
-      .hero-grid { grid-template-columns: 1fr; gap: 48px; }
-      /* 사례 미리보기는 좁은 화면에서도 숨기지 않는다. 첫 화면에서 결과를
-         보여주려고 둔 칸이라, 1열에서는 버튼 아래로 내려온다. */
-      /* 터치 기기엔 호버가 없다 — 접힌 설명문에 닿을 방법이 사라지므로
-         가로 확장을 버리고 전부 펼친 격자로 되돌린다. */
-      .feat-row { display: grid; grid-template-columns: 1fr 1fr; column-gap: 36px; row-gap: 40px; }
-      .feat-item { flex: none; padding-right: 0; }
-      /* 선은 마주보는 자리에만 — 가로 한 줄일 때와 같은 규칙이다.
-         2열에서는 왼쪽 열(1·3·5)이 전부 바깥 모서리라 선을 빼고
-         섹션 제목과 왼쪽 끝을 맞춘다. 첫 항목에만 빼두면
-         3·5번에는 선이 있어 왼쪽 열이 저 혼자 어긋나 보인다. */
-      .feat-item:nth-child(odd) { border-left: none; padding-left: 0; }
-      .feat-row:hover .feat-item, .feat-row:focus-within .feat-item,
-      .feat-item:hover, .feat-item:focus-within { flex-grow: 0; }
-      .feat-body, .feat-item:hover .feat-body { grid-template-rows: 1fr; }
-      .cta-grid { grid-template-columns: 1fr; gap: 48px; }
-      .foot-inner { flex-direction: column; gap: 20px; }
-      /* 문제·해결의 번호칸을 좁은 화면에서 따로 손보던 규칙은 걷어냈다.
-         아이콘 칸이 사라지면서 기본 격자가 두 섹션 모두 48px 1fr로 같아져,
-         여기서 다시 잡아줄 것이 없다. */
-    }
-    @media (max-width: 600px) {
-      .container { padding: 0 20px; }
-      section { padding: 80px 0; }
-      #hero { min-height: auto; padding: 60px 0; }
-      /* 1열에서는 본문 폭(기기 폭 − 40px)에 비례시킨다. 8.46em 줄이
-         320px 기기(본문 280px)에서 30.7px로 여유 있게 들어가고, 600px에서 48px이다. */
-      .hero-h1 { font-size: clamp(30px, 9.6vw, 48px); }
-      /* 섹션 제목은 <br>로 줄을 잡아둬서 자동 줄바꿈에 맡길 수 없다.
-         대신 폭에 따라 글자가 줄어들게 해서, 잡아둔 두 줄이 좁은 화면에서도
-         그대로 유지되게 한다. 가장 긴 줄 "전하고 싶은 의미는 그대로,"가
-         29px에서 333.5px인데 375px 기기의 본문 폭이 335px이라 여유가 1.5px뿐이고
-         360px에서는 14px 넘친다. 넘치면 "그대로,"만 홀로 떨어져 세 줄이 된다.
-         웹폰트가 뜨기 전 대체 글꼴에서는 375px에서도 넘쳐 줄이 한 번 출렁인다.
-         7.3vw면 320px까지 두 줄이 버틴다. 397px 이상에서는 종전과 같은 29px. */
-      .sh { font-size: clamp(23px, 7.3vw, 29px); }
-      /* 히어로·CTA의 보조 문장은 <br>를 그대로 둔다.
-         한때 이 줄들을 풀어 브라우저에 맡긴 적이 있는데, 360px에서 끝 단어가
-         홀로 떨어지는 것을 막으려던 것이었다. 그런데 그 대가로 402px(아이폰 16 프로)
-         에서 "…충분해요. 레피가 어떻게 / 다듬는지, …"처럼 문장 한가운데가 잘렸다.
-         잡아둔 줄은 문장과 문장 사이라 어디서 끊겨도 읽히지만, 자동 줄바꿈은
-         문장 경계를 모른다. 흔한 폭에서 멀쩡하던 것을 좁은 폭 때문에 깨뜨리는
-         맞바꿈이라 되돌렸다. */
-      .feat-row { grid-template-columns: 1fr; row-gap: 34px; }
-      /* 1열에서는 다섯 다 바깥 모서리다. 마주보는 카드가 없으니 선도 없다 —
-         항목 사이는 row-gap 34px가 이미 갈라준다. 좁은 화면에서
-         들여쓰기 24px를 걷어내면 본문 한 줄에 들어가는 글자도 늘어난다. */
-      .feat-item { border-left: none; padding-left: 0; }
-      .feat-photo { margin-bottom: 40px; }
-      /* 번호를 제목 위로 올리고 본문 들여쓰기를 없앤다. 매달린 들여쓰기는
-         번호칸 48px에 간격 32px까지 80px을 본문에서 떼어가는데, 본문 폭이
-         335px(375px 기기)뿐인 자리에서 그 80px은 한 줄에 들어가는 글자를
-         다섯 자 남짓 줄인다. keep-all로 띄어쓰기에서만 끊는 터라 칸이 좁을수록
-         줄 끝이 들쭉날쭉해지기도 한다. 게다가 같은 화면을 이어 내려갈 때
-         특징 항목은 제목 선에 맞아 있어 문제·해결만 혼자 밀려 보였다.
-         번호는 위로 올려도 순서를 읽는 데 지장이 없다. */
-      .prob-row, .sol-step { grid-template-columns: 1fr; gap: 10px; }
-      /* 나란히 놓였을 때 11px 번호를 17px 제목의 중심에 맞추려던 값이다.
-         위아래로 서면 두 줄 사이만 벌리므로 뺀다. */
-      .prob-n, .sol-n { padding-top: 0; }
-      .prob-callout { margin-top: 48px; }
-      .faq-btn { grid-template-columns: 36px 1fr 18px; gap: 14px; }
-      .faq-body-inner { padding-left: 50px; }
-      nav .nav-link { display: none; }
-    }
-  </style>
+.pd-posted{position:absolute;inset:22px;background:var(--card);border-radius:10px;display:flex;flex-wrap:wrap;overflow:hidden;opacity:0;pointer-events:none;transition:opacity 500ms var(--ease);z-index:3}
+.pd-posted.pd-show{opacity:1;pointer-events:auto}
+.pd-posted .pd-photo img{min-height:200px}
+.pd-postcol{flex:1 1 240px;min-width:0;display:flex;flex-direction:column;gap:8px;padding:14px 16px;border-left:1px solid var(--rule);overflow-y:auto;max-height:100%;box-sizing:border-box}
+.pd-comments{list-style:none;margin:6px 0 0;padding:10px 0 0;border-top:1px solid var(--rule);display:flex;flex-direction:column;gap:8px}
+.pd-comments li{font-size:13px;line-height:1.6;transition:opacity 500ms var(--ease),transform 500ms var(--ease)}
+.pd-comments li b{font-weight:500;margin-right:6px}
+.pd-comments li.pd-reply{padding-left:18px;color:var(--muted)}
+.pd-comments li.pd-reply b{color:var(--fg)}
+.pd-heart{width:24px;height:24px;display:block}
+.pd-heart path{fill:transparent;stroke:var(--fg);stroke-width:1.6;transition:fill 250ms ease,stroke 250ms ease}
+.pd-liked .pd-heart path{fill:var(--accent);stroke:var(--accent)}
+.pd-liked .pd-heart{animation:pdPop 520ms cubic-bezier(.34,1.56,.64,1)}
+@keyframes pdPop{40%{transform:scale(1.35)}}
+.pd-likes{font-size:14px;font-weight:500;font-variant-numeric:tabular-nums}
+.pd-postcap{font-size:13px;line-height:1.7;margin:0}
+.pd-postcap b{font-weight:500;margin-right:6px}
+.pd-toast{position:absolute;left:50%;top:58px;transform:translate(-50%,-10px);background:var(--fg);color:var(--on);font-size:13px;padding:9px 16px;border-radius:999px;opacity:0;transition:opacity 400ms var(--ease),transform 500ms var(--ease);white-space:nowrap;z-index:7;pointer-events:none}
+.pd-toast.pd-show{opacity:1;transform:translate(-50%,0)}
+.pd-guide{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;min-height:44px}
+.pd-guide p{margin:0;font-size:14px;color:var(--fg);display:flex;gap:10px;align-items:baseline}
+.pd-guide b{font-family:var(--serif);font-weight:400;color:var(--accent)}
+.pd-text{font:inherit;font-size:13px;background:none;border:0;color:var(--muted);text-decoration:underline;text-underline-offset:4px;cursor:pointer;padding:10px 4px;min-height:44px}
+@media (max-width:640px){.pd-web{padding:12px;min-height:0}.pd-posted{inset:12px}.pd-capcol,.pd-postcol{border-left:0;border-top:1px solid var(--rule)}.pd-panel{width:88%}}
+@media (prefers-reduced-motion:reduce){.pd-root *,.pd-root *::before,.pd-root *::after{transition-duration:1ms!important;transition-delay:0ms!important;animation:none!important}}
+</style>
 </head>
 <body>
-
-<!-- 키보드 사용자가 nav를 건너뛰고 본문으로 바로 갈 수 있게 한다.
-     평소엔 화면 밖에 있다가 탭 포커스를 받으면 나타난다. -->
-<a href="#hero" class="skip-link">본문으로 건너뛰기</a>
-
-<!-- NAV -->
-<nav>
-  <div class="container">
-    <div class="logo">Lepi<span class="logo-dot">.</span></div>
-    <div class="nav-right">
-      <a href="#faq" class="nav-link">FAQ</a>
-      <a href="#cta" class="nav-cta">무료 베타 신청</a>
-    </div>
-  </div>
-</nav>
-
-<main>
-
-<!-- HERO -->
-<section id="hero">
-  <div class="container">
-    <div class="hero-grid">
-      <div>
-        <div class="hero-badge">
-          <span class="badge-rule"></span>
-          무료 베타 운영 중
-        </div>
-        <h1 class="hero-h1">
-          <em>물건은 흔해도,</em>
-          <em>고른 이유는 저마다.</em>
-        </h1>
-        <!-- 줄바꿈을 의미 단위로 고정한다. 자동 줄바꿈에 맡기면
-             "이야기를 / 입혀드려요"처럼 구가 갈라진다. -->
-        <p class="hero-promise">그 이유를 담아,<br><b>레피가 상품에 이야기를 입혀드려요.</b></p>
-        <p class="hero-sub">
-          없는 이야기는 만들지 않아요.<br>
-          내용은 사장님 메모에서, 표현은 더 선명하게.
-        </p>
-        <!-- 신청 버튼은 여기 두지 않는다. nav가 sticky라 "무료 베타 신청"이
-             모든 폭에서 오른쪽 위에 상시 떠 있고(600px 이하에서 숨는 건 FAQ뿐),
-             체험 결과 직후의 안내와 하단 폼까지 신청 경로가 이미 셋이다.
-             히어로에서는 행동을 하나로 둔다 — 나란히 놓인 원형 버튼 둘은
-             테두리 색 1px 차이뿐이라 위계도 만들지 못했다. -->
-        <div class="hero-btns">
-          <a href="#test" class="arr-btn">
-            <div class="arr-circle">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
-            </div>
-            <span class="arr-label">내 메모로 테스트</span>
-          </a>
-        </div>
-      </div>
-      <!-- 첫 화면에서 설명보다 결과를 먼저 보여준다. 사례 섹션의 밀짚모자를
-           메모와 헤드라인만 남겨 줄인 것이다. 사례 섹션이 바로 아래라 같은
-           사례가 연달아 보이지 않도록, 사례 목록에서는 밀짚모자를 맨 끝에 둔다. 밑줄(.kept)은 뜻을 풀어주는
-           사례 섹션 도입문이 여기엔 없어 링크처럼 보이므로 빼둔다. -->
-      <div class="hero-right">
-        <figure class="hero-case-photo">
-          <img src="images/case-straw-hat.jpg" width="1400" height="1050"
-               alt="밀짚모자를 쓴 두 사람이 강과 산이 내려다보이는 전망대에서 웃으며 찍은 셀카">
-        </figure>
-        <p class="case-label">사장님 메모 · 밀짚모자</p>
-        <p class="case-memo">못생긴 밀짚모자인데 철원 주상절리입장료내면 한사람당 5천원 상품권주는데 그걸 이용하면 주변상점에서 살수 있거든 너무 햇볕이 뜨거워서 어쩔수 없이 샀는데 국내 여행갈때마다 필요할때 들고갔더니 추억템이 됐어</p>
-        <div class="case-result">
-          <p class="case-label">레피가 정리한 글</p>
-          <p class="case-headline">예쁘진 않아도,<br>여행마다 따라다니면 추억이&nbsp;되는&nbsp;모자.</p>
-        </div>
-        <a href="#cases" class="hero-case-more">사례 네 가지 더 보기 ↓</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CASES -->
-<section id="cases">
-  <div class="container">
-    <div class="sl">
-      <div class="sl-line"></div>
-      <span class="sl-text">사례</span>
-    </div>
-    <h2 class="sh">메모 몇 줄이,<br>올릴 수 있는 글이 됐어요.</h2>
-    <p class="cases-lead">
-      메모에서 이야기를 찾고, 그중 가장 사장님다운 한마디를 앞에 세워요.<br>
-      <span class="kept">밑줄</span>은 레피가 메모에서 찾아 글에 쓴 재료예요.
-    </p>
-
-    <ol class="case-list">
-
-      <!-- 1. 선운사 소원의 종 -->
-      <li class="case">
-        <figure class="case-photo">
-          <img src="images/case-seonunsa-bell.jpg" width="1050" height="1400" loading="lazy"
-               alt="선운사 소원나무에 걸린 색색의 작은 도자기 종과 소원을 적은 나무 패">
-        </figure>
-        <div>
-          <div class="case-card">
-            <span class="case-name">선운사 소원의 종</span>
-            <span class="case-price">10,000원</span>
-          </div>
-          <p class="case-label">사장님 메모</p>
-          <p class="case-memo">선운사 종은 만원인데 소원나무에 저렇게 대부분 <span class="kept">가족의 건강과 성공을 기원하는</span> 거라 나도 시댁어른이랑 남편이랑 <span class="kept">간 김에</span> 구매했어. 사서 <span class="kept">몸에 지니지 않더라도</span> 저렇게 바람에 <span class="kept">풍경처럼 흔들리면서</span> <span class="kept">촤르르</span> 소리나니까 <span class="kept">마음이 평안해지면서 꼭 소원이 이루어진것 같더라</span></p>
-          <div class="case-result">
-            <p class="case-label">레피가 정리한 글</p>
-            <p class="case-headline">빌고 지나간 소원을,<br>바람 부는 자리에 오래 남겨두는 종.</p>
-            <div class="case-body">
-              <p>촤르르.<br>바람이 불 때마다 풍경처럼 흔들리며 나는 소리입니다.</p>
-              <p>선운사 소원나무에는 이런 종이 가득 걸려 있습니다. 대부분 가족의 건강과 성공을 비는 소원이에요. 꼭 몸에 지니지 않아도 괜찮습니다.</p>
-              <p>저는 그 소리를 듣고 있으면 마음이 평안해지고, 꼭 소원이 이루어진 것 같습니다.</p>
-              <p>가족과 함께 오신 김에, 하나 걸어두고 가세요.</p>
-            </div>
-          </div>
-        </div>
-      </li>
-
-      <!-- 2. 잉어킹 액막이 -->
-      <li class="case">
-        <figure class="case-photo">
-          <img src="images/case-magikarp.jpg" width="480" height="600" loading="lazy"
-               alt="팝업 매장 천장에 밧줄로 매달린 빨간 잉어킹 액막이 장식">
-        </figure>
-        <div>
-          <div class="case-card">
-            <span class="case-name">잉어킹 액막이</span>
-            <span class="case-price">가챠 1회 10,000원</span>
-          </div>
-          <p class="case-label">사장님 메모</p>
-          <p class="case-memo">남편이랑 포켓몬팝업이 있다고 해서 놀러갔더니 잉어킹액막이가 있더라고 그런데 <span class="kept">가챠로밖에</span> 안팔아서 <span class="kept">만원이라는 큰 금액</span>이어도 <span class="kept">한번 도전해</span>봤더니 성공해서 한번에 뽑았어 몇달뒤에 <span class="kept">이사 예정이어서 가지고 싶었는데</span> 좋은 추억이었어</p>
-          <div class="case-memo">
-            <p class="case-memo-add">결과를 보고 덧붙인 말</p>
-            <p><span class="kept">별일 없이 잘 지나가자는 마음을 걸어두는 작은 액막이</span> 이런 글귀도 있으면 좋지</p>
-          </div>
-          <div class="case-result">
-            <p class="case-label">레피가 정리한 글</p>
-            <p class="case-headline">별일 없이 잘 지나가자는<br>마음을 걸어두는 작은 액막이.</p>
-            <div class="case-body">
-              <p>이사를 앞두고 있다면, 이런 거 하나쯤 갖고 싶어집니다.</p>
-              <p>잉어킹 액막이는 가챠로만 만날 수 있습니다. 한&nbsp;번에 만 원이라, 가볍게 돌리긴 어려운 금액이죠. 그래도 새집에 들어가기 전이라면, 한 번쯤 도전해볼 만합니다.</p>
-            </div>
-          </div>
-        </div>
-      </li>
-
-      <!-- 3. 닉스고 인형 키링 -->
-      <li class="case">
-        <figure class="case-photo">
-          <img src="images/case-knicksgo.jpg" width="1050" height="1400" loading="lazy"
-               alt="보라색 굴레와 10번 안장을 두른 회색 닉스고 말 인형 키링과 한국마사회 상자">
-        </figure>
-        <div>
-          <div class="case-card">
-            <span class="case-name">닉스고 인형 키링</span>
-            <span class="case-price">8,000원</span>
-          </div>
-          <p class="case-label">사장님 메모</p>
-          <p class="case-memo">저는 <span class="kept">현역 시절</span> 닉스고를 <span class="kept">응원했</span>습니다. <span class="kept">세계적인 무대에서 좋은 성적을 거두던 한국마사회 소유의 말</span>이라는 점도 특별하게 느껴졌고요. 지금은 경주에서 은퇴해 <span class="kept">씨수말</span>로 지내고 있지만, 마사회 공식 굿즈에서 실제 닉스고의 외형을 본떠 만든 인형을 발견했습니다. 여러 마사회 굿즈 중에서도 <span class="kept">가장 실제 말처럼 생겼고, 무엇보다 귀여웠</span>습니다. 가격은 8천 원. 그래서 하나 <span class="kept">데려</span>왔습니다.</p>
-          <div class="case-result">
-            <p class="case-label">레피가 정리한 글</p>
-            <p class="case-headline">응원하던 말의 경주는 끝나도,<br>그때의 기억은 곁에 둘 수 있으니까.</p>
-            <div class="case-body">
-              <p>세계적인 무대에서 좋은 성적을 거두던 한국마사회 소유의 말, 닉스고.<br>저도 현역 시절 응원했던 말입니다.</p>
-              <p>지금은 경주장을 떠나 씨수말로 지내고 있지만, 그 모습을 본뜬 인형이 마사회 공식 굿즈로 나와 있습니다. 여러 굿즈 중에서도 가장 실제 말처럼 생겼고, 무엇보다 귀엽습니다.</p>
-              <p>그 시절을 기억하는 분이라면, 하나 데려가셔도 좋겠습니다.</p>
-            </div>
-          </div>
-        </div>
-      </li>
-
-      <!-- 4. 밀짚모자 -->
-      <li class="case">
-        <figure class="case-photo">
-          <img src="images/case-straw-hat.jpg" width="1400" height="1050" loading="lazy"
-               alt="밀짚모자를 쓴 두 사람이 강과 산이 내려다보이는 전망대에서 웃으며 찍은 셀카">
-        </figure>
-        <div>
-          <div class="case-card">
-            <span class="case-name">밀짚모자</span>
-            <span class="case-price">철원 주상절리 입장 상품권으로 구매</span>
-          </div>
-          <p class="case-label">사장님 메모</p>
-          <p class="case-memo"><span class="kept">못생긴</span> 밀짚모자인데 철원 주상절리입장료내면 한사람당 <span class="kept">5천원 상품권</span>주는데 그걸 이용하면 주변상점에서 살수 있거든 <span class="kept">너무 햇볕이 뜨거워서 어쩔수 없이</span> 샀는데 <span class="kept">국내 여행갈때마다 필요할때 들고갔더니</span> <span class="kept">추억템</span>이 됐어</p>
-          <div class="case-result">
-            <p class="case-label">레피가 정리한 글</p>
-            <p class="case-headline">예쁘진 않아도,<br>여행마다 따라다니면 추억이&nbsp;되는&nbsp;모자.</p>
-            <div class="case-body">
-              <p>솔직히 말하면, 못생긴 모자입니다.</p>
-              <p>그런데 철원 주상절리에서 햇볕이 너무 뜨거운 날엔 어쩔 수 없이 이 모자를 찾게 됩니다. 입장료를 내면 받는 5천 원 상품권으로 살 수 있거든요.</p>
-              <p>저는 그 뒤로 국내 여행 갈 때마다 필요할 때면 이 모자를 들고 다녔습니다. 그러다 보니 추억템이 됐어요.</p>
-            </div>
-          </div>
-        </div>
-      </li>
-
-    </ol>
-
-    <div class="cases-foot">
-      <p class="cases-disc">
-        위 글은 실제 구매 경험을 바탕으로, 판매하는 입장이 되어 정리한 시연 예시예요.
-        제조사나 판매처의 공식 문구가 아니에요.
-      </p>
-      <a href="#test" class="arr-btn">
-        <div class="arr-circle">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
-        </div>
-        <span class="arr-label">내 메모로 테스트</span>
-      </a>
-    </div>
-  </div>
-</section>
-
-<!-- LEPI TEST -->
-<!-- 이 섹션이 페이지 뒤쪽에 있는 것은 의도된 배치다.
-     앞으로 옮기면 전환율에는 유리하지만 남용이 늘어난다 —
-     변환 한 번이 곧 OpenAI 비용이라 스크롤 마찰을 일부러 남겨둔다.
-     "데모가 너무 뒤에 있다"는 지적으로 위치를 바꾸지 말 것. -->
-<section id="test">
-  <div class="container">
-    <div class="sl">
-      <div class="sl-line"></div>
-      <span class="sl-text">직접 체험</span>
-    </div>
-    <h2 class="sh">내 메모로<br>직접 테스트해보세요.</h2>
-    <p class="test-desc">
-      상품 메모를 적어주세요. 그 안의 이야기를 찾아 상품 글로 정리해드려요.<br>
-      메모에 있는 이야기로만 쓰니까, 이 상품을 고른 이유나 있었던 일을 한두 줄 꼭 넣어주세요.
-    </p>
-    <!-- 주소에 ?test를 붙였을 때만 보인다. 구매자로 쓴 메모를
-         판매자 글로 바꿔 보는 내부 확인용이라 방문자에게는 숨긴다. -->
-    <p id="test-mode-note" class="test-notice" hidden>
-      테스트 모드 · 산 사람이 쓴 메모를 판매자 글로 바꿔요. 횟수 제한이 없어요.
-    </p>
-
-    <div class="test-form">
-      <label class="test-label" for="original-text">원문</label>
-
-      <textarea
-        id="original-text"
-        class="test-textarea"
-        placeholder="예: 못생긴 밀짚모자인데, 햇볕이 너무 뜨거워서 어쩔 수 없이 샀어요. 그 뒤로 여행 갈 때마다 들고 다녔더니 추억템이 됐어요."
-        rows="8"
-        maxlength="500"
-      ></textarea>
-
-      <button id="refine-button" type="button" class="arr-btn">
-        <div class="arr-circle">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
-        </div>
-        <span class="arr-label" id="refine-label">이야기 입히기</span>
-      </button>
-    </div>
-
-    <!-- 라벨을 상자 밖에 둔다. 안에 두면 패딩 32px만큼 밀려서
-         위쪽 "원문" 라벨과 왼쪽 끝이 어긋난다. -->
-    <!-- 결과는 사례 섹션과 같은 모양(상품 카드 · 헤드라인 · 본문)으로 보여준다.
-         위 사례와 나란히 비교되는 자리라 같은 클래스를 그대로 쓴다.
-         되묻는 질문(NEED_MORE_INFO)과 안내(NO_STORY_FOUND)도 이 상자에 뜬다. -->
-    <div id="result-area" class="test-result-wrap" hidden>
-      <div id="result-label" class="test-label test-label-strong">레피가 입힌 이야기</div>
-      <div class="test-result">
-        <div id="result-card" class="case-card" hidden>
-          <span id="result-name" class="case-name"></span>
-          <span id="result-price" class="case-price"></span>
-        </div>
-        <p id="result-headline" class="case-headline" hidden></p>
-        <div id="result-body" class="case-body" hidden></div>
-        <ol id="result-questions" class="test-questions" hidden></ol>
-        <p id="result-hint" class="test-result-text" hidden></p>
-      </div>
-    </div>
-
-    <p id="error-message" class="test-error" hidden></p>
-
-    <!-- 체험은 한 번만. 결과를 본 직후가 신청으로 넘어갈 가장 좋은 순간이라
-         막다른 안내로 두지 않고 신청 폼으로 가는 링크를 붙인다. -->
-    <p id="test-notice" class="test-notice" hidden>
-      레피를 더 이용하고 싶으시면 <a href="#cta">베타 참여를 신청해 주세요</a>.
-    </p>
-  </div>
-</section>
-
-<!-- PROBLEM -->
-<section id="problem">
-  <div class="container">
-    <div class="sl">
-      <div class="sl-line"></div>
-      <span class="sl-text">문제</span>
-    </div>
-    <h2 class="sh">설명은 했는데,<br>왜 사야 하는지가 없어요.</h2>
-    <div class="prob-list">
-      <div class="prob-row">
-        <div class="prob-n">01</div>
-        <div>
-          <div class="prob-title">쓰다 보면 설명서가 돼요</div>
-          <div class="prob-desc">상품명, 가격, 크기. 사실만 적다 보면 흔한 물건처럼 보여요.</div>
-        </div>
-      </div>
-      <div class="prob-row">
-        <div class="prob-n">02</div>
-        <div>
-          <div class="prob-title">좋은 이유는 말로 꺼내기 어려워요</div>
-          <div class="prob-desc">왜 좋은지는 아는데, 막상 글로 옮기면 뻔한 말이 돼요.</div>
-        </div>
-      </div>
-      <div class="prob-row">
-        <div class="prob-n">03</div>
-        <div>
-          <div class="prob-title">AI에 맡기면 광고가 돼요</div>
-          <div class="prob-desc">'특별한 순간', '작은 행복'. 내 가게 말투가 아닌 문장이 돌아와요.</div>
-        </div>
-      </div>
-      <div class="prob-row">
-        <div class="prob-n">04</div>
-        <div>
-          <div class="prob-title">없는 이야기가 끼어들어요</div>
-          <div class="prob-desc">하지 않은 약속, 없는 효능까지. 다시 읽고 지우는 몫이 남아요.</div>
-        </div>
-      </div>
-      <div class="prob-row">
-        <div class="prob-n">05</div>
-        <div>
-          <div class="prob-title">결국 가격만 남은 글이 올라가요</div>
-          <div class="prob-desc">이유는 빠지고, 상품명과 가격만 적힌 글이 올라가요.</div>
-        </div>
-      </div>
-    </div>
-    <!-- 의미 단위로 세 줄로 끊는다. 두 줄로 두면 가운데 긴 구절이
-         한쪽에 몰려 한 줄이 다른 줄의 두 배 가까이 길어진다. -->
-    <div class="prob-callout">
-      물건이 평범해서가 아니에요.<br>
-      손님이 그걸 왜 자기 것으로 만드는지,<br>
-      그 <strong>한 문장</strong>이 빠져 있을 뿐이에요.
-    </div>
-  </div>
-</section>
-
-<!-- SOLUTION -->
-<section id="solution">
-  <div class="container">
-    <div class="sl">
-      <div class="sl-line"></div>
-      <span class="sl-text">해결</span>
-    </div>
-    <h2 class="sh">전하고 싶은 의미는 그대로,<br>표현은 더 선명하게.</h2>
-    <div class="sol-steps">
-      <div class="sol-step">
-        <div class="sol-n">01</div>
-        <div>
-          <div class="sol-title">메모를 그대로 가져와요</div>
-          <p class="sol-desc">상품 사진 한 장, 대충 적은 메모 몇 줄이면 돼요. 잘 쓰지 않아도 괜찮아요.</p>
-        </div>
-      </div>
-      <div class="sol-step">
-        <div class="sol-n">02</div>
-        <div>
-          <div class="sol-title">레피가 이야기를 입혀요</div>
-          <p class="sol-desc">메모 속 사실과 경험에서 출발해요. 없는 이야기는 보태지 않고, 모자라면 되물어요.</p>
-        </div>
-      </div>
-      <div class="sol-step">
-        <div class="sol-n">03</div>
-        <div>
-          <div class="sol-title">사장님 말로 정리해요</div>
-          <p class="sol-desc">헤드라인 한 문장과 본문으로. '못생긴' 같은 사장님 말은 광고 문구로 바꾸지 않아요.</p>
-        </div>
-      </div>
-      <div class="sol-step">
-        <div class="sol-n">04</div>
-        <div>
-          <div class="sol-title">마지막은 언제나 당신이 정해요</div>
-          <p class="sol-desc">올리기 전에 내용은 직접 확인해주세요. 레피는 결정을 대신하지 않아요.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- FEATURES -->
-<section id="features">
-  <div class="container">
-    <div class="sl">
-      <div class="sl-line"></div>
-      <span class="sl-text">특징</span>
-    </div>
-    <h2 class="sh">기능을 자랑하기보다,<br>당신의 하루에 맞췄어요.</h2>
-
-    <!-- 실사 사진 자리. 아래 주석을 풀고 src·alt를 채우면 된다.
-         가로로 넓은 사진이 아래 항목 행과 폭이 맞는다. alt는 반드시 채울 것.
-    <figure class="feat-photo">
-      <img src="파일명.jpg" alt="사진에 무엇이 담겼는지 설명하는 문장" />
-    </figure>
-    -->
-
-    <!-- tabindex는 키보드로도 펼칠 수 있게 하려고 넣었다.
-         마우스가 없는 환경에서 설명문에 닿을 방법이 이것뿐이다. -->
-    <div class="feat-row">
-      <div class="feat-item" tabindex="0">
-        <h3 class="feat-title">게시 전 문장 정리</h3>
-        <div class="feat-body"><p class="feat-desc">거칠게 쓴 초안이나 메모를 SNS에 올릴 수 있는 문장으로 다듬어요.</p></div>
-      </div>
-      <div class="feat-item" tabindex="0">
-        <h3 class="feat-title">핵심 정보 유지</h3>
-        <div class="feat-body"><p class="feat-desc">가격, 날짜, 메뉴명, 구성, 예약 조건처럼 틀리면 안 되는 정보는 적어주신 그대로 지켜요.</p></div>
-      </div>
-      <div class="feat-item" tabindex="0">
-        <h3 class="feat-title">프롬프트 없는 실행</h3>
-        <div class="feat-body"><p class="feat-desc">"과하지 않게", "우리 가게 톤으로" — 매번 같은 부탁을 길게 쓰지 않아도 돼요.</p></div>
-      </div>
-      <div class="feat-item" tabindex="0">
-        <h3 class="feat-title">작업 흐름 안에서 사용</h3>
-        <div class="feat-body"><p class="feat-desc">창을 옮겨 다니지 않아도 돼요. 글을 넣고 결과를 보는 흐름이 한 곳에서 이어져요.</p></div>
-      </div>
-      <div class="feat-item" tabindex="0">
-        <h3 class="feat-title">음성으로 남기기</h3>
-        <span class="feat-tag tag-next">정식 출시 예정</span>
-        <div class="feat-body"><p class="feat-desc">손이 바쁠 땐 말로 남겨두세요. 나중에 올릴 글로 정리해드려요.</p></div>
-      </div>
-    </div>
-    <!-- 아직 시점이 없는 기능은 카드로 두지 않는다. 되는 것과 나란히 놓으면
-         지금 쓸 수 있는 기능으로 오해된다. -->
-    <p class="feat-later">
-      <span class="feat-tag tag-soon">고도화 예정</span>
-      <span><b>브랜드 톤 프로필</b> — 레피를 사용하면서 사장님만의 말투와 표현을 쌓아가요.</span>
-    </p>
-  </div>
-</section>
-
-<!-- FAQ -->
-<section id="faq">
-  <div class="container">
-    <div class="sl">
-      <div class="sl-line"></div>
-      <span class="sl-text">FAQ</span>
-    </div>
-    <h2 class="sh" style="margin-bottom: 0;">혹시, 이런 게 궁금하셨나요?</h2>
-    <div class="faq-list" style="margin-top: 40px;">
-
-      <div class="faq-item">
-        <button class="faq-btn" aria-expanded="false">
-          <span class="faq-n">01</span>
-          <span class="faq-q-text">레피는 ChatGPT나 Gemini와 무엇이 다른가요?</span>
-          <svg class="faq-chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 8l5 5 5-5"/></svg>
-        </button>
-        <div class="faq-body">
-          <div class="faq-body-inner">ChatGPT나 Gemini도 문장을 바꿔줘요. 다만 매번 프롬프트를 직접 쓰고, 원하는 말투를 설명하고, 나온 결과가 괜찮은지 다시 판단해야 해요. 레피는 그 과정을 없앴어요. AI 사용법을 몰라도, 써두신 글을 넣으면 올릴 수 있는 문장으로 정리해드려요.</div>
-        </div>
-      </div>
-
-      <div class="faq-item">
-        <button class="faq-btn" aria-expanded="false">
-          <span class="faq-n">02</span>
-          <span class="faq-q-text">레피가 글을 대신 새로 써주나요?</span>
-          <svg class="faq-chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 8l5 5 5-5"/></svg>
-        </button>
-        <div class="faq-body">
-          <div class="faq-body-inner">아니에요. 레피는 없는 글을 지어내지 않아요. 이미 써두신 글이나 메모해둔 홍보 소재를 바탕으로, 표현과 흐름만 정리해드려요.</div>
-        </div>
-      </div>
-
-      <div class="faq-item">
-        <button class="faq-btn" aria-expanded="false">
-          <span class="faq-n">03</span>
-          <span class="faq-q-text">어떤 업종에 적합한가요?</span>
-          <svg class="faq-chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 8l5 5 5-5"/></svg>
-        </button>
-        <div class="faq-body">
-          <div class="faq-body-inner">공방, 핸드메이드, 디저트·카페, 온라인 셀러, 네일샵, 미용실, 꽃집처럼 SNS가 곧 손님을 만나는 창구인 작은 가게에 특히 잘 맞아요. SNS를 직접 하고 계신데 글 다듬는 게 부담스러우시다면, 업종과 상관없이 써보셔도 돼요.</div>
-        </div>
-      </div>
-
-      <div class="faq-item">
-        <button class="faq-btn" aria-expanded="false">
-          <span class="faq-n">04</span>
-          <span class="faq-q-text">무료인가요? 나중에 유료로 바뀌나요?</span>
-          <svg class="faq-chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 8l5 5 5-5"/></svg>
-        </button>
-        <div class="faq-body">
-          <div class="faq-body-inner">지금은 초기 무료 베타로 운영하고 있어요. 기본 정리 기능을 먼저 써보시고, 앞으로 말투 커스텀이나 업종별 양식 같은 기능이 더해질 예정이에요. 요금이 생긴다면 미리 알려드릴게요.</div>
-        </div>
-      </div>
-
-      <div class="faq-item">
-        <button class="faq-btn" aria-expanded="false">
-          <span class="faq-n">05</span>
-          <span class="faq-q-text">레피를 쓰면 매출이 늘어나나요?</span>
-          <svg class="faq-chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 8l5 5 5-5"/></svg>
-        </button>
-        <div class="faq-body">
-          <div class="faq-body-inner">늘어난다고 약속드릴 수는 없어요. 레피가 하는 일은 글 다듬는 부담을 덜어서, SNS를 더 자주 올릴 수 있게 돕는 것까지예요. 실제 매출이나 방문, 문의는 업종, 상품, 사진, 동네, 손님 반응에 따라 달라져요.</div>
-        </div>
-      </div>
-
-      <div class="faq-item">
-        <button class="faq-btn" aria-expanded="false">
-          <span class="faq-n">06</span>
-          <span class="faq-q-text">AI가 잘못된 정보를 만들지는 않나요?</span>
-          <svg class="faq-chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 8l5 5 5-5"/></svg>
-        </button>
-        <div class="faq-body">
-          <div class="faq-body-inner">가격, 날짜, 메뉴명, 이벤트 조건처럼 틀리면 안 되는 건 적어주신 그대로 지키도록 만들었어요. 다만 올리기 전에 사실 관계는 꼭 한 번 직접 확인해주세요.</div>
-        </div>
-      </div>
-
-      <div class="faq-item">
-        <button class="faq-btn" aria-expanded="false">
-          <span class="faq-n">07</span>
-          <span class="faq-q-text">내가 쓴 글이나 데이터는 어떻게 처리되나요?</span>
-          <svg class="faq-chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 8l5 5 5-5"/></svg>
-        </button>
-        <div class="faq-body">
-          <div class="faq-body-inner">베타 기간에는 원문, 정리 결과, 고치신 내용, 피드백을 미리 동의해주신 범위 안에서 서비스 개선과 사용성 검증에 활용할 수 있어요. 어떤 항목을 모으고 어떻게 다루는지는 베타 참여에 동의하실 때 구체적으로 안내드릴게요.</div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-<!-- CTA -->
-<section id="cta">
-  <div class="container">
-    <div class="sl">
-      <div class="sl-line"></div>
-      <span class="sl-text">무료 베타</span>
-    </div>
-    <div class="cta-grid">
-      <div>
-        <h2 class="cta-h">설명만 적어둔 상품,<br>레피에게 먼저 보여주세요.</h2>
-        <p class="cta-sub">상품 하나, 메모 몇 줄이면 충분해요.<br>레피가 어떤 이야기를 입히는지, 부담 없이 먼저 만나보세요.</p>
-      </div>
-      <form id="betaForm" onsubmit="handleSubmit(event)" novalidate>
-        <div class="fg">
-          <label class="fl">이름 또는 닉네임 <span class="req">*</span></label>
-          <input class="fi" type="text" name="name" placeholder="예: 지은 사장님" required />
-        </div>
-        <div class="fg">
-          <label class="fl">업종 <span class="req">*</span></label>
-          <select class="fs" name="category" required>
-            <option value="">업종을 선택해주세요</option>
-            <option value="cafe">카페·디저트</option>
-            <option value="craft">공방·핸드메이드</option>
-            <option value="nail">네일샵·미용실</option>
-            <option value="flower">꽃집</option>
-            <option value="online">온라인 셀러</option>
-            <option value="etc">기타 소규모 업장</option>
-          </select>
-        </div>
-        <div class="fg">
-          <label class="fl">운영 중인 SNS 채널</label>
-          <input class="fi" type="text" name="sns" placeholder="예: 인스타그램, 네이버 블로그" />
-        </div>
-        <div class="fg">
-          <label class="fl">연락 가능한 이메일 <span class="req">*</span></label>
-          <input class="fi" type="email" name="email" placeholder="example@email.com" required />
-        </div>
-        <div class="fg">
-          <label class="fl">최근 올리려다 멈춘 게시글</label>
-          <textarea class="ft" name="post" placeholder="있다면 간단히 적어주세요. (선택)"></textarea>
-        </div>
-        <div class="fc-wrap">
-          <input class="fc" type="checkbox" id="agree" name="agree" required />
-          <label class="fc-label" for="agree">
-            베타 테스트 참여에 동의합니다. 입력한 내용은 서비스 개선과 사용성 검증에 활용될 수 있습니다.
-            <!-- TODO: 개인정보 처리방침 및 베타 참여 동의 링크 연결 필요 -->
-          </label>
-        </div>
-        <button type="submit" class="submit-btn" id="submitBtn">
-          <div class="submit-circle">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
-          </div>
-          <span class="submit-label">무료 베타 신청하기</span>
-        </button>
-      </form>
-    </div>
-  </div>
-</section>
-
-</main>
-
-<!-- FOOTER -->
-<footer>
-  <div class="container">
-    <div class="foot-inner">
-      <div class="foot-brand">
-        <div class="foot-logo">Lepi<span>.</span></div>
-        <p class="foot-slogan">전하고 싶은 의미는 그대로,<br>표현은 더 선명하게.</p>
-      </div>
-      <div class="foot-disc">
-        <p>레피는 사용자가 입력한 내용을 바탕으로 SNS 게시글 표현을 정리하는 AI 카피라이터이며, 가격·일정·이벤트 조건 등 사실 정보와 최종 게시 여부는 사용자가 직접 확인해야 합니다.</p>
-        <p>베타 기간 중 수집되는 원문, 정리 결과, 수정본, 피드백은 사전 동의 범위 내에서 서비스 개선과 사용성 검증에 활용될 수 있습니다.</p>
-        <!-- TODO: 개인정보 처리방침 및 베타 참여 동의 링크 연결 필요 -->
-      </div>
-    </div>
-  </div>
-</footer>
-
+<div id="app"></div>
+<script>!function(e,n){"object"==typeof exports&&"undefined"!=typeof module?n(exports):"function"==typeof define&&define.amd?define(["exports"],n):n(e.htmPreact={})}(this,function(e){var n,_,t,o,r,u,l,i={},c=[],f=/acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera/i;function s(e,n){for(var _ in n)e[_]=n[_];return e}function a(e){var n=e.parentNode;n&&n.removeChild(e)}function p(e,_,t){var o,r,u,l={};for(u in _)"key"==u?o=_[u]:"ref"==u?r=_[u]:l[u]=_[u];if(arguments.length>2&&(l.children=arguments.length>3?n.call(arguments,2):t),"function"==typeof e&&null!=e.defaultProps)for(u in e.defaultProps)void 0===l[u]&&(l[u]=e.defaultProps[u]);return h(e,l,o,r,null)}function h(e,n,o,r,u){var l={type:e,props:n,key:o,ref:r,__k:null,__:null,__b:0,__e:null,__d:void 0,__c:null,__h:null,constructor:void 0,__v:null==u?++t:u};return null!=_.vnode&&_.vnode(l),l}function d(e){return e.children}function v(e,n){this.props=e,this.context=n}function y(e,n){if(null==n)return e.__?y(e.__,e.__.__k.indexOf(e)+1):null;for(var _;n<e.__k.length;n++)if(null!=(_=e.__k[n])&&null!=_.__e)return _.__e;return"function"==typeof e.type?y(e):null}function m(e){var n,_;if(null!=(e=e.__)&&null!=e.__c){for(e.__e=e.__c.base=null,n=0;n<e.__k.length;n++)if(null!=(_=e.__k[n])&&null!=_.__e){e.__e=e.__c.base=_.__e;break}return m(e)}}function g(e){(!e.__d&&(e.__d=!0)&&o.push(e)&&!k.__r++||u!==_.debounceRendering)&&((u=_.debounceRendering)||r)(k)}function k(){for(var e;k.__r=o.length;)e=o.sort(function(e,n){return e.__v.__b-n.__v.__b}),o=[],e.some(function(e){var n,_,t,o,r,u;e.__d&&(r=(o=(n=e).__v).__e,(u=n.__P)&&(_=[],(t=s({},o)).__v=o.__v+1,D(u,o,t,n.__n,void 0!==u.ownerSVGElement,null!=o.__h?[r]:null,_,null==r?y(o):r,o.__h),w(_,o),o.__e!=r&&m(o)))})}function b(e,n,_,t,o,r,u,l,f,s){var a,p,v,m,g,k,b,H=t&&t.__k||c,E=H.length;for(_.__k=[],a=0;a<n.length;a++)if(null!=(m=_.__k[a]=null==(m=n[a])||"boolean"==typeof m?null:"string"==typeof m||"number"==typeof m||"bigint"==typeof m?h(null,m,null,null,m):Array.isArray(m)?h(d,{children:m},null,null,null):m.__b>0?h(m.type,m.props,m.key,null,m.__v):m)){if(m.__=_,m.__b=_.__b+1,null===(v=H[a])||v&&m.key==v.key&&m.type===v.type)H[a]=void 0;else for(p=0;p<E;p++){if((v=H[p])&&m.key==v.key&&m.type===v.type){H[p]=void 0;break}v=null}D(e,m,v=v||i,o,r,u,l,f,s),g=m.__e,(p=m.ref)&&v.ref!=p&&(b||(b=[]),v.ref&&b.push(v.ref,null,m),b.push(p,m.__c||g,m)),null!=g?(null==k&&(k=g),"function"==typeof m.type&&null!=m.__k&&m.__k===v.__k?m.__d=f=C(m,f,e):f=x(e,m,v,H,g,f),s||"option"!==_.type?"function"==typeof _.type&&(_.__d=f):e.value=""):f&&v.__e==f&&f.parentNode!=e&&(f=y(v))}for(_.__e=k,a=E;a--;)null!=H[a]&&("function"==typeof _.type&&null!=H[a].__e&&H[a].__e==_.__d&&(_.__d=y(t,a+1)),A(H[a],H[a]));if(b)for(a=0;a<b.length;a++)U(b[a],b[++a],b[++a])}function C(e,n,_){var t,o;for(t=0;t<e.__k.length;t++)(o=e.__k[t])&&(o.__=e,n="function"==typeof o.type?C(o,n,_):x(_,o,o,e.__k,o.__e,n));return n}function x(e,n,_,t,o,r){var u,l,i;if(void 0!==n.__d)u=n.__d,n.__d=void 0;else if(null==_||o!=r||null==o.parentNode)e:if(null==r||r.parentNode!==e)e.appendChild(o),u=null;else{for(l=r,i=0;(l=l.nextSibling)&&i<t.length;i+=2)if(l==o)break e;e.insertBefore(o,r),u=r}return void 0!==u?u:o.nextSibling}function H(e,n,_){"-"===n[0]?e.setProperty(n,_):e[n]=null==_?"":"number"!=typeof _||f.test(n)?_:_+"px"}function E(e,n,_,t,o){var r;e:if("style"===n)if("string"==typeof _)e.style.cssText=_;else{if("string"==typeof t&&(e.style.cssText=t=""),t)for(n in t)_&&n in _||H(e.style,n,"");if(_)for(n in _)t&&_[n]===t[n]||H(e.style,n,_[n])}else if("o"===n[0]&&"n"===n[1])r=n!==(n=n.replace(/Capture$/,"")),n=n.toLowerCase()in e?n.toLowerCase().slice(2):n.slice(2),e.l||(e.l={}),e.l[n+r]=_,_?t||e.addEventListener(n,r?S:P,r):e.removeEventListener(n,r?S:P,r);else if("dangerouslySetInnerHTML"!==n){if(o)n=n.replace(/xlink[H:h]/,"h").replace(/sName$/,"s");else if("href"!==n&&"list"!==n&&"form"!==n&&"tabIndex"!==n&&"download"!==n&&n in e)try{e[n]=null==_?"":_;break e}catch(e){}"function"==typeof _||(null!=_&&(!1!==_||"a"===n[0]&&"r"===n[1])?e.setAttribute(n,_):e.removeAttribute(n))}}function P(e){this.l[e.type+!1](_.event?_.event(e):e)}function S(e){this.l[e.type+!0](_.event?_.event(e):e)}function D(e,n,t,o,r,u,l,i,c){var f,a,p,h,y,m,g,k,C,x,H,E=n.type;if(void 0!==n.constructor)return null;null!=t.__h&&(c=t.__h,i=n.__e=t.__e,n.__h=null,u=[i]),(f=_.__b)&&f(n);try{e:if("function"==typeof E){if(k=n.props,C=(f=E.contextType)&&o[f.__c],x=f?C?C.props.value:f.__:o,t.__c?g=(a=n.__c=t.__c).__=a.__E:("prototype"in E&&E.prototype.render?n.__c=a=new E(k,x):(n.__c=a=new v(k,x),a.constructor=E,a.render=M),C&&C.sub(a),a.props=k,a.state||(a.state={}),a.context=x,a.__n=o,p=a.__d=!0,a.__h=[]),null==a.__s&&(a.__s=a.state),null!=E.getDerivedStateFromProps&&(a.__s==a.state&&(a.__s=s({},a.__s)),s(a.__s,E.getDerivedStateFromProps(k,a.__s))),h=a.props,y=a.state,p)null==E.getDerivedStateFromProps&&null!=a.componentWillMount&&a.componentWillMount(),null!=a.componentDidMount&&a.__h.push(a.componentDidMount);else{if(null==E.getDerivedStateFromProps&&k!==h&&null!=a.componentWillReceiveProps&&a.componentWillReceiveProps(k,x),!a.__e&&null!=a.shouldComponentUpdate&&!1===a.shouldComponentUpdate(k,a.__s,x)||n.__v===t.__v){a.props=k,a.state=a.__s,n.__v!==t.__v&&(a.__d=!1),a.__v=n,n.__e=t.__e,n.__k=t.__k,n.__k.forEach(function(e){e&&(e.__=n)}),a.__h.length&&l.push(a);break e}null!=a.componentWillUpdate&&a.componentWillUpdate(k,a.__s,x),null!=a.componentDidUpdate&&a.__h.push(function(){a.componentDidUpdate(h,y,m)})}a.context=x,a.props=k,a.state=a.__s,(f=_.__r)&&f(n),a.__d=!1,a.__v=n,a.__P=e,f=a.render(a.props,a.state,a.context),a.state=a.__s,null!=a.getChildContext&&(o=s(s({},o),a.getChildContext())),p||null==a.getSnapshotBeforeUpdate||(m=a.getSnapshotBeforeUpdate(h,y)),H=null!=f&&f.type===d&&null==f.key?f.props.children:f,b(e,Array.isArray(H)?H:[H],n,t,o,r,u,l,i,c),a.base=n.__e,n.__h=null,a.__h.length&&l.push(a),g&&(a.__E=a.__=null),a.__e=!1}else null==u&&n.__v===t.__v?(n.__k=t.__k,n.__e=t.__e):n.__e=T(t.__e,n,t,o,r,u,l,c);(f=_.diffed)&&f(n)}catch(e){n.__v=null,(c||null!=u)&&(n.__e=i,n.__h=!!c,u[u.indexOf(i)]=null),_.__e(e,n,t)}}function w(e,n){_.__c&&_.__c(n,e),e.some(function(n){try{e=n.__h,n.__h=[],e.some(function(e){e.call(n)})}catch(e){_.__e(e,n.__v)}})}function T(e,_,t,o,r,u,l,c){var f,s,p,h=t.props,d=_.props,v=_.type,m=0;if("svg"===v&&(r=!0),null!=u)for(;m<u.length;m++)if((f=u[m])&&(f===e||(v?f.localName==v:3==f.nodeType))){e=f,u[m]=null;break}if(null==e){if(null===v)return document.createTextNode(d);e=r?document.createElementNS("http://www.w3.org/2000/svg",v):document.createElement(v,d.is&&d),u=null,c=!1}if(null===v)h===d||c&&e.data===d||(e.data=d);else{if(u=u&&n.call(e.childNodes),s=(h=t.props||i).dangerouslySetInnerHTML,p=d.dangerouslySetInnerHTML,!c){if(null!=u)for(h={},m=0;m<e.attributes.length;m++)h[e.attributes[m].name]=e.attributes[m].value;(p||s)&&(p&&(s&&p.__html==s.__html||p.__html===e.innerHTML)||(e.innerHTML=p&&p.__html||""))}if(function(e,n,_,t,o){var r;for(r in _)"children"===r||"key"===r||r in n||E(e,r,null,_[r],t);for(r in n)o&&"function"!=typeof n[r]||"children"===r||"key"===r||"value"===r||"checked"===r||_[r]===n[r]||E(e,r,n[r],_[r],t)}(e,d,h,r,c),p)_.__k=[];else if(m=_.props.children,b(e,Array.isArray(m)?m:[m],_,t,o,r&&"foreignObject"!==v,u,l,u?u[0]:t.__k&&y(t,0),c),null!=u)for(m=u.length;m--;)null!=u[m]&&a(u[m]);c||("value"in d&&void 0!==(m=d.value)&&(m!==e.value||"progress"===v&&!m)&&E(e,"value",m,h.value,!1),"checked"in d&&void 0!==(m=d.checked)&&m!==e.checked&&E(e,"checked",m,h.checked,!1))}return e}function U(e,n,t){try{"function"==typeof e?e(n):e.current=n}catch(e){_.__e(e,t)}}function A(e,n,t){var o,r;if(_.unmount&&_.unmount(e),(o=e.ref)&&(o.current&&o.current!==e.__e||U(o,null,n)),null!=(o=e.__c)){if(o.componentWillUnmount)try{o.componentWillUnmount()}catch(e){_.__e(e,n)}o.base=o.__P=null}if(o=e.__k)for(r=0;r<o.length;r++)o[r]&&A(o[r],n,"function"!=typeof e.type);t||null==e.__e||a(e.__e),e.__e=e.__d=void 0}function M(e,n,_){return this.constructor(e,_)}n=c.slice,_={__e:function(e,n){for(var _,t,o;n=n.__;)if((_=n.__c)&&!_.__)try{if((t=_.constructor)&&null!=t.getDerivedStateFromError&&(_.setState(t.getDerivedStateFromError(e)),o=_.__d),null!=_.componentDidCatch&&(_.componentDidCatch(e),o=_.__d),o)return _.__E=_}catch(n){e=n}throw e}},t=0,v.prototype.setState=function(e,n){var _;_=null!=this.__s&&this.__s!==this.state?this.__s:this.__s=s({},this.state),"function"==typeof e&&(e=e(s({},_),this.props)),e&&s(_,e),null!=e&&this.__v&&(n&&this.__h.push(n),g(this))},v.prototype.forceUpdate=function(e){this.__v&&(this.__e=!0,e&&this.__h.push(e),g(this))},v.prototype.render=d,o=[],r="function"==typeof Promise?Promise.prototype.then.bind(Promise.resolve()):setTimeout,k.__r=0,l=0;var F,L,N,W=0,R=[],I=_.__b,O=_.__r,V=_.diffed,q=_.__c,B=_.unmount;function $(e,n){_.__h&&_.__h(L,e,W||n),W=0;var t=L.__H||(L.__H={__:[],__h:[]});return e>=t.__.length&&t.__.push({}),t.__[e]}function j(e){return W=1,G(ee,e)}function G(e,n,_){var t=$(F++,2);return t.t=e,t.__c||(t.__=[_?_(n):ee(void 0,n),function(e){var n=t.t(t.__[0],e);t.__[0]!==n&&(t.__=[n,t.__[1]],t.__c.setState({}))}],t.__c=L),t.__}function z(e,n){var t=$(F++,4);!_.__s&&Z(t.__H,n)&&(t.__=e,t.__H=n,L.__h.push(t))}function J(e,n){var _=$(F++,7);return Z(_.__H,n)&&(_.__=e(),_.__H=n,_.__h=e),_.__}function K(){R.forEach(function(e){if(e.__P)try{e.__H.__h.forEach(X),e.__H.__h.forEach(Y),e.__H.__h=[]}catch(n){e.__H.__h=[],_.__e(n,e.__v)}}),R=[]}_.__b=function(e){L=null,I&&I(e)},_.__r=function(e){O&&O(e),F=0;var n=(L=e.__c).__H;n&&(n.__h.forEach(X),n.__h.forEach(Y),n.__h=[])},_.diffed=function(e){V&&V(e);var n=e.__c;n&&n.__H&&n.__H.__h.length&&(1!==R.push(n)&&N===_.requestAnimationFrame||((N=_.requestAnimationFrame)||function(e){var n,_=function(){clearTimeout(t),Q&&cancelAnimationFrame(n),setTimeout(e)},t=setTimeout(_,100);Q&&(n=requestAnimationFrame(_))})(K)),L=void 0},_.__c=function(e,n){n.some(function(e){try{e.__h.forEach(X),e.__h=e.__h.filter(function(e){return!e.__||Y(e)})}catch(t){n.some(function(e){e.__h&&(e.__h=[])}),n=[],_.__e(t,e.__v)}}),q&&q(e,n)},_.unmount=function(e){B&&B(e);var n=e.__c;if(n&&n.__H)try{n.__H.__.forEach(X)}catch(e){_.__e(e,n.__v)}};var Q="function"==typeof requestAnimationFrame;function X(e){var n=L;"function"==typeof e.__c&&e.__c(),L=n}function Y(e){var n=L;e.__c=e.__(),L=n}function Z(e,n){return!e||e.length!==n.length||n.some(function(n,_){return n!==e[_]})}function ee(e,n){return"function"==typeof n?n(e):n}var ne=function(e,n,_,t){var o;n[0]=0;for(var r=1;r<n.length;r++){var u=n[r++],l=n[r]?(n[0]|=u?1:2,_[n[r++]]):n[++r];3===u?t[0]=l:4===u?t[1]=Object.assign(t[1]||{},l):5===u?(t[1]=t[1]||{})[n[++r]]=l:6===u?t[1][n[++r]]+=l+"":u?(o=e.apply(l,ne(e,l,_,["",null])),t.push(o),l[0]?n[0]|=2:(n[r-2]=0,n[r]=o)):t.push(l)}return t},_e=new Map,te=function(e){var n=_e.get(this);return n||(n=new Map,_e.set(this,n)),(n=ne(this,n.get(e)||(n.set(e,n=function(e){for(var n,_,t=1,o="",r="",u=[0],l=function(e){1===t&&(e||(o=o.replace(/^\s*\n\s*|\s*\n\s*$/g,"")))?u.push(0,e,o):3===t&&(e||o)?(u.push(3,e,o),t=2):2===t&&"..."===o&&e?u.push(4,e,0):2===t&&o&&!e?u.push(5,0,!0,o):t>=5&&((o||!e&&5===t)&&(u.push(t,0,o,_),t=6),e&&(u.push(t,e,0,_),t=6)),o=""},i=0;i<e.length;i++){i&&(1===t&&l(),l(i));for(var c=0;c<e[i].length;c++)n=e[i][c],1===t?"<"===n?(l(),u=[u],t=3):o+=n:4===t?"--"===o&&">"===n?(t=1,o=""):o=n+o[0]:r?n===r?r="":o+=n:'"'===n||"'"===n?r=n:">"===n?(l(),t=1):t&&("="===n?(t=5,_=o,o=""):"/"===n&&(t<5||">"===e[i][c+1])?(l(),3===t&&(u=u[0]),t=u,(u=u[0]).push(2,0,t),t=0):" "===n||"\t"===n||"\n"===n||"\r"===n?(l(),t=2):o+=n),3===t&&"!--"===o&&(t=4,u=u[0])}return l(),u}(e)),n),arguments,[])).length>1?n:n[0]}.bind(p);e.h=p,e.html=te,e.render=function(e,t,o){var r,u,l;_.__&&_.__(e,t),u=(r="function"==typeof o)?null:o&&o.__k||t.__k,l=[],D(t,e=(!r&&o||t).__k=p(d,null,[e]),u||i,i,void 0!==t.ownerSVGElement,!r&&o?[o]:u?null:t.firstChild?n.call(t.childNodes):null,l,!r&&o?o:u?u.__e:t.firstChild,r),w(l,e)},e.Component=v,e.createContext=function(e,n){var _={__c:n="__cC"+l++,__:e,Consumer:function(e,n){return e.children(n)},Provider:function(e){var _,t;return this.getChildContext||(_=[],(t={})[n]=this,this.getChildContext=function(){return t},this.shouldComponentUpdate=function(e){this.props.value!==e.value&&_.some(g)},this.sub=function(e){_.push(e);var n=e.componentWillUnmount;e.componentWillUnmount=function(){_.splice(_.indexOf(e),1),n&&n.call(e)}}),e.children}};return _.Provider.__=_.Consumer.contextType=_},e.useState=j,e.useReducer=G,e.useEffect=function(e,n){var t=$(F++,3);!_.__s&&Z(t.__H,n)&&(t.__=e,t.__H=n,L.__H.__h.push(t))},e.useLayoutEffect=z,e.useRef=function(e){return W=5,J(function(){return{current:e}},[])},e.useImperativeHandle=function(e,n,_){W=6,z(function(){"function"==typeof e?e(n()):e&&(e.current=n())},null==_?_:_.concat(e))},e.useMemo=J,e.useCallback=function(e,n){return W=8,J(function(){return e},n)},e.useContext=function(e){var n=L.context[e.__c],_=$(F++,9);return _.c=e,n?(null==_.__&&(_.__=!0,n.sub(L)),n.props.value):e.__},e.useDebugValue=function(e,n){_.useDebugValue&&_.useDebugValue(n?n(e):e)},e.useErrorBoundary=function(e){var n=$(F++,10),_=j();return n.__=e,L.componentDidCatch||(L.componentDidCatch=function(e){n.__&&n.__(e),_[1](e)}),[_[0],function(){_[1](void 0)}]}});
+</script>
 <script>
-  document.querySelectorAll('.faq-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      var item = btn.closest('.faq-item');
-      var isOpen = item.classList.contains('open');
-      document.querySelectorAll('.faq-item.open').forEach(function(el) {
-        el.classList.remove('open');
-        el.querySelector('.faq-btn').setAttribute('aria-expanded', 'false');
-      });
-      if (!isOpen) {
-        item.classList.add('open');
-        btn.setAttribute('aria-expanded', 'true');
-      }
-    });
+(function(){
+const { html, render, Component } = window.htmPreact;
+const PD = { __html: "<div class=\"pd-root\">\n<div class=\"pd-stage\">\n  <div class=\"pd-side\">\n    <span class=\"pd-label\">지금까지 사장님이 하던 방법<\/span>\n    <ol class=\"pd-steps\" id=\"pdsteps\">\n      <li><span class=\"pd-n\">1<\/span><span class=\"pd-t\">상품 메모를 따로 정리해요<\/span><\/li>\n      <li><span class=\"pd-n\">2<\/span><span class=\"pd-t\">ChatGPT를 열고 어떻게 써달라고 설명해요<\/span><\/li>\n      <li><span class=\"pd-n\">3<\/span><span class=\"pd-t\">어색한 말, 없는 내용을 다시 고쳐요<\/span><\/li>\n      <li><span class=\"pd-n\">4<\/span><span class=\"pd-t\">나온 글을 복사해서 글쓰기 칸에 붙여 넣어요<\/span><\/li>\n      <li><span class=\"pd-n\">5<\/span><span class=\"pd-t\" id=\"pdstep5\">공유하기를 눌러 올려요<\/span><\/li>\n    <\/ol>\n    <div class=\"pd-time\"><span class=\"pd-timer\" id=\"pdtimer\">0.0초<\/span><span>레피가 일한 시간. 정리하고 본문에 넣는 데까지 레피가 해요.<\/span><\/div>\n    <p class=\"pd-note\">시연 화면이에요. 실제 SNS에 게시하지 않으며, 가게 이름, 좋아요와 댓글은 예시예요. 레피 크롬 확장 프로그램은 개발 중이에요.<\/p>\n  <\/div>\n\n  <div class=\"pd-main\">\n    <div class=\"pd-browser\" id=\"pdbrowser\">\n      <div class=\"pd-chrome\">\n        <span class=\"pd-dots\" aria-hidden=\"true\"><i><\/i><i><\/i><i><\/i><\/span>\n        <span class=\"pd-addr\">SNS 웹 · 새 게시물 만들기<\/span>\n        <span class=\"pd-ext\" id=\"pdext\" title=\"레피 확장 프로그램\" aria-hidden=\"true\"><svg width=\"16\" height=\"18\" viewBox=\"0 0 22 24\"><path d=\"M11 20 V10\" stroke=\"#6E8F2A\" stroke-width=\"2\" stroke-linecap=\"round\" fill=\"none\"><\/path><path d=\"M11 11.5 C 6.5 11.5 3.5 9 3 5 C 7 5 10.5 7 11 11.5 Z\" fill=\"#9BC53D\"><\/path><path d=\"M11 9.5 C 14.5 9.5 18.5 7 19 2.5 C 14.5 2.5 11.5 5 11 9.5 Z\" fill=\"#8DB33A\"><\/path><circle cx=\"11\" cy=\"20.5\" r=\"3\" fill=\"#BC6C25\"><\/circle><\/svg><\/span>\n      <\/div>\n      <div class=\"pd-web\">\n        <div class=\"pd-modal\">\n          <div class=\"pd-mhead\"><span class=\"pd-back\" aria-hidden=\"true\">‹<\/span><span>새 게시물 만들기<\/span><button class=\"pd-share\" id=\"pdshare\" type=\"button\" disabled>공유하기<\/button><\/div>\n          <div class=\"pd-mbody\">\n            <div class=\"pd-photo\" id=\"pdphoto\">\n              <img class=\"pd-bw\" src=\"images/lepi/hat.jpg\" alt=\"밀짚모자를 쓴 두 사람이 강과 산이 보이는 전망대에서 웃는 셀카\">\n              <img class=\"pd-ov\" src=\"images/lepi/hat-ov.webp\" alt=\"\" aria-hidden=\"true\">\n            <\/div>\n            <div class=\"pd-capcol\">\n              <div class=\"pd-acct\"><span class=\"pd-avatar\" aria-hidden=\"true\"><svg width=\"16\" height=\"18\" viewBox=\"0 0 22 24\"><circle cx=\"11\" cy=\"20.5\" r=\"3\" fill=\"#BC6C25\"><\/circle><\/svg><\/span>철원 여행 소품점<\/div>\n              <div class=\"pd-capwrap\">\n                <p class=\"pd-cap pd-hint\" id=\"pdcap\" tabindex=\"0\" role=\"button\" aria-label=\"메모를 선택하고 레피 부르기\"><mark>못생긴 밀짚모자인데 철원 주상절리입장료내면 한사람당 5천원 상품권주는데 그걸 이용하면 주변상점에서 살수 있거든 너무 햇볕이 뜨거워서 어쩔수 없이 샀는데 국내 여행갈때마다 필요할때 들고갔더니 추억템이 됐어<\/mark><\/p>\n                <div class=\"pd-story pd-hide\" id=\"pdstory\">\n                  <h4>예쁘진 않아도, 여행마다 따라다니면 추억이 되는 모자.<\/h4>\n                  <p>주상절리를 걷다 햇볕에 지치셨다면, 입장할 때 받으신 5천 원 상품권을 들고 오세요. 저희 가게에서 바로 바꿔 드려요.<\/p>\n                  <p>솔직히 좀 못생겼어요. 그래도 여기에는 철원에서 보낸 그 더운 하루가 담겨요. 다른 곳으로 떠날 때 챙겨 쓰면, 그날 이야기가 덤으로 함께 가는 셈이죠.<\/p>\n                <\/div>\n              <\/div>\n              <div class=\"pd-count\" id=\"pdcount\">108/2,200<\/div>\n            <\/div>\n          <\/div>\n        <\/div>\n\n        <aside class=\"pd-panel\" id=\"pdpanel\" aria-label=\"레피 에디터\">\n          <div class=\"pd-phead\"><span class=\"pd-logo\">lepi<b>.<\/b><\/span><span class=\"pd-tag\" id=\"pdtag\">호출됨<\/span><\/div>\n          <div class=\"pd-bar\"><i id=\"pdbar\"><\/i><\/div>\n          <div class=\"pd-pbody\">\n            <p class=\"pd-stagetext\" id=\"pdstagetext\"><i><\/i><span>메모를 읽고 있어요<\/span><\/p>\n            <div class=\"pd-result pd-hide\" id=\"pdresult\">\n              <h4>예쁘진 않아도, 여행마다 따라다니면 추억이 되는 모자.<\/h4>\n              <p>주상절리를 걷다 햇볕에 지치셨다면, 입장할 때 받으신 5천 원 상품권을 들고 오세요. 저희 가게에서 바로 바꿔 드려요.<\/p>\n                  <p>솔직히 좀 못생겼어요. 그래도 여기에는 철원에서 보낸 그 더운 하루가 담겨요. 다른 곳으로 떠날 때 챙겨 쓰면, 그날 이야기가 덤으로 함께 가는 셈이죠.<\/p>\n            <\/div>\n          <\/div>\n          <div class=\"pd-pbtns\"><button class=\"pd-btn pd-line\" id=\"pdcopy\" type=\"button\" disabled>복사하기<\/button><button class=\"pd-btn\" id=\"pdinsert\" type=\"button\" disabled>본문에 삽입<\/button><\/div>\n        <\/aside>\n\n        <div class=\"pd-posted\" id=\"pdposted\">\n          <div class=\"pd-photo pd-colored\"><img class=\"pd-bw\" src=\"images/lepi/hat.jpg\" alt=\"\"><img class=\"pd-ov\" src=\"images/lepi/hat-ov.webp\" alt=\"\" aria-hidden=\"true\"><\/div>\n          <div class=\"pd-postcol\" id=\"pdlikerow\">\n            <div class=\"pd-acct\" style=\"padding:0\"><span class=\"pd-avatar\" aria-hidden=\"true\"><svg width=\"16\" height=\"18\" viewBox=\"0 0 22 24\"><circle cx=\"11\" cy=\"20.5\" r=\"3\" fill=\"#BC6C25\"><\/circle><\/svg><\/span>철원 여행 소품점<\/div>\n            <svg class=\"pd-heart\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M12 20.5s-7.5-4.6-9.2-9.4C1.7 7.8 3.9 4.5 7.3 4.5c2 0 3.5 1.1 4.7 2.7 1.2-1.6 2.7-2.7 4.7-2.7 3.4 0 5.6 3.3 4.5 6.6-1.7 4.8-9.2 9.4-9.2 9.4z\"><\/path><\/svg>\n            <span class=\"pd-likes\">좋아요 <span id=\"pdlikes\">0<\/span>개<\/span>\n            <p class=\"pd-postcap\"><b>철원 여행 소품점<\/b>예쁘진 않아도, 여행마다 따라다니면 추억이 되는 모자. 주상절리를 걷다 햇볕에 지치셨다면, 입장할 때 받으신 5천 원 상품권을 들고 오세요…<\/p>\n            <ul class=\"pd-comments\" id=\"pdcomments\">\n              <li class=\"pd-hide\"><b>여행가는_곰<\/b>저도 주상절리 갔다가 이거 샀어요 ㅋㅋ<\/li>\n              <li class=\"pd-hide\"><b>모자수집가<\/b>못생겼다면서 너무 귀여운데요<\/li>\n              <li class=\"pd-hide\"><b>주말엔캠핑<\/b>상품권으로 살 수 있는 거 처음 알았어요!<\/li>\n              <li class=\"pd-hide pd-reply\"><b>철원 여행 소품점<\/b>@주말엔캠핑 의외로 모르시는 분들 많더라고요 ㅎㅎ 철원 오시면 꼭 들러 주세요!<\/li>\n            <\/ul>\n          <\/div>\n        <\/div>\n      <\/div>\n      <div class=\"pd-menu\" id=\"pdmenu\" role=\"menu\">\n        <div>뒤로<\/div><div>복사<\/div><div>검색<\/div><hr>\n        <button type=\"button\" id=\"pdlepi\" role=\"menuitem\"><svg width=\"14\" height=\"16\" viewBox=\"0 0 22 24\" aria-hidden=\"true\"><path d=\"M11 20 V10\" stroke=\"#6E8F2A\" stroke-width=\"2\" stroke-linecap=\"round\" fill=\"none\"><\/path><path d=\"M11 11.5 C 6.5 11.5 3.5 9 3 5 C 7 5 10.5 7 11 11.5 Z\" fill=\"#9BC53D\"><\/path><path d=\"M11 9.5 C 14.5 9.5 18.5 7 19 2.5 C 14.5 2.5 11.5 5 11 9.5 Z\" fill=\"#8DB33A\"><\/path><circle cx=\"11\" cy=\"20.5\" r=\"3\" fill=\"#BC6C25\"><\/circle><\/svg>Lepi: 상품설명<\/button>\n      <\/div>\n      <div class=\"pd-toast\" id=\"pdtoast\" role=\"status\">게시됐어요<\/div>\n    <\/div>\n    <div class=\"pd-guide\"><p><b id=\"pdgnum\">1<\/b><span id=\"pdguide\">글쓰기 칸의 메모를 드래그하거나 눌러보세요.<\/span><\/p><button class=\"pd-text\" id=\"pdreset\" type=\"button\">처음부터 다시 보기<\/button><\/div>\n  <\/div>\n<\/div>\n<\/div>" };
+
+function initBeta(){
+  const WEBHOOK = "https://oclc-consisting-jenny-return.trycloudflare.com/webhook/d8fb407a-3c06-4358-a882-5a150d5672eb";
+  document.addEventListener('click', async (e) => {
+    const btn = e.target.closest && e.target.closest('#betaBtn');
+    if (!btn || btn.disabled) return;
+    const $ = (id) => document.getElementById(id);
+    const msg = $('betaMsg');
+    const name = $('nm').value.trim(), category = $('biz').value, email = $('em').value.trim(), agree = $('agree').checked;
+    if (!name || !category || !email || !agree) { msg.textContent = '이름, 업종, 이메일을 적고 참여 동의에 체크해 주세요.'; return; }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { msg.textContent = '이메일 주소를 다시 확인해 주세요.'; return; }
+    btn.disabled = true; btn.textContent = '신청 중…'; msg.textContent = '';
+    try {
+      const r = await fetch(WEBHOOK, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, category, sns: '', email, recent_post: '', agree }) });
+      if (!r.ok) throw new Error('send failed');
+      btn.textContent = '신청되었어요. 감사합니다';
+      ['nm','biz','em','agree'].forEach((id) => { $(id).disabled = true; });
+      msg.textContent = '정식으로 열리면 가장 먼저 알려드릴게요.';
+    } catch (err) {
+      btn.disabled = false; btn.textContent = '베타 신청하기';
+      msg.textContent = '신청을 보내지 못했어요. 잠시 후 다시 시도해 주세요.';
+    }
+  });
+}
+
+function initPD(){
+  const $ = (id) => document.getElementById(id);
+  if (!$('pdcap') || $('pdcap').dataset.ready) return;
+  $('pdcap').dataset.ready = '1';
+  const steps = [...$('pdsteps').children];
+  const cap = $('pdcap'), menu = $('pdmenu'), panel = $('pdpanel'), browser = $('pdbrowser');
+  const resText = '예쁘진 않아도, 여행마다 따라다니면 추억이 되는 모자.\n\n주상절리를 걷다 햇볕에 지치셨다면, 입장할 때 받으신 5천 원 상품권을 들고 오세요. 저희 가게에서 바로 바꿔 드려요.\n\n솔직히 좀 못생겼어요. 그래도 여기에는 철원에서 보낸 그 더운 하루가 담겨요. 다른 곳으로 떠날 때 챙겨 쓰면, 그날 이야기가 덤으로 함께 가는 셈이죠.';
+  let phase = 'idle', timers = [], acc = 0, t0 = 0, tick = null;
+  const later = (fn, ms) => timers.push(setTimeout(fn, ms));
+  const show = (ms) => { $('pdtimer').textContent = (ms / 1000).toFixed(1) + '초'; };
+  const go = () => { t0 = performance.now(); clearInterval(tick); tick = setInterval(() => show(acc + performance.now() - t0), 100); };
+  const stop = () => { clearInterval(tick); acc += performance.now() - t0; show(acc); };
+  const guide = (n, t) => { $('pdgnum').textContent = n; $('pdguide').textContent = t; };
+  const stage = (t) => { $('pdstagetext').querySelector('span').textContent = t; };
+
+  function openMenu(x, y){
+    if (phase !== 'idle' && phase !== 'menu') return;
+    cap.classList.remove('pd-hint'); cap.classList.add('pd-sel');
+    try { const r = document.createRange(); r.selectNodeContents(cap); const s = window.getSelection(); s.removeAllRanges(); s.addRange(r); } catch (e) {}
+    const b = browser.getBoundingClientRect();
+    const left = Math.min(Math.max(8, x - b.left), b.width - 220), top = Math.min(Math.max(8, y - b.top), b.height - 175);
+    menu.style.left = left + 'px'; menu.style.top = top + 'px';
+    menu.classList.add('pd-show'); phase = 'menu';
+    steps[0].classList.add('pd-done');
+    guide(2, '오른쪽 클릭 메뉴에서 "Lepi: 상품설명"을 눌러보세요.');
+    $('pdlepi').focus({ preventScroll: true });
+  }
+  cap.addEventListener('mouseup', (e) => openMenu(e.clientX, e.clientY));
+  cap.addEventListener('contextmenu', (e) => { e.preventDefault(); openMenu(e.clientX, e.clientY); });
+  cap.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); const r = cap.getBoundingClientRect(); openMenu(r.left + 40, r.top + 40); } });
+
+  $('pdlepi').addEventListener('click', () => {
+    if (phase !== 'menu') return;
+    phase = 'working'; menu.classList.remove('pd-show');
+    try { window.getSelection().removeAllRanges(); } catch (e) {}
+    $('pdext').classList.add('pd-on'); panel.classList.add('pd-show'); go();
+    guide(3, '레피가 메모 속 이야기를 찾아 정리하고 있어요.');
+    $('pdtag').textContent = '정리 중'; $('pdbar').style.width = '30%'; stage('메모를 읽고 있어요');
+    later(() => { $('pdbar').style.width = '62%'; stage('이야기를 찾고 있어요'); steps[1].classList.add('pd-done'); }, 1100);
+    later(() => { $('pdbar').style.width = '88%'; stage('글로 정리하고 있어요'); }, 2200);
+    later(() => {
+      stop(); $('pdbar').style.width = '100%'; $('pdtag').textContent = '정리 완료';
+      $('pdstagetext').classList.add('pd-hide'); $('pdresult').classList.remove('pd-hide');
+      steps[2].classList.add('pd-done');
+      $('pdcopy').disabled = false; $('pdinsert').disabled = false; phase = 'result';
+      guide(4, '"본문에 삽입"을 누르면 글쓰기 칸에 바로 들어가요.');
+    }, 3300);
   });
 
-  async function handleSubmit(e) {
-    e.preventDefault();
+  $('pdcopy').addEventListener('click', () => {
+    const done = () => { $('pdcopy').textContent = '복사했어요'; later(() => { $('pdcopy').textContent = '복사하기'; }, 2000); };
+    try { navigator.clipboard.writeText(resText).then(done, done); } catch (e) { done(); }
+  });
 
-    var form = e.target;
+  $('pdinsert').addEventListener('click', () => {
+    if (phase !== 'result') return;
+    phase = 'inserting'; go(); $('pdinsert').disabled = true;
+    later(() => {
+      stop();
+      cap.classList.add('pd-hide'); $('pdstory').classList.remove('pd-hide'); $('pdphoto').classList.add('pd-colored');
+      $('pdcount').textContent = '214/2,200'; $('pdtag').textContent = '본문에 넣었어요';
+      steps[3].classList.add('pd-done'); steps[4].classList.add('pd-mine'); $('pdstep5').textContent = '공유하기만 사장님이 눌러요';
+      panel.classList.remove('pd-show'); $('pdext').classList.remove('pd-on');
+      $('pdshare').disabled = false; $('pdshare').classList.add('pd-pulse'); phase = 'review';
+      guide(5, '레피는 여기까지. 확인하고 "공유하기"를 눌러 직접 올려요.');
+    }, 500);
+  });
 
-    var name = form.querySelector('[name="name"]').value.trim();
-    var category = form.querySelector('[name="category"]').value;
-    var sns = form.querySelector('[name="sns"]').value.trim();
-    var email = form.querySelector('[name="email"]').value.trim();
-    var recentPost = form.querySelector('[name="post"]').value.trim();
-    var agree = form.querySelector('[name="agree"]').checked;
+  $('pdshare').addEventListener('click', () => {
+    if (phase !== 'review') return;
+    phase = 'posted'; $('pdshare').classList.remove('pd-pulse'); $('pdshare').disabled = true;
+    $('pdposted').classList.add('pd-show'); $('pdtoast').classList.add('pd-show');
+    guide('✓', '사장님이 올린 게시물이에요. 메모 몇 줄이 이야기가 됐어요.');
+    later(() => $('pdtoast').classList.remove('pd-show'), 2200);
+    later(() => $('pdlikerow').classList.add('pd-liked'), 900);
+    let n = 0; later(() => { const iv = setInterval(() => { n++; $('pdlikes').textContent = n; if (n >= 24) clearInterval(iv); }, 70); timers.push(iv); }, 1000);
+    const col = $('pdlikerow');
+    [...$('pdcomments').children].forEach((li, i) => later(() => { li.classList.remove('pd-hide'); col.scrollTo({ top: col.scrollHeight, behavior: 'smooth' }); }, 2000 + i * 900));
+  });
 
-    if (!name || !email || !category || !agree) {
-      alert('필수 항목을 모두 입력해 주세요.');
-      return;
-    }
+  document.addEventListener('mousedown', (e) => { if (phase === 'menu' && !menu.contains(e.target) && e.target !== cap && !cap.contains(e.target)) { menu.classList.remove('pd-show'); phase = 'idle'; cap.classList.remove('pd-sel'); cap.classList.add('pd-hint'); steps[0].classList.remove('pd-done'); guide(1, '글쓰기 칸의 메모를 드래그하거나 눌러보세요.'); } });
 
-    var btn = document.getElementById('submitBtn');
-    var label = btn.querySelector('.submit-label');
+  $('pdreset').addEventListener('click', () => {
+    timers.forEach((t) => { clearTimeout(t); clearInterval(t); }); timers = []; clearInterval(tick); acc = 0; show(0); phase = 'idle';
+    steps.forEach((s) => s.classList.remove('pd-done', 'pd-mine')); $('pdstep5').textContent = '공유하기를 눌러 올려요';
+    menu.classList.remove('pd-show'); panel.classList.remove('pd-show'); $('pdext').classList.remove('pd-on');
+    cap.classList.remove('pd-hide', 'pd-sel'); cap.classList.add('pd-hint'); $('pdstory').classList.add('pd-hide'); $('pdphoto').classList.remove('pd-colored');
+    $('pdcount').textContent = '108/2,200'; $('pdtag').textContent = '호출됨'; $('pdbar').style.width = '0';
+    $('pdstagetext').classList.remove('pd-hide'); stage('메모를 읽고 있어요'); $('pdresult').classList.add('pd-hide');
+    $('pdcopy').disabled = true; $('pdcopy').textContent = '복사하기'; $('pdinsert').disabled = true;
+    $('pdshare').disabled = true; $('pdshare').classList.remove('pd-pulse');
+    $('pdposted').classList.remove('pd-show'); $('pdtoast').classList.remove('pd-show'); $('pdlikerow').classList.remove('pd-liked'); $('pdlikes').textContent = '0';
+    [...$('pdcomments').children].forEach((li) => li.classList.add('pd-hide')); $('pdlikerow').scrollTop = 0;
+    guide(1, '글쓰기 칸의 메모를 드래그하거나 눌러보세요.');
+  });
+}
 
-    btn.disabled = true;
-    label.textContent = '신청 중...';
-
+class Page extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { revealed: false, phase: 'idle', copied: false, ci: 0, cshown: true, crev: false, faq: 0, tried: false };
+    this.timers = [];
+  }
+  componentDidMount() {
     try {
-      var response = await fetch(
-        "https://oclc-consisting-jenny-return.trycloudflare.com/webhook/d8fb407a-3c06-4358-a882-5a150d5672eb",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            name: name,
-            category: category,
-            sns: sns,
-            email: email,
-            recent_post: recentPost,
-            agree: agree
-          })
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("베타 신청 전송 실패");
+      ['images/lepi/hat-ov.webp','images/lepi/bell-ov.webp','images/lepi/karp-ov.webp','images/lepi/knicks-ov.webp'].forEach((u) => { const im = new Image(); im.decoding = 'async'; im.src = u; });
+    } catch (e) {}
+    try {
+      if (window.matchMedia && window.matchMedia('(hover: none)').matches) {
+        this.timers.push(setTimeout(() => this.setState({ revealed: true }), 3000));
       }
-
-      label.textContent = '신청되었습니다. 감사합니다';
-      btn.querySelector('.submit-circle').innerHTML =
-        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
-      btn.classList.add('success');
-      form.querySelectorAll('input, select, textarea').forEach(function (el) {
-        el.disabled = true;
-      });
-
-    } catch (error) {
-      console.error("베타 신청 오류:", error);
-
-      alert(
-        '신청을 보내지 못했습니다. 잠시 후 다시 시도해 주세요.'
-      );
-
-      label.textContent = '무료 베타 신청하기';
-      btn.disabled = false;
-    }
+    } catch (e) {}
   }
-  
-  const refineButton = document.getElementById("refine-button");
-  const refineLabel = document.getElementById("refine-label");
-
-  const testNotice = document.getElementById("test-notice");
-
-  // 테스트 모드(주소 ?test): 구매자 메모를 판매자 시점(DEMO_SELLER)으로 쓰고,
-  // 반복해서 확인할 수 있게 체험 잠금을 걸지 않는다.
-  const TEST_MODE = new URLSearchParams(location.search).has("test");
-  const testModeNote = document.getElementById("test-mode-note");
-
-  if (TEST_MODE && testModeNote) {
-    testModeNote.hidden = false;
+  componentWillUnmount() { this.timers.forEach((t) => clearTimeout(t)); }
+  reduced() {
+    try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; }
   }
-
-  // 변환 한 번이 곧 OpenAI 비용이다. 성공하면 체험을 잠그고 신청으로 안내하며,
-  // 실패했을 때만 10초 뒤 다시 시도할 수 있게 한다 —
-  // 네트워크 오류로 한 번뿐인 기회를 잃으면 안 되기 때문이다.
-  const COOLDOWN_SECONDS = 10;
-  let cooldownTimer = null;
-
-  function lockAfterTrial() {
-    clearInterval(cooldownTimer);
-
-    if (TEST_MODE) {
-      refineButton.disabled = false;
-      refineLabel.textContent = "이야기 입히기";
-      return;
-    }
-
-    refineButton.disabled = true;
-    refineLabel.textContent = "체험 완료";
-
-    if (testNotice) {
-      testNotice.hidden = false;
-    }
+  later(fn, ms) { this.timers.push(setTimeout(fn, ms)); }
+  fade(on, delay, dur) {
+    const ease = 'cubic-bezier(0.16,1,0.3,1)';
+    const d = dur || 800;
+    return 'opacity: ' + (on ? 1 : 0) + '; transform: translateY(' + (on ? 0 : 8) + 'px); transition: opacity ' + d + 'ms ' + ease + ' ' + delay + 'ms, transform ' + d + 'ms ' + ease + ' ' + delay + 'ms;';
   }
-
-  function startCooldown() {
-    let left = COOLDOWN_SECONDS;
-    refineButton.disabled = true;
-    refineLabel.textContent = left + "초 후 다시 시도";
-
-    clearInterval(cooldownTimer);
-    cooldownTimer = setInterval(function () {
-      left -= 1;
-
-      if (left > 0) {
-        refineLabel.textContent = left + "초 후 다시 시도";
-        return;
-      }
-
-      clearInterval(cooldownTimer);
-      refineButton.disabled = false;
-      refineLabel.textContent = "이야기 입히기";
-    }, 1000);
+  run(steps) {
+    let acc = 0;
+    steps.forEach(([phase, wait]) => { acc += wait; this.later(() => this.setState({ phase }), acc); });
   }
-
-  const originalText = document.getElementById("original-text");
-  const resultArea = document.getElementById("result-area");
-  const resultLabel = document.getElementById("result-label");
-  const resultCard = document.getElementById("result-card");
-  const resultName = document.getElementById("result-name");
-  const resultPrice = document.getElementById("result-price");
-  const resultHeadline = document.getElementById("result-headline");
-  const resultBody = document.getElementById("result-body");
-  const resultQuestions = document.getElementById("result-questions");
-  const resultHint = document.getElementById("result-hint");
-  const errorMessage = document.getElementById("error-message");
-
-  // 모델 출력은 전부 textContent로만 넣는다. innerHTML을 쓰면
-  // 메모에 섞인 태그가 결과를 거쳐 페이지에서 실행될 수 있다.
-  function clearResult() {
-    resultCard.hidden = true;
-    resultHeadline.hidden = true;
-    resultBody.hidden = true;
-    resultQuestions.hidden = true;
-    resultHint.hidden = true;
-    resultBody.replaceChildren();
-    resultQuestions.replaceChildren();
+  pickCase(i) {
+    if (i === this.state.ci) return;
+    if (this.reduced()) { this.setState({ ci: i, crev: false }); return; }
+    this.setState({ cshown: false });
+    this.later(() => this.setState({ ci: i, crev: false }), 280);
+    this.later(() => this.setState({ cshown: true }), 330);
   }
+  renderVals() {
+    const s = this.state;
+    const r = s.revealed;
+    const serifH = "margin: 0; font-family: 'Noto Serif KR', serif; font-weight: 400; font-size: 22px; line-height: 1.5; color: #283618; ";
+    const body = 'margin: 12px 0 0; font-size: 16px; line-height: 1.85; color: #283618; ';
 
-  function showStory(data) {
-    const card = data.product_card || {};
+    const heroParas = [
+      '주상절리를 걷다 햇볕에 지치셨다면, 입장할 때 받으신 5천 원 상품권을 들고 오세요. 저희 가게에서 바로 바꿔 드려요.',
+      '솔직히 좀 못생겼어요. 그래도 여기에는 철원에서 보낸 그 더운 하루가 담겨요. 다른 곳으로 떠날 때 챙겨 쓰면, 그날 이야기가 덤으로 함께 가는 셈이죠.'
+    ];
+    const hero = {
+      closed: !r, open: r,
+      hintShow: r ? 'display: none' : 'display: inline', hideShow: r ? 'display: inline' : 'display: none',
+      imgStyle: 'filter: grayscale(1) contrast(0.92);',
+      cutStyle: 'opacity: ' + (r ? 1 : 0) + '; transition: opacity ' + (r ? '1400ms cubic-bezier(0.16,1,0.3,1) 0ms' : '1200ms ease-in-out 0ms') + ';',
+      memoStyle: 'opacity: ' + (r ? 0 : 1) + '; transition: opacity ' + (r ? 450 : 700) + 'ms cubic-bezier(0.16,1,0.3,1) ' + (r ? 0 : 380) + 'ms; pointer-events: ' + (r ? 'none' : 'auto') + ';',
+      resultWrap: 'visibility: ' + (r ? 'visible' : 'hidden') + '; transition: visibility 0s ' + (r ? 0 : 380) + 'ms;',
+      h: serifH + (r ? this.fade(true, 350) : this.fade(false, 0, 320)),
+      paras: heroParas.map((text, i) => ({ text, style: body + (r ? this.fade(true, 600 + i * 250) : this.fade(false, 0, 320)) }))
+    };
 
-    resultLabel.textContent = "레피가 입힌 이야기";
-    resultName.textContent = card.name || "";
-    resultPrice.textContent = card.price || "";
-    resultCard.hidden = !(card.name || card.price);
+    const order = ['idle', 'select', 'menu', 'w1', 'w2', 'w3', 'result', 'inserted'];
+    const p = s.phase;
+    const at = (name) => order.indexOf(p) >= order.indexOf(name);
+    const working = p === 'w1' || p === 'w2' || p === 'w3';
+    const bar = { idle: 0, select: 0, menu: 0, w1: 30, w2: 62, w3: 88, result: 100, inserted: 100 }[p];
+    const resParas = [
+      '우리집 고양이가 제일 좋아하는 장난감이에요.',
+      '실리콘이라 엄청 부드럽고, 흔들면 진짜 쥐꼬리 같은 느낌이 나요. 그래서인지 다른 장난감이랑은 반응이 달라요. 흔들기만 해도 흥분하면서 좋아하거든요.',
+      '고양이랑 놀아줄 때 반응 확 오는 낚시대를 찾고 계셨다면, 한번 흔들어 보세요.'
+    ];
+    const showRes = at('result');
+    const inserted = p === 'inserted';
+    const demo = {
+      windowNote: inserted ? '레피가 정리한 글이 들어갔어요' : (at('select') ? '메모 선택됨' : '작성 중'),
+      panelTag: p === 'idle' ? '대기 중' : (working ? '정리 중' : (inserted ? '완료' : (showRes ? '정리 완료' : '호출됨'))),
+      memoStyle: 'margin: 0; font-size: 16px; line-height: 1.85; opacity: ' + (inserted ? 0 : 1) + '; transition: opacity 700ms cubic-bezier(0.16,1,0.3,1);',
+      selStyle: 'background-image: linear-gradient(rgba(188,108,37,0.18), rgba(188,108,37,0.18)); background-repeat: no-repeat; background-size: ' + (at('select') && !inserted ? '100% 100%' : '0% 100%') + '; transition: background-size 900ms cubic-bezier(0.16,1,0.3,1);',
+      insertedWrap: 'visibility: ' + (inserted ? 'visible' : 'hidden') + ';',
+      insH: serifH + this.fade(inserted, 350),
+      insParas: resParas.map((text, i) => ({ text, style: body + this.fade(inserted, 600 + i * 250) })),
+      menuStyle: 'position: absolute; top: 120px; left: 46%; min-width: 200px; background: #FFFFFF; border: 1px solid #93987C; border-radius: 4px; box-shadow: 0 8px 24px rgba(40,54,24,0.08); ' + this.fade(p === 'menu' || p === 'w1', 0) + ' pointer-events: none;',
+      barStyle: 'position: absolute; left: 0; top: 0; height: 1px; background: #BC6C25; width: ' + bar + '%; transition: width 1100ms cubic-bezier(0.16,1,0.3,1);',
+      idleStyle: 'margin: 0; font-size: 16px; line-height: 1.85; color: #606C38; ' + this.fade(p === 'idle', 0),
+      stageStyle: 'margin: 0; font-size: 16px; ' + this.fade(working, 0),
+      stageText: { w1: '메모를 읽고 있어요', w2: '이야기를 찾고 있어요', w3: '글로 정리하고 있어요' }[p] || '',
+      resultWrap: 'visibility: ' + (showRes ? 'visible' : 'hidden') + ';',
+      resH: serifH + this.fade(showRes, 100),
+      resParas: resParas.map((text, i) => ({ text, style: body + this.fade(showRes, 350 + i * 250) })),
+      showStart: p === 'idle', showResultBtns: p === 'result', showReset: inserted,
+      copyLabel: s.copied ? '복사했어요' : '복사하기'
+    };
 
-    resultHeadline.textContent = data.headline;
-    resultHeadline.hidden = false;
-
-    data.body.forEach(function (paragraph) {
-      const p = document.createElement("p");
-      p.textContent = paragraph;
-      resultBody.appendChild(p);
+    const K = (t) => ({ t, k: true });
+    const N = (t) => ({ t, k: false });
+    const cases = [
+      { name: '선운사 소원의 종', price: '10,000원', src: 'images/lepi/bell.jpg', cut: 'images/lepi/bell-ov.webp', alt: '선운사 소원나무에 걸린 색색의 작은 도자기 종과 소원을 적은 나무 패',
+        memo: [N('선운사 종은 만원인데 소원나무에 저렇게 대부분 '), K('가족의 건강과 성공을 기원하는'), N(' 거라 나도 시댁어른이랑 남편이랑 '), K('간 김에'), N(' 구매했어. 사서 '), K('몸에 지니지 않더라도'), N(' 저렇게 바람에 '), K('풍경처럼 흔들리면서'), N(' '), K('촤르르'), N(' 소리나니까 '), K('마음이 평안해지면서 꼭 소원이 이루어진것 같더라')],
+        headline: '가족과 함께 온 날, 소원 하나 바람에 걸어두는 종.',
+        paras: ['촤르르.', '선운사 소원나무 아래 서면 이 소리부터 들려요. 가지가 살랑이면 방울들이 풍경처럼 흔들리거든요.', '저마다 적힌 사연은 대부분 비슷해요. 식구들이 건강하기를, 하는 일이 잘되기를.', '들고 다니지 않아도 돼요. 한 번 달아 두면 알아서 울려주니까요. 가만히 귀 기울이고 있으면 괜스레 편안해지고, 소망이 벌써 이루어진 것 같더라고요.', '소중한 사람들과 나선 길이라면, 그 마음 여기 남기고 가세요.'] },
+      { name: '잉어킹 액막이', price: '가챠 1회 10,000원', src: 'images/lepi/karp.jpg', cut: 'images/lepi/karp-ov.webp', alt: '팝업 매장 천장에 밧줄로 매달린 빨간 잉어킹 액막이 장식',
+        memo: [N('남편이랑 포켓몬팝업이 있다고 해서 놀러갔더니 잉어킹액막이가 있더라고 그런데 '), K('가챠로밖에'), N(' 안팔아서 '), K('만원이라는 큰 금액'), N('이어도 '), K('한번 도전해'), N('봤더니 성공해서 한번에 뽑았어 몇달뒤에 '), K('이사 예정이어서 가지고 싶었는데'), N(' 좋은 추억이었어')],
+        addKept: '별일 없이 잘 지나가자는 마음을 걸어두는 작은 액막이', addRest: ' 이런 글귀도 있으면 좋지',
+        headline: '별일 없이 잘 지나가자는 마음을 걸어두는 작은 액막이.',
+        paras: ['이사를 앞두고 있으면, 새 보금자리에 무엇부터 들일지 괜히 신경 쓰이잖아요. 그럴 때 첫 짐으로 이 잉어킹을 챙겨 보세요. 저희 팝업에서만 만날 수 있는 녀석이에요.', '낯선 곳이라도 현관에 익숙한 얼굴 하나 달려 있으면, 앞으로의 날들이 한결 든든해지거든요.'] },
+      { name: '닉스고 인형 키링', price: '8,000원', src: 'images/lepi/knicks.jpg', cut: 'images/lepi/knicks-ov.webp', alt: '보라색 굴레와 10번 안장을 두른 회색 닉스고 말 인형 키링과 한국마사회 상자',
+        memo: [N('저는 '), K('현역 시절'), N(' 닉스고를 '), K('응원했'), N('습니다. '), K('세계적인 무대에서 좋은 성적을 거두던 한국마사회 소유의 말'), N('이라는 점도 특별하게 느껴졌고요. 지금은 경주에서 은퇴해 '), K('씨수말'), N('로 지내고 있지만, 마사회 공식 굿즈에서 실제 닉스고의 외형을 본떠 만든 인형을 발견했습니다. 여러 마사회 굿즈 중에서도 '), K('가장 실제 말처럼 생겼고, 무엇보다 귀여웠'), N('습니다. 가격은 8천 원. 그래서 하나 '), K('데려'), N('왔습니다.')],
+        headline: '응원하던 말의 경주는 끝나도, 그때의 기억은 곁에 둘 수 있으니까.',
+        paras: ['세계적인 무대에서 좋은 성적을 거두던, 한국마사회 소유의 닉스고. 현역 시절을 지켜본 팬이라면 그 이름만 들어도 가슴이 먼저 달려갑니다.', '지금은 은퇴해 씨수말로 지내고 있지만, 그 모습은 생김새를 고스란히 본뜬 이 인형 안에, 무엇보다 귀엽게 남아 있습니다.', '그 질주가 그리운 분이라면, 하나 데려가세요.'] }
+    ];
+    const c = cases[s.ci];
+    const shown = s.cshown;
+    const on = s.cshown && s.crev;
+    const underline = (kept, idx) => kept
+      ? 'background-image: linear-gradient(#BC6C25, #BC6C25); background-repeat: no-repeat; background-position: 0 100%; background-size: ' + (on ? '100%' : '0%') + ' 2px; transition: background-size 700ms cubic-bezier(0.16,1,0.3,1) ' + (on ? 500 + idx * 140 : 0) + 'ms; padding-bottom: 2px;'
+      : '';
+    let ki = 0;
+    const cs = {
+      name: c.name, price: c.price, headline: c.headline,
+      hasAdd: !!c.addKept, addKept: c.addKept || '', addRest: c.addRest || '',
+      headStyle: shown ? this.fade(true, 0, 600) : this.fade(false, 0, 260),
+      closed: !s.crev, open: s.crev,
+      hintShow: s.crev ? 'display: none' : 'display: inline', hideShow: s.crev ? 'display: inline' : 'display: none',
+      memo: c.memo.map((seg) => ({ t: seg.t, style: underline(seg.k, seg.k ? ki++ : 0) })),
+      addStyle: underline(true, c.memo.filter((x) => x.k).length),
+      labelStyle: on ? this.fade(true, 900, 600) : this.fade(false, 0, 260),
+      hStyle: serifH + (on ? this.fade(true, 1100) : this.fade(false, 0, 260)),
+      paras: c.paras.map((text, i) => ({ text, style: body + (on ? this.fade(true, 1300 + i * 220) : this.fade(false, 0, 260)) }))
+    };
+    const tabs = cases.map((x, i) => ({
+      name: x.name,
+      pressed: i === s.ci ? 'true' : 'false',
+      style: i === s.ci ? 'color: #283618; border-bottom-color: #283618;' : '',
+      pick: () => this.pickCase(i)
+    }));
+    const imgBase = 'width: 100%; height: auto; aspect-ratio: 3 / 4; object-fit: cover; display: block; ';
+    const photos = cases.map((x, i) => {
+      const active = i === s.ci;
+      const colored = active && on;
+      return {
+        src: x.src, alt: x.alt, cut: x.cut || '', hasCut: !!x.cut,
+        wrapStyle: 'opacity: ' + (active ? 1 : 0) + '; transition: opacity 500ms cubic-bezier(0.16,1,0.3,1);',
+        style: imgBase + 'filter: grayscale(' + (x.cut || !colored ? 1 : 0) + '); transition: filter 1400ms cubic-bezier(0.16,1,0.3,1) 150ms;',
+        cutStyle: 'opacity: ' + (colored ? 1 : 0) + '; transition: opacity ' + (colored ? '1400ms cubic-bezier(0.16,1,0.3,1) 150ms' : '1200ms ease-in-out 0ms') + ';'
+      };
     });
-    resultBody.hidden = false;
-  }
 
-  // 되묻기와 안내는 체험 횟수에 넣지 않는다. 레피가 스토리를 입히지
-  // 않은 것이라, 여기서 잠그면 한 번뿐인 체험이 질문 하나로 끝난다.
-  function showQuestions(questions) {
-    resultLabel.textContent = "레피가 묻는 말";
-
-    questions.forEach(function (question) {
-      const li = document.createElement("li");
-      li.textContent = question;
-      resultQuestions.appendChild(li);
+    const problems = [
+      { n: '01', t: '쓰다 보면 설명서가 돼요', d: '상품명, 가격, 크기. 사실만 적다 보면 흔한 물건처럼 보여요.' },
+      { n: '02', t: '좋은 이유는 말로 꺼내기 어려워요', d: '왜 좋은지는 아는데, 막상 글로 옮기면 뻔한 말이 돼요.' },
+      { n: '03', t: 'AI에 맡기면 광고가 돼요', d: '‘특별한 순간’, ‘작은 행복’. 내 가게 말투가 아닌 문장이 돌아와요.' },
+      { n: '04', t: '없는 이야기가 끼어들어요', d: '하지 않은 약속, 없는 효능까지. 다시 읽고 지우는 몫이 남아요.' }
+    ];
+    const promises = [
+      { t: '없는 이야기는 보태지 않아요', d: '메모에 없는 장면, 효능, 손님 반응은 쓰지 않아요. 재료가 모자라면 글 대신 질문을 드려요.' },
+      { t: '틀리면 안 되는 건 그대로', d: '가격, 날짜, 메뉴명, 조건처럼 틀리면 안 되는 정보는 적어주신 그대로 지켜요.' },
+      { t: '사장님 말은 살려요', d: '‘못생긴’, ‘촤르르’처럼 그 상품에만 있는 말은 광고 문구로 바꾸지 않아요.' },
+      { t: '마지막은 사장님이 정해요', d: '올리기 전에 한 번 읽어봐 주세요. 레피는 결정을 대신하지 않아요.' }
+    ];
+    const faqData = [
+      ['레피는 ChatGPT나 Gemini와 무엇이 다른가요?', 'ChatGPT나 Gemini도 글을 써줘요. 다만 매번 무엇을 어떻게 써달라고 설명하고, 결과를 복사해 붙여 넣고, 없는 내용이 섞이진 않았는지 다시 확인해야 해요. 레피는 메모를 넣으면 메모 속 이야기만으로 정리하고, 쓰던 자리에 바로 넣을 수 있게 만들고 있어요.'],
+      ['레피가 글을 대신 새로 써주나요?', '문장은 새로 써요. 다만 내용은 사장님 메모에 있는 것만 써요. 메모에 없는 경험이나 효과를 지어내지 않고, 재료가 부족하면 먼저 물어봐요.'],
+      ['어떤 업종에 적합한가요?', '공방, 핸드메이드, 디저트·카페, 온라인 셀러, 네일숍, 꽃집처럼 SNS가 곧 손님을 만나는 창구인 작은 가게에 특히 잘 맞아요.'],
+      ['무료인가요? 나중에 유료로 바뀌나요?', '지금은 홈페이지에서 무료로 체험할 수 있어요. 요금이 생긴다면 미리 알려드릴게요.'],
+      ['레피를 쓰면 매출이 늘어나나요?', '늘어난다고 약속드릴 수는 없어요. 레피가 하는 일은 상품을 고른 이유를 글로 꺼내는 부담을 덜어드리는 것까지예요.'],
+      ['AI가 잘못된 정보를 만들지는 않나요?', '메모에 없는 내용은 쓰지 않도록 만들고 있어요. 그래도 올리기 전에 가격, 날짜 같은 사실은 꼭 한 번 직접 확인해주세요.'],
+      ['내가 쓴 글이나 데이터는 어떻게 처리되나요?', '베타 기간에는 동의해주신 범위 안에서 원문, 결과, 고치신 내용을 서비스 개선에 활용할 수 있어요. 무엇을 어떻게 다루는지는 베타 참여에 동의하실 때 안내드릴게요.']
+    ];
+    const faqs = faqData.map(([q, a], i) => {
+      const open = s.faq === i;
+      return {
+        n: String(i + 1).padStart(2, '0'), q, a,
+        expanded: open ? 'true' : 'false',
+        iconStyle: 'font-size: 22px; font-weight: 300; line-height: 1; color: #606C38; width: 24px; text-align: center; flex: 0 0 auto; display: inline-block; transform: rotate(' + (open ? 45 : 0) + 'deg); transition: transform 500ms cubic-bezier(0.16,1,0.3,1);',
+        bodyStyle: 'display: grid; grid-template-rows: ' + (open ? '1fr' : '0fr') + '; opacity: ' + (open ? 1 : 0) + '; transition: grid-template-rows 600ms cubic-bezier(0.16,1,0.3,1), opacity 500ms ease;',
+        toggle: () => this.setState({ faq: this.state.faq === i ? -1 : i })
+      };
     });
-    resultQuestions.hidden = questions.length === 0;
 
-    resultHint.textContent =
-      "답을 메모에 덧붙여 다시 눌러 주세요. 이번 시도는 체험 횟수에 들어가지 않아요.";
-    resultHint.hidden = false;
+    return {
+      revealCase: () => { clearTimeout(this.caseT); if (!this.state.crev) this.setState({ crev: true }); },
+      hideCase: () => this.setState({ crev: false }),
+      hero, demo, cs, tabs, photos, problems, promises, faqs,
+      tryNoteStyle: 'margin: 0; font-size: 13px; line-height: 1.7; color: #606C38; ' + this.fade(s.tried, 0, 500),
+      tryIt: () => this.setState({ tried: true }),
+      reveal: () => { clearTimeout(this.heroT); if (!this.state.revealed) this.setState({ revealed: true }); },
+      hide: () => this.setState({ revealed: false }),
+      heroToggle: () => { clearTimeout(this.heroT); this.setState({ revealed: !this.state.revealed }); },
+      caseToggle: () => { clearTimeout(this.caseT); this.setState({ crev: !this.state.crev }); },
+      start: () => {
+        if (this.reduced()) { this.setState({ phase: 'result' }); return; }
+        this.run([['select', 50], ['menu', 950], ['w1', 900], ['w2', 1300], ['w3', 1300], ['result', 1300]]);
+      },
+      copy: () => {
+        const text = '흔들기만 해도 사냥 모드, 쥐꼬리 낚시대\n\n' + resParas.join('\n\n');
+        try { navigator.clipboard && navigator.clipboard.writeText(text); } catch (e) {}
+        this.setState({ copied: true });
+        this.later(() => this.setState({ copied: false }), 2000);
+      },
+      insert: () => this.setState({ phase: 'inserted' }),
+      reset: () => { this.timers.forEach((t) => clearTimeout(t)); this.timers = []; this.setState({ phase: 'idle', copied: false }); }
+    };
   }
 
-  function showNoStory() {
-    resultLabel.textContent = "레피의 안내";
-    resultHint.textContent =
-      "이 메모만으로는 이야기를 입히기 어려워요. 누가, 어떤 때 이 물건을 고르는지 한두 줄 더 적어 주세요.";
-    resultHint.hidden = false;
+  render() {
+    const { hero, demo, cs, tabs, photos, problems, promises, faqs, tryNoteStyle, tryIt, reveal, revealCase, heroToggle, caseToggle, start, copy, insert, reset } = this.renderVals();
+    return html`<div style="font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif; color: #283618; background: #FFFDE5; word-break: keep-all">
+
+<header class="wrap" style="padding-top: 22px; padding-bottom: 22px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px">
+<a href="#top" class="logo" aria-label="lepi 처음으로"><span class="lt" style="--c: #BC6C25; --d: 0ms">l</span><span class="lt" style="--c: #DDA15E; --d: 90ms">e</span><span class="lt" style="--c: #606C38; --d: 180ms">p</span><span class="lt" style="--c: #BC6C25; --d: 270ms">i</span><span class="seed"><svg class="sprout" viewBox="0 0 18 20" aria-hidden="true"><path class="stem" d="M9 20 V9" stroke="#6E8F2A" stroke-width="1.8" stroke-linecap="round" fill="none"></path><path class="leaf leaf-l" d="M9 10.5 C 4.5 10.5 1.5 8 1 4 C 5 4 8.5 6 9 10.5 Z" fill="#9BC53D"></path><path class="leaf leaf-r" d="M9 8.5 C 12.5 8.5 16.5 6 17 1.5 C 12.5 1.5 9.5 4 9 8.5 Z" fill="#8DB33A"></path></svg></span></a>
+<nav style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 20px">
+<a class="navlink" href="#how">사용 방법</a>
+<a class="navlink" href="#cases">사례</a>
+<a class="navlink" href="#faq">FAQ</a>
+<a class="btn btn-line" href="#try" style="min-height: 44px; font-size: 13px; padding: 0 18px">무료로 체험하기</a>
+</nav>
+</header>
+
+<section id="top" class="wrap" style="padding-top: 64px; padding-bottom: 112px; display: flex; flex-wrap: wrap; gap: 56px; align-items: center; border-top: 1px solid #E0DEC4">
+<div style="flex: 1 1 520px; min-width: 0">
+<a href="#try" class="rise" style="display: inline-block; font-size: 12px; letter-spacing: 0.08em; text-decoration: none; border: 1px solid #93987C; border-radius: 999px; padding: 7px 14px; animation-delay: 100ms">무료 체험 운영 중</a>
+<h1 class="rise" style="font-family: 'Noto Serif KR', serif; font-weight: 300; font-size: clamp(32px, 4.6vw, 60px); line-height: 1.28; letter-spacing: -0.015em; margin: 28px 0 0; animation-delay: 250ms"><span style="white-space: nowrap">물건은 흔해도,</span><br /><span style="white-space: nowrap">고른 이유는 저마다.</span></h1>
+<p class="rise" style="font-family: 'Noto Serif KR', serif; font-weight: 300; font-size: clamp(21px, 2.1vw, 27px); line-height: 1.6; letter-spacing: -0.01em; margin: 24px 0 0; animation-delay: 380ms">그 이유를 담아,<br />레피가 상품에 <span class="draw">이야기를</span> 입혀드려요.</p>
+<p class="rise" style="font-size: 16px; line-height: 1.85; color: #606C38; margin: 28px 0 0; animation-delay: 500ms">없는 이야기는 만들지 않아요.<br />내용은 사장님 메모에서, 표현은 더 선명하게.</p>
+<div class="rise" style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 36px; animation-delay: 620ms">
+<a class="btn btn-solid" href="#try">내 메모로 체험하기</a>
+<a class="btn btn-line" href="#how">어떻게 쓰나요</a>
+</div>
+</div>
+
+<div style="flex: 1 1 440px; min-width: 0" onMouseEnter=${reveal}>
+<div style="display: flex; flex-direction: column; background: #FFFFFF; border: 1px solid #E0DEC4; border-radius: 4px; overflow: hidden">
+<div class="stack">
+<img src="images/lepi/hat.jpg" alt="밀짚모자를 쓴 두 사람이 강과 산이 보이는 전망대에서 웃는 셀카" class="bw" style="width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; display: block" />
+<img src="images/lepi/hat-ov.webp" alt="" aria-hidden="true" class="ov" style="width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; display: block; ${hero.cutStyle}" />
+</div>
+<div style="padding: 28px 32px 16px; display: flex; flex-direction: column; gap: 20px; box-sizing: border-box">
+<div class="label">밀짚모자 · 철원 주상절리 상품권으로 구매</div>
+<div class="stack">
+<div style=${hero.memoStyle}>
+<div class="label" style="margin-bottom: 12px">사장님 메모</div>
+<p style="margin: 0; font-size: 16px; line-height: 1.85; background: #F7F0D2; padding: 18px 20px">못생긴 밀짚모자인데 철원 주상절리입장료내면 한사람당 5천원 상품권주는데 그걸 이용하면 주변상점에서 살수 있거든 너무 햇볕이 뜨거워서 어쩔수 없이 샀는데 국내 여행갈때마다 필요할때 들고갔더니 추억템이 됐어</p>
+</div>
+<div style=${hero.resultWrap}>
+<div class="label" style="margin-bottom: 12px; color: #283618; display: flex; align-items: center; gap: 8px"><span style="width: 6px; height: 6px; border-radius: 50%; background: #BC6C25; display: inline-block"></span>레피가 정리한 글</div>
+<p style=${hero.h}>예쁘진 않아도,<br />여행마다 따라다니면 추억이 되는 모자.</p>
+${(hero.paras).map((p) => html`
+<p style=${p.style}>${p.text}</p>
+`)}
+</div>
+</div>
+<div style="border-top: 1px solid #E0DEC4; padding-top: 4px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap">
+<button type="button" class="textbtn" onClick=${heroToggle}><span style=${hero.hintShow}><span class="hint-mouse">마우스를 올리면 레피가 정리해요</span><span class="hint-touch">눌러보면 레피가 정리해요</span></span><span style=${hero.hideShow}>메모 다시 보기</span></button>
+<a class="textbtn" href="#cases" style="color: #606C38">사례 더 보기</a>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section class="sec" style="background: #FFFDE5">
+<div class="wrap">
+<p class="sl"><span class="sl-line"></span>문제</p>
+<h2 class="sh">설명은 했는데,<br />왜 사야 하는지가 없어요.</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0 40px; margin-top: 64px">
+${(problems).map((it) => html`
+<div style="border-top: 1px solid #E0DEC4; padding: 28px 0 36px">
+<div style="font-family: 'Noto Serif KR', serif; font-size: 22px; color: #BC6C25">${it.n}</div>
+<h3 style="font-size: 16px; font-weight: 500; margin: 16px 0 10px; line-height: 1.5">${it.t}</h3>
+<p style="font-size: 16px; line-height: 1.8; color: #606C38; margin: 0">${it.d}</p>
+</div>
+`)}
+</div>
+<p style="font-family: 'Noto Serif KR', serif; font-weight: 300; font-size: clamp(21px, 2.1vw, 27px); line-height: 1.6; margin: 48px 0 0">물건이 평범해서가 아니에요.<br />손님이 왜 이걸 골라야 하는지, 그 한 문장이 빠져 있을 뿐이에요.</p>
+</div>
+</section>
+
+<section id="how" class="sec" style="background: #F7F0D2">
+<div class="wrap">
+<p class="sl"><span class="sl-line"></span>사용 방법</p>
+<h2 class="sh">복사하고, 붙여 넣고, 다시 고치던 일.<br />이제 쓰던 자리에서 버튼 하나로.</h2>
+<p class="lead" style="margin-bottom: 48px">게시물 글쓰기 칸에 메모를 적고, 드래그한 뒤 오른쪽 클릭으로 레피를 부르세요. 정리된 글이 그 자리에 들어갑니다.</p>
+<div dangerouslySetInnerHTML=${PD}></div>
+</div>
+</section>
+
+<section id="cases" class="sec" style="background: #FFFDE5">
+<div class="wrap">
+<p class="sl"><span class="sl-line"></span>사례</p>
+<h2 class="sh">메모 몇 줄이,<br />올릴 수 있는 글이 됐어요.</h2>
+<p class="lead">메모에서 이야기를 찾고, 그중 가장 사장님다운 한마디를 앞에 세워요. <span style="text-decoration: underline; text-decoration-color: #BC6C25; text-decoration-thickness: 2px; text-underline-offset: 5px; color: #283618">밑줄</span>은 레피가 메모에서 찾아 글에 쓴 재료예요.</p>
+<div role="group" aria-label="사례 고르기" style="display: flex; flex-wrap: wrap; gap: 8px 32px; margin: 48px 0 32px; border-bottom: 1px solid #E0DEC4">
+${(tabs).map((t) => html`
+<button type="button" class="tab" aria-pressed=${t.pressed} onClick=${t.pick} style=${t.style}>${t.name}</button>
+`)}
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 48px; align-items: flex-start" onMouseEnter=${revealCase}>
+<div class="stack" style="flex: 1 1 320px; min-width: 0; max-width: 460px; border-radius: 4px; overflow: hidden; background: #F7F0D2">
+${(photos).map((ph) => html`
+<div class="stack ov" style=${ph.wrapStyle}>
+<img src=${ph.src} alt=${ph.alt} class="bw" style="width: 100%; height: auto; aspect-ratio: 3 / 4; object-fit: cover; display: block" />
+${(ph.hasCut) ? html`
+<img src=${ph.cut} alt="" aria-hidden="true" class="ov" style="width: 100%; height: auto; aspect-ratio: 3 / 4; object-fit: cover; display: block; ${ph.cutStyle}" />
+` : null}
+</div>
+`)}
+</div>
+<div style="flex: 1 1 440px; min-width: 0">
+<div style=${cs.headStyle}>
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px">
+<span style="font-size: 16px; font-weight: 500">${cs.name}</span>
+<span style="font-size: 13px; color: #606C38">${cs.price}</span>
+</div>
+<div class="label" style="margin: 28px 0 12px">사장님 메모</div>
+<p style="margin: 0; font-size: 16px; line-height: 1.85; background: #F7F0D2; padding: 18px 20px">${(cs.memo).map((seg) => html`<span style=${seg.style}>${seg.t}</span>`)}</p>
+${(cs.hasAdd) ? html`
+<div class="label" style="margin: 16px 0 12px">결과를 보고 덧붙인 말</div>
+<p style="margin: 0; font-size: 16px; line-height: 1.85; background: #F7F0D2; padding: 18px 20px"><span style=${cs.addStyle}>${cs.addKept}</span>${cs.addRest}</p>
+` : null}
+</div>
+<div style="border-top: 1px solid #E0DEC4; margin-top: 20px; padding-top: 4px; display: flex">
+<span style="font-size: 13px; color: #606C38; padding: 12px 0; display: inline-block" onClick=${revealCase}><span class="hint-mouse">마우스를 올리면 레피가 정리해요</span><span class="hint-touch">눌러보면 레피가 정리해요</span></span>
+</div>
+<div style="border-left: 1px solid #283618; padding-left: 24px; margin-top: 28px">
+<div class="label" style="color: #283618; margin-bottom: 12px; ${cs.labelStyle}">레피가 정리한 글</div>
+<p style=${cs.hStyle}>${cs.headline}</p>
+${(cs.paras).map((p) => html`
+<p style=${p.style}>${p.text}</p>
+`)}
+</div>
+</div>
+</div>
+<p style="font-size: 13px; line-height: 1.7; color: #606C38; margin: 48px 0 0">위 글은 실제 구매 경험을 바탕으로, 판매하는 입장이 되어 정리한 시연 예시예요. 제조사나 판매처의 공식 문구가 아니에요.</p>
+</div>
+</section>
+
+<section id="try" class="sec" style="background: #F7F0D2">
+<div class="wrap" style="display: flex; flex-wrap: wrap; gap: 48px">
+<div style="flex: 1 1 360px; min-width: 0">
+<p class="sl"><span class="sl-line"></span>직접 체험</p>
+<h2 class="sh">내 메모로<br />직접 해보세요.</h2>
+<p class="lead">상품 메모를 적어주세요. 그 안의 이야기를 찾아 상품 글로 정리해드려요. 메모에 있는 이야기로만 쓰니까, 이 상품을 고른 이유나 있었던 일을 한두 줄 꼭 넣어주세요.</p>
+</div>
+<div style="flex: 1 1 520px; min-width: 0; background: #FFFFFF; border: 1px solid #E0DEC4; border-radius: 4px; padding: 28px; box-sizing: border-box; display: flex; flex-direction: column; gap: 16px">
+<div class="field">
+<label for="memo">상품 메모</label>
+<textarea id="memo" rows="6" placeholder="예: 못생긴 밀짚모자인데, 햇볕이 너무 뜨거워서 어쩔 수 없이 샀어요. 그 뒤로 여행 갈 때마다 들고 다녔더니 추억템이 됐어요." style="resize: vertical; line-height: 1.8"></textarea>
+</div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+<span style="font-size: 13px; color: #606C38">횟수 제한 없이 써볼 수 있어요.</span>
+<button type="button" class="btn btn-solid" onClick=${tryIt}>이야기 입히기</button>
+</div>
+<p style=${tryNoteStyle}>레피 엔진을 새로 다듬고 있어요. 곧 이 자리에서 정리된 글을 바로 받아 보실 수 있어요.</p>
+</div>
+</div>
+</section>
+
+<section class="sec" style="background: #FFFDE5">
+<div class="wrap">
+<p class="sl"><span class="sl-line"></span>레피의 약속</p>
+<h2 class="sh">내용은 사장님 것으로,<br />표현은 더 선명하게.</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0 40px; margin-top: 64px">
+${(promises).map((it) => html`
+<div style="border-top: 1px solid #E0DEC4; padding: 28px 0 36px">
+<h3 style="font-family: 'Noto Serif KR', serif; font-weight: 400; font-size: 22px; margin: 0 0 14px; line-height: 1.45">${it.t}</h3>
+<p style="font-size: 16px; line-height: 1.8; color: #606C38; margin: 0">${it.d}</p>
+</div>
+`)}
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px">
+<span style="font-size: 13px; color: #606C38; border: 1px solid #CFCCB0; border-radius: 999px; padding: 8px 16px">곧 만나요 · 말로 남기면 글로 정리</span>
+<span style="font-size: 13px; color: #606C38; border: 1px solid #CFCCB0; border-radius: 999px; padding: 8px 16px">곧 만나요 · 쓸수록 쌓이는 우리 가게 말투</span>
+</div>
+</div>
+</section>
+
+<section id="faq" class="sec" style="background: #FFFDE5">
+<div class="wrap" style="display: flex; flex-wrap: wrap; gap: 48px">
+<div style="flex: 1 1 300px; min-width: 0">
+<p class="sl"><span class="sl-line"></span>FAQ</p>
+<h2 class="sh">혹시, 이런 게<br />궁금하셨나요?</h2>
+</div>
+<div style="flex: 999 1 560px; min-width: 0; border-top: 1px solid #E0DEC4">
+${(faqs).map((f) => html`
+<div style="border-bottom: 1px solid #E0DEC4">
+<button type="button" class="faq-q" aria-expanded=${f.expanded} onClick=${f.toggle}>
+<span style="font-family: 'Noto Serif KR', serif; font-size: 16px; color: #BC6C25; width: 28px; flex: 0 0 auto">${f.n}</span>
+<span style="font-size: 16px; font-weight: 500; line-height: 1.6; flex: 1">${f.q}</span>
+<span aria-hidden="true" style=${f.iconStyle}>+</span>
+</button>
+<div style=${f.bodyStyle}>
+<div style="overflow: hidden">
+<p style="margin: 0; padding: 0 44px 28px 48px; font-size: 16px; line-height: 1.85; color: #606C38">${f.a}</p>
+</div>
+</div>
+</div>
+`)}
+</div>
+</div>
+</section>
+
+<section id="join" class="sec" style="background: #283618; color: #FFFDE5; border-top: 0">
+<div class="wrap" style="display: flex; flex-wrap: wrap; gap: 56px">
+<div style="flex: 1 1 380px; min-width: 0">
+<p class="sl" style="color: #FFFDE5"><span class="sl-line" style="background: #FFFDE5"></span>베타 신청</p>
+<h2 class="sh" style="color: #FFFDE5">설명만 적어둔 상품,<br />레피에게 먼저 보여주세요.</h2>
+<p class="lead" style="color: #E0DEC4">상품 하나, 메모 몇 줄이면 충분해요. 정식으로 열리면 가장 먼저 알려드릴게요.</p>
+</div>
+<div style="flex: 1 1 480px; min-width: 0; background: #FFFDE5; color: #283618; border-radius: 4px; padding: 32px; box-sizing: border-box; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px 20px">
+<div class="field"><label for="nm">이름 또는 닉네임</label><input id="nm" type="text" /></div>
+<div class="field"><label for="biz">업종</label><select id="biz"><option value="">업종을 선택해주세요</option><option value="cafe">카페·디저트</option><option value="craft">공방·핸드메이드</option><option value="nail">네일샵·미용실</option><option value="flower">꽃집</option><option value="online">온라인 셀러</option><option value="etc">기타 소규모 업장</option></select></div>
+<div class="field" style="grid-column: 1 / -1"><label for="em">연락 가능한 이메일</label><input id="em" type="email" /></div>
+<label style="grid-column: 1 / -1; display: flex; gap: 10px; align-items: flex-start; font-size: 13px; line-height: 1.7; color: #606C38"><input id="agree" type="checkbox" style="width: 18px; height: 18px; margin: 3px 0 0; accent-color: #283618" />베타 참여에 동의합니다. 입력한 내용은 서비스 개선과 사용성 검증에 활용될 수 있어요.</label>
+<button type="button" id="betaBtn" class="btn btn-solid" style="grid-column: 1 / -1">베타 신청하기</button>
+<p id="betaMsg" role="status" style="grid-column: 1 / -1; margin: 0; font-size: 13px; line-height: 1.7; color: #606C38; min-height: 1.7em"></p>
+</div>
+</div>
+</section>
+
+<footer class="wrap" style="padding-top: 48px; padding-bottom: 56px; display: flex; flex-wrap: wrap; gap: 16px 48px; justify-content: space-between">
+<div style="font-family: 'Noto Serif KR', serif; font-size: 22px">lepi<span style="color: #BC6C25">.</span></div>
+<p style="flex: 1 1 480px; max-width: 640px; margin: 0; font-size: 13px; line-height: 1.8; color: #606C38">레피는 사장님이 적은 메모를 바탕으로 상품 글을 정리하는 서비스예요. 가격·일정·조건 같은 사실 정보와 최종 게시 여부는 사장님이 직접 확인해주세요.</p>
+</footer>
+</div>`;
   }
-
-  if (
-    refineButton &&
-    originalText &&
-    resultArea &&
-    resultHeadline &&
-    errorMessage
-  ) {
-    refineButton.addEventListener("click", async function () {
-      const text = originalText.value.trim();
-
-      resultArea.hidden = true;
-      clearResult();
-      errorMessage.hidden = true;
-      errorMessage.textContent = "";
-
-      if (!text) {
-        errorMessage.textContent = "상품 메모를 먼저 입력해 주세요.";
-        errorMessage.hidden = false;
-        originalText.focus();
-        return;
-      }
-
-      refineButton.disabled = true;
-      refineLabel.textContent = "이야기를 입히는 중…";
-
-      const controller = new AbortController();
-      let succeeded = false;
-
-      // 분석과 작성, 모델 호출이 두 번이라 한 번일 때보다 오래 걸린다.
-      const timeout = setTimeout(() => {
-       controller.abort();
-      }, 60000); // 60초
-
-      try {
-        const response = await fetch("/api", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(
-            TEST_MODE ? { text: text, mode: "demo" } : { text: text }
-          ),
-          signal: controller.signal
-        });
-
-        const data = await response.json();
-
-
-        if (!response.ok) {
-          throw new Error(
-            data.error || "이야기를 입히지 못했습니다. 잠시 후 다시 시도해 주세요."
-          );
-        }
-
-        if (data.status === "READY") {
-          showStory(data);
-          succeeded = true;
-        } else if (data.status === "NEED_MORE_INFO") {
-          showQuestions(data.questions || []);
-        } else {
-          showNoStory();
-        }
-
-        resultArea.hidden = false;
-
-      } catch (error) {
-        console.error("스토리 변환 오류:", error);
-        errorMessage.textContent =
-          error.name === "AbortError"
-            ? "응답이 늦어지고 있어요. 잠시 후 다시 시도해 주세요."
-            : error.message || "서버에 연결하지 못했습니다. 인터넷 연결을 확인해 주세요.";
-
-        errorMessage.hidden = false;
-
-      } finally {
-        clearTimeout(timeout);
-
-        if (succeeded) {
-          lockAfterTrial();
-        } else {
-          // 스토리를 받지 못한 경우에만 다시 시도할 여지를 남긴다.
-          startCooldown();
-        }
-      }
-    });
-  }
+}
+render(html`<${Page} />`, document.getElementById('app'));
+initPD();
+initBeta();
+})();
 </script>
-
 </body>
 </html>
