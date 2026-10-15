@@ -16,7 +16,7 @@ const state = {
   cfg: null, fb: null, user: null,
   runId: null, metric: null, unit: "m/s", summary: null,
   filter: "", offset: 0, total: 0, editing: null,
-  convId: null, busy: false,
+  convId: null, busy: false, convRequest: 0,
 };
 
 class ApiError extends Error {
@@ -425,26 +425,33 @@ function renderThread(messages) {
   t.scrollTop = t.scrollHeight;
 }
 
+// Ignore responses from earlier selections when conversations are opened rapidly.
 async function openConversation(id) {
+  const request = ++state.convRequest;
   try {
     const c = await api(`/api/conversations/${encodeURIComponent(id)}`);
+    if (request !== state.convRequest) return;
     state.convId = c.id;
     renderThread(c.messages);
     await loadConversations();
   } catch (e) {
+    if (request !== state.convRequest) return;
     toast(errorText(e));
     if (e.status === 404) { state.convId = null; await loadConversations(); }
   }
 }
 
 async function newConversation() {
+  const request = ++state.convRequest;
   try {
     const c = await api("/api/conversations", { method: "POST", body: { run_id: state.runId, metric: state.metric } });
+    if (request !== state.convRequest) return;
     state.convId = c.id;
     renderThread([]);
     await loadConversations();
     $("#question").focus();
   } catch (e) {
+    if (request !== state.convRequest) return;
     toast(errorText(e));
   }
 }

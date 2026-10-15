@@ -91,7 +91,7 @@ h4 { font-size: .95rem; margin-bottom: 10px; }
   padding: 16px 20px 32px; max-width: 1480px; margin: 0 auto; align-items: start;
 }
 .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; min-width: 0; }
-.assistant { position: sticky; top: 72px; display: flex; flex-direction: column; max-height: calc(100vh - 92px); }
+.panel.assistant { position: sticky; top: 72px; display: flex; flex-direction: column; max-height: calc(100vh - 92px); }
 .section-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
 .section-head.sub { margin: 22px 0 10px; align-items: center; flex-wrap: wrap; }
 .meta { margin: 3px 0 0; font-size: .8rem; color: var(--ink-2); word-break: break-all; }
@@ -190,7 +190,7 @@ select { width: auto; }
 .conv-list .del:hover { color: var(--err-ink); }
 
 .thread { flex: 1; min-height: 240px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 2px; }
-.msg { border-radius: 12px; padding: 10px 12px; font-size: .9rem; max-width: 100%; }
+.msg { flex: 0 0 auto; overflow-wrap: anywhere; border-radius: 12px; padding: 10px 12px; font-size: .9rem; max-width: 100%; }
 .msg.user { align-self: flex-end; background: var(--surface-2); border: 1px solid var(--line); max-width: 88%; white-space: pre-wrap; }
 .msg.assistant { border: 1px solid color-mix(in srgb, var(--ai) 35%, var(--line)); }
 .msg-head { display: flex; gap: 6px; align-items: center; margin-bottom: 6px; font-size: .74rem; color: var(--ink-2); flex-wrap: wrap; }
@@ -225,7 +225,7 @@ select { width: auto; }
 /* 반응형 */
 @media (max-width: 1080px) {
   .layout { grid-template-columns: minmax(0, 1fr); }
-  .assistant { position: static; max-height: none; }
+  .panel.assistant { position: static; max-height: none; }
   .tabs {
     display: flex; gap: 4px; padding: 8px 16px 0; position: sticky; top: 57px; z-index: 4; background: var(--bg);
   }
